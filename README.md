@@ -23,6 +23,25 @@ The active content should help an agent start with real project context, preserv
   - grouped by use case, such as development workflows, automation, agent systems, and project-specific prompts
   - each file should have a clear task boundary, scenario, prompt text, and usage constraints
 
+## Sync Local Skills
+
+Install or upgrade all repository skills into the local Codex skills directory:
+
+```bash
+python3 scripts/sync-skills.py
+python3 scripts/sync-skills.py --apply
+```
+
+The first command previews the sync. The second writes to `${CODEX_HOME:-~/.codex}/skills`, updates every discovered `skills/*/SKILL.md` package, and removes obsolete legacy skill directories.
+
+Useful targeted checks:
+
+```bash
+python3 scripts/sync-skills.py --skill code-planner --apply
+python3 scripts/sync-skills.py --validate-only
+python3 scripts/sync-skills.py --target /private/tmp/aicraft-skills-test --apply
+```
+
 ## Principles
 
 - keep active root content reusable
