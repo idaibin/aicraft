@@ -2,7 +2,7 @@
 
 ## Summary
 
-Turn codebase work into executable, verifiable task packages. Use subagents by default only when tools are available, scopes are independent, ownership is clear, and the main thread can audit outputs.
+Turn future codebase work into executable, verifiable task packages before implementation. Use subagents by default only when tools are available, scopes are independent, ownership is clear, and the main thread can audit outputs.
 
 ## Best For
 
@@ -21,9 +21,9 @@ Use for prompts like:
 - `哪些可以并行处理`
 - `分多个子代理处理`
 - `禁止子代理，主线程逐个完成`
-- `标记 contract-impact，提交前审查`
+- `标记 contract-impact，后续交给 code-review 审查`
 
-Do not use for first-pass repo onboarding or dirty-tree commit review; prefer `code-context` or `code-review` for those.
+Do not use for first-pass repo onboarding, existing dirty-tree review, or commit grouping; prefer `code-context` or `code-review` for those.
 
 ## Output
 
