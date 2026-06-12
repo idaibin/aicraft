@@ -7,6 +7,7 @@ Install only these skill package directories:
 - `skills/code-context`
 - `skills/code-planner`
 - `skills/code-review`
+- `skills/code-security`
 
 Do not install the repository root, `prompts/`, `skills/skill-standard.md`, or legacy skill names such as `repo-context`, `commit-reviewer`, or `planner`.
 
@@ -19,7 +20,8 @@ python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-githu
   --repo idaibin/aicraft \
   --path skills/code-context \
   --path skills/code-planner \
-  --path skills/code-review
+  --path skills/code-review \
+  --path skills/code-security
 ```
 
 Run the same command to upgrade the installed packages from GitHub. After installing or upgrading skills, restart Codex so the new descriptions and metadata are loaded.

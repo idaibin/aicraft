@@ -15,6 +15,7 @@ Use these cases when changing `code-planner` triggers, task contracts, owner mod
 | User prompt | Expected result | Why |
 | --- | --- | --- |
 | `审查所有本地改动并拆分 commit。` | Should prefer `code-review`. | Dirty-tree review. |
+| `提交前判断当前改动能不能提交。` | Should prefer `code-review`. | Existing local changes are review scope. |
 | `先了解这个仓库真实命令和目录结构。` | Should prefer `code-context`. | Repository grounding. |
 | `直接修这个按钮样式。` | Should not require `code-planner` unless planning is requested. | Simple implementation. |
 

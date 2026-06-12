@@ -7,8 +7,8 @@ Use this file when applying Upgrade mode. These sources are candidates for updat
 - Repository: `https://github.com/idaibin/aicraft`
 - Git remote: `https://github.com/idaibin/aicraft.git`
 - Default branch: `main`
-- Last verified branch HEAD: `Not verified`
-- Last verified date: `2026-06-05`
+- Last verified branch HEAD: `Resolved during upgrade workflow`
+- Last verified date: `Resolved during upgrade workflow`
 
 `main` is a moving target. Resolve and report the current commit SHA before comparing or applying any update.
 

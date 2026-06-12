@@ -2,7 +2,7 @@
 
 ## Summary
 
-Review local git changes before commit. It protects unrelated edits, checks contract chains, handles mixed hunks safely, and turns a dirty tree into scoped commit groups.
+Review existing local git changes before commit. It protects unrelated edits, checks contract chains, handles mixed hunks safely, and turns a dirty tree into scoped commit groups.
 
 ## Best For
 
@@ -23,7 +23,7 @@ Use for prompts like:
 - `接口链路审查一下`
 - `帮我生成 commit message，但先确认文件范围`
 
-Do not use for repo onboarding or forward implementation planning; prefer `code-context` or `code-planner` for those.
+Do not use for repo onboarding or future implementation planning before code exists; prefer `code-context` or `code-planner` for those.
 
 ## Output
 

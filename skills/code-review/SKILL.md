@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Use when reviewing local git changes before commit, classifying dirty-tree ownership, checking changed code/docs/API contract chains, splitting semantic commit groups, drafting exact path-limited staging commands and Conventional Commit messages, or upgrading this skill. Triggers include 提交前审查, 审查所有改动, 接口链路审查, 分类提交, 拆分 commit, 只提交本次修改, 生成 commit message, and code-review 升级.
+description: Use when reviewing existing local git changes before commit, classifying dirty-tree ownership, checking changed code/docs/API contract chains, splitting semantic commit groups, drafting exact path-limited staging commands and Conventional Commit messages, or upgrading this skill. Triggers include 提交前审查, 审查所有改动, 接口链路审查, 分类提交, 拆分 commit, 只提交本次修改, 生成 commit message, and code-review 升级.
 ---
 
 # Code Review

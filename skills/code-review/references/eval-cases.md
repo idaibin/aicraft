@@ -16,6 +16,7 @@ Use these cases when changing `code-review` triggers, ownership labels, staging 
 | --- | --- | --- |
 | `先了解这个仓库真实命令和目录结构。` | Should prefer `code-context`. | Repository grounding. |
 | `把这个需求拆成可执行任务。` | Should prefer `code-planner`. | Forward planning. |
+| `这个功能还没写，先拆成实现计划。` | Should prefer `code-planner`. | Future implementation planning. |
 | `直接实现这个功能，不需要审查。` | Should not require `code-review`. | Implementation task. |
 
 ## Quality Eval
