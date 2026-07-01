@@ -25,14 +25,14 @@ Do not pull from repository-level `prompts/` during skill upgrade. Prompt-derive
 After edits, run:
 
 ```bash
-python3 scripts/sync-skills.py --validate-only
+python3 scripts/validate-skills.py
 git diff --check -- skills/code-security
 ```
 
-After local install or upgrade in the AICraft source repository, run:
+After publishing to GitHub, run:
 
 ```bash
-python3 scripts/sync-skills.py --validate-only --check-target
+npx skills add https://github.com/rustzen/aicraft --list
 ```
 
 ## Output

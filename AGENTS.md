@@ -5,7 +5,7 @@ This file defines how AI agents should work on this repository. It is not the pr
 ## Task Routing
 
 - For repository development, documentation edits, prompt edits, skill package edits, reviews, or commits, follow the repository work rules below.
-- Only when the user explicitly asks to install skills from `https://github.com/idaibin/aicraft`, read `INSTALL.md` and follow that installation flow.
+- Only when the user explicitly asks to install skills from `https://github.com/rustzen/aicraft`, read `INSTALL.md` and follow that installation flow.
 - Do not switch into installation mode just because this repository contains `skills/`.
 
 ## Repository Work Rules
@@ -20,6 +20,6 @@ This file defines how AI agents should work on this repository. It is not the pr
 
 - `skills/` contains publishable or reusable skill packages.
 - `prompts/` contains reusable prompt assets.
-- `scripts/sync-skills.py` syncs local skill packages into a local Codex skills directory.
+- `scripts/validate-skills.py` validates source skill packages for repository development.
 
-When editing or adding skill packages under `skills/`, also read `skills/AGENT.md` and `skills/skill-standard.md`.
+When editing or adding skill packages under `skills/`, also read `skills/AGENTS.md` and `docs/skills/skill-standard.md`.

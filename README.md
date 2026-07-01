@@ -23,31 +23,42 @@ The active content should help an agent start with real project context, preserv
   - grouped by use case, such as development workflows, automation, agent systems, and project-specific prompts
   - each file should have a clear task boundary, scenario, prompt text, and usage constraints
 
+- `docs/`
+  - repository maintenance standards and contributor-facing references
+  - not part of the installable skill package set
+
 ## Install Skills From GitHub
 
-For AI-assisted or manual installation from GitHub, use [`INSTALL.md`](INSTALL.md). It lists the exact skill package paths and the direct Codex install command.
-
-## Sync Local Skills
-
-Install or upgrade all repository skills into the local Codex skills directory:
+Install or upgrade skills from GitHub with the standard `skills` npm CLI flow:
 
 ```bash
-python3 scripts/sync-skills.py --validate-only
-python3 scripts/sync-skills.py
-python3 scripts/sync-skills.py --apply
+npx skills add https://github.com/rustzen/aicraft
+npx skills update
 ```
 
-The validation command checks the source packages without requiring local installation. The dry run previews the sync. The apply command writes to `${CODEX_HOME:-~/.codex}/skills`, updates every discovered `skills/*/SKILL.md` package, validates the installed target, and removes obsolete legacy skill directories.
+To install only selected skills:
+
+```bash
+npx skills add https://github.com/rustzen/aicraft --skill ops-browser ops-client
+```
+
+For the full command list and available skill names, see [`INSTALL.md`](INSTALL.md).
+
+## Validate Local Skills
+
+For repository development, validate source skill packages before publishing changes:
+
+```bash
+python3 scripts/validate-skills.py
+```
 
 Useful targeted checks:
 
 ```bash
-python3 scripts/sync-skills.py --skill code-planner --apply
-python3 scripts/sync-skills.py --validate-only --check-target
-python3 scripts/sync-skills.py --target /private/tmp/aicraft-skills-test --apply
+python3 scripts/validate-skills.py --skill code-planner
 ```
 
-After installing or upgrading local skills, restart Codex so updated skill metadata and descriptions are loaded.
+End-user installation and updates should use `npx skills add` and `npx skills update`.
 
 ## Principles
 
@@ -55,6 +66,6 @@ After installing or upgrading local skills, restart Codex so updated skill metad
 - keep prompt and skill assets directly accessible
 - keep publishable skills self-contained; repo-local prompts can supplement them but should not be required
 - let prompts capture task language, and let skills capture stable execution workflows
-- keep skill trigger/eval cases in `references/eval-cases.md` and validate packages before publishing or syncing
+- keep skill trigger/eval cases in `references/eval-cases.md` and validate packages before publishing
 - retire time-sensitive or old workflow material from the active root
 - avoid mixing transient notes and historical references into the active root

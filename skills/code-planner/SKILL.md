@@ -44,7 +44,7 @@ Start with verified current state and dirty-tree risks. Then provide task packag
 
 ## Skill Maintenance
 
-When maintaining this package, update `references/eval-cases.md`, `references/usage.md`, and `agents/openai.yaml` with trigger, owner-model, task-contract, or output changes. In AICraft, run `python3 scripts/sync-skills.py --validate-only` before publishing and `python3 scripts/sync-skills.py --validate-only --check-target` after local install or upgrade.
+When maintaining this package, update `references/eval-cases.md`, `references/usage.md`, and `agents/openai.yaml` with trigger, owner-model, task-contract, or output changes. In AICraft, run `python3 scripts/validate-skills.py` before publishing and `npx skills add https://github.com/rustzen/aicraft --list` after publishing to GitHub.
 
 ## References
 

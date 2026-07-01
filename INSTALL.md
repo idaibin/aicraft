@@ -1,6 +1,6 @@
 # Install Skills
 
-This file is for AI agents or users who want to install Codex skills from this repository.
+This file is for AI agents or users who want to install or update skills from this repository.
 
 Install only these skill package directories:
 
@@ -8,33 +8,68 @@ Install only these skill package directories:
 - `skills/code-planner`
 - `skills/code-review`
 - `skills/code-security`
+- `skills/ops-browser`
+- `skills/ops-client`
 
-Do not install the repository root, `prompts/`, `skills/skill-standard.md`, or legacy skill names such as `repo-context`, `commit-reviewer`, or `planner`.
+Do not install the repository root, `prompts/`, `docs/`, or legacy skill names such as `repo-context`, `commit-reviewer`, or `planner`.
 
-## Direct GitHub Install
+## Recommended Install
 
-Use this when the user provides `https://github.com/idaibin/aicraft` and asks to install skills:
-
-```bash
-python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
-  --repo idaibin/aicraft \
-  --path skills/code-context \
-  --path skills/code-planner \
-  --path skills/code-review \
-  --path skills/code-security
-```
-
-Run the same command to upgrade the installed packages from GitHub. After installing or upgrading skills, restart Codex so the new descriptions and metadata are loaded.
-
-## Local Clone Sync
-
-Use this only when working from a local clone of this repository:
+Use the standard `skills` npm CLI flow:
 
 ```bash
-python3 scripts/sync-skills.py --validate-only
-python3 scripts/sync-skills.py
-python3 scripts/sync-skills.py --apply
-python3 scripts/sync-skills.py --validate-only --check-target
+npx skills add https://github.com/rustzen/aicraft
 ```
 
-The first command validates source packages without touching local installed skills. The dry run previews the sync. The apply command writes to `${CODEX_HOME:-~/.codex}/skills` and validates the installed target. The final command re-checks that the selected packages are installed and that legacy names are absent.
+List available skills without installing:
+
+```bash
+npx skills add https://github.com/rustzen/aicraft --list
+```
+
+Install selected skills:
+
+```bash
+npx skills add https://github.com/rustzen/aicraft \
+  --skill code-context code-planner code-review code-security ops-browser ops-client
+```
+
+For multiple selected skills, pass the names after `--skill` as shown above.
+
+Install only the operations skills:
+
+```bash
+npx skills add https://github.com/rustzen/aicraft --skill ops-browser ops-client
+```
+
+## Update
+
+Update installed skills:
+
+```bash
+npx skills update
+```
+
+Update only selected skills:
+
+```bash
+npx skills update ops-browser ops-client
+```
+
+For updates, selected skill names are positional arguments.
+
+After installing or upgrading skills, restart any long-running agent app so updated skill metadata and descriptions are loaded.
+
+## Reproducible Project Installs
+
+The `skills` CLI also exposes `skills-lock.json` restore support through `skills experimental_install`. Treat it as experimental for now; prefer the standard install flow for normal use.
+
+## Maintainer Validation
+
+Use this only when developing this repository:
+
+```bash
+python3 scripts/validate-skills.py
+```
+
+This validates source packages without installing them. End-user installation and updates should use `npx skills add` and `npx skills update`.

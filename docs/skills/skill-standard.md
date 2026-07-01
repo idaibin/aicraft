@@ -97,7 +97,7 @@ Default upgrade scope is the matching remote skill package: `skills/<skill-name>
 
 Before considering a skill package ready:
 
-- `python3 scripts/sync-skills.py --validate-only`
+- `python3 scripts/validate-skills.py`
 - `find skills/<skill-name> -maxdepth 3 -type f | sort`
 - `rg -n "^name:|^description: Use when" skills/<skill-name>/SKILL.md`
 - `rg -n "[ \t]+$" skills/<skill-name>`
@@ -108,9 +108,9 @@ Before considering a skill package ready:
 - self-contained check for required external prompt or doc dependencies
 - `agents/openai.yaml` check for stale display name, short description, or default prompt
 
-After local install or upgrade:
+After publishing to GitHub, confirm the repository is discoverable by the standard installer:
 
-- `python3 scripts/sync-skills.py --validate-only --check-target`
+- `npx skills add https://github.com/rustzen/aicraft --list`
 
 ## Review Rubric
 

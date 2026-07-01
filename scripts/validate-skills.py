@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-"""Validate and sync repository skill packages into the local Codex skills directory."""
+"""Validate repository skill packages."""
 
 from __future__ import annotations
 
 import argparse
-import os
 import re
-import shutil
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -15,7 +13,9 @@ from pathlib import Path
 LEGACY_SKILL_NAMES = ("repo-context", "commit-reviewer", "planner")
 SKILL_NAME_RE = re.compile(r"^[a-z0-9-]+$")
 LEGACY_RE = re.compile(
-    r"(?<![A-Za-z0-9-])(" + "|".join(re.escape(name) for name in LEGACY_SKILL_NAMES) + r")(?![A-Za-z0-9-])"
+    r"(?<![A-Za-z0-9_-])("
+    + "|".join(re.escape(name) for name in LEGACY_SKILL_NAMES)
+    + r")(?![A-Za-z0-9_-])"
 )
 MARKDOWN_LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 EVAL_CASES_FILE = "eval-cases.md"
@@ -37,50 +37,15 @@ def repo_root() -> Path:
     return Path(__file__).resolve().parents[1]
 
 
-def default_target() -> Path:
-    codex_home = os.environ.get("CODEX_HOME")
-    if codex_home:
-        return Path(codex_home).expanduser() / "skills"
-    return Path.home() / ".codex" / "skills"
-
-
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="Sync all repository skill packages into the local Codex skills directory."
-    )
-    parser.add_argument(
-        "--apply",
-        action="store_true",
-        help="perform the sync; without this flag the command only prints the planned changes",
-    )
-    parser.add_argument(
-        "--validate-only",
-        action="store_true",
-        help="validate selected source packages without copying or deleting",
-    )
-    parser.add_argument(
-        "--check-target",
-        action="store_true",
-        help="with --validate-only, also validate matching installed packages in the target directory",
-    )
+    parser = argparse.ArgumentParser(description="Validate repository skill packages.")
     parser.add_argument(
         "--skill",
         action="append",
         default=[],
-        help="sync only this skill name; may be provided multiple times",
+        help="validate only this skill name; may be provided multiple times",
     )
-    parser.add_argument(
-        "--target",
-        type=Path,
-        default=default_target(),
-        help="target skills directory; defaults to ${CODEX_HOME:-~/.codex}/skills",
-    )
-    args = parser.parse_args()
-    if args.apply and args.validate_only:
-        parser.error("--apply and --validate-only cannot be used together")
-    if args.check_target and not args.validate_only:
-        parser.error("--check-target requires --validate-only")
-    return args
+    return parser.parse_args()
 
 
 def discover_skills(skills_dir: Path) -> list[SkillPackage]:
@@ -227,27 +192,6 @@ def validate_source_packages(packages: list[SkillPackage]) -> list[str]:
     return errors
 
 
-def validate_target_packages(target_dir: Path, packages: list[SkillPackage]) -> list[str]:
-    errors: list[str] = []
-    if not target_dir.exists():
-        errors.append(f"target: directory does not exist: {target_dir}")
-        return errors
-
-    for package in packages:
-        target_package = SkillPackage(name=package.name, path=target_dir / package.name)
-        if not target_package.path.exists():
-            errors.append(f"target {package.name}: package is not installed")
-            continue
-        errors.extend(validate_package(target_package, label=f"target {package.name}"))
-
-    for legacy_name in LEGACY_SKILL_NAMES:
-        legacy_path = target_dir / legacy_name
-        if legacy_path.exists():
-            errors.append(f"target: legacy skill must be removed: {legacy_path}")
-
-    return errors
-
-
 def selected_packages(packages: list[SkillPackage], names: list[str]) -> tuple[list[SkillPackage], list[str]]:
     if not names:
         return packages, []
@@ -264,53 +208,6 @@ def selected_packages(packages: list[SkillPackage], names: list[str]) -> tuple[l
     return selected, missing
 
 
-def ensure_safe_target(source_dir: Path, target_dir: Path) -> None:
-    resolved_source = source_dir.resolve()
-    resolved_target = target_dir.expanduser().resolve()
-    if resolved_target == resolved_source:
-        raise RuntimeError("target directory cannot be the repository skills/ source directory")
-    if resolved_source in resolved_target.parents:
-        raise RuntimeError("target directory cannot be inside the repository skills/ source directory")
-
-
-def remove_path(path: Path, *, dry_run: bool) -> None:
-    if not path.exists() and not path.is_symlink():
-        return
-    if dry_run:
-        print(f"would remove: {path}")
-        return
-    if path.is_dir() and not path.is_symlink():
-        shutil.rmtree(path)
-    else:
-        path.unlink()
-    print(f"removed: {path}")
-
-
-def copy_package(package: SkillPackage, target_dir: Path, *, dry_run: bool) -> None:
-    target_package = target_dir / package.name
-    if dry_run:
-        print(f"would sync: {package.path} -> {target_package}")
-        return
-
-    remove_path(target_package, dry_run=False)
-    shutil.copytree(package.path, target_package)
-    print(f"synced: {package.path} -> {target_package}")
-
-
-def sync_packages(packages: list[SkillPackage], target_dir: Path, *, dry_run: bool) -> None:
-    if dry_run:
-        if not target_dir.exists():
-            print(f"would create target directory: {target_dir}")
-    else:
-        target_dir.mkdir(parents=True, exist_ok=True)
-
-    for package in packages:
-        copy_package(package, target_dir, dry_run=dry_run)
-
-    for legacy_name in LEGACY_SKILL_NAMES:
-        remove_path(target_dir / legacy_name, dry_run=dry_run)
-
-
 def print_package_list(title: str, packages: list[SkillPackage]) -> None:
     print(title)
     for package in packages:
@@ -321,7 +218,6 @@ def main() -> int:
     args = parse_args()
     root = repo_root()
     source_dir = root / "skills"
-    target_dir = args.target.expanduser()
 
     packages = discover_skills(source_dir)
     selected, missing = selected_packages(packages, args.skill)
@@ -337,32 +233,7 @@ def main() -> int:
             print(f"error: {error}", file=sys.stderr)
         return 1
 
-    if args.validate_only:
-        if args.check_target:
-            target_errors = validate_target_packages(target_dir, selected)
-            if target_errors:
-                for error in target_errors:
-                    print(f"error: {error}", file=sys.stderr)
-                return 1
-            print(f"validated source and target packages: {target_dir}")
-        else:
-            print(f"validated source packages: {source_dir}")
-        return 0
-
-    ensure_safe_target(source_dir, target_dir)
-    print_package_list("Selected for sync:", selected)
-    sync_packages(selected, target_dir, dry_run=not args.apply)
-
-    if args.apply:
-        target_errors = validate_target_packages(target_dir, selected)
-        if target_errors:
-            for error in target_errors:
-                print(f"error: {error}", file=sys.stderr)
-            return 1
-        print(f"validated synced packages: {target_dir}")
-    else:
-        print("dry-run only; pass --apply to write changes")
-
+    print(f"validated source packages: {source_dir}")
     return 0
 
 

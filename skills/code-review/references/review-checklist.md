@@ -99,4 +99,4 @@ Use this checklist before planning or making commits in a dirty worktree, review
 - Preview proposed changes first. Do not write files until the user confirms or explicitly asks for implementation.
 - Keep the skill self-contained; do not introduce required external prompt dependencies.
 - After writing, run stale-name, self-contained-reference, Markdown whitespace, YAML, `git diff --check`, and status checks.
-- After local install or upgrade in the AICraft source repository, run `python3 scripts/sync-skills.py --validate-only --check-target`.
+- After publishing to GitHub, run `npx skills add https://github.com/rustzen/aicraft --list`.
