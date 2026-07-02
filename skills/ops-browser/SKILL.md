@@ -1,6 +1,6 @@
 ---
 name: ops-browser
-description: Use when operating browser pages for inspection, testing, debugging, verification, form filling, file upload/download, console/network/storage checks, or account/session-sensitive workflows while preserving existing tabs and user browser state. Triggers include 浏览器操作, 页面调试, 复用标签页, 填写表单, 上传文件, and 关闭临时页面.
+description: Use when operating browser pages for inspection, testing, debugging, verification, form filling, file upload/download, console/network/storage checks, or account/session-sensitive workflows while preserving existing tabs, focus, and user browser state. Triggers include 浏览器操作, 页面调试, 复用标签页, 后台操作, 不抢窗口, console/network, 填写表单, 上传文件, and 关闭临时页面.
 ---
 
 # Ops Browser

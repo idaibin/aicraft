@@ -7,6 +7,7 @@ Use these cases when changing `code-planner` triggers, task contracts, owner mod
 | User prompt | Expected result | Why |
 | --- | --- | --- |
 | `把这个迁移拆成可执行、可验证的任务。` | Should trigger `code-planner`. | Planning and validation gates. |
+| `先给计划，不要直接改。` | Should trigger `code-planner`. | Explicit planning before implementation. |
 | `分多个子代理处理：实现、review、判断是否可以提交。` | Should trigger `code-planner`. | Delegated planning. |
 | `禁止子代理，主线程逐个完成，但先给计划。` | Should trigger sequential mode. | Explicit no-delegation override. |
 

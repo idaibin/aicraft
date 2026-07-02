@@ -1,6 +1,6 @@
 ---
 name: code-context
-description: Use when grounding work in a repository, first-pass onboarding, mapping real commands and paths, checking docs against code, generating or previewing AGENTS.md/project-map docs, or upgrading this skill from a trusted upstream source. Triggers include 项目上下文初始化, 先了解项目, 熟悉项目, 项目摸底, 文档和代码是否匹配, 生成 AGENTS.md, and code-context 升级.
+description: Use when grounding work in a repository, first-pass onboarding, mapping real commands, paths, and entry points, checking docs against code, generating or previewing AGENTS.md/project-map docs, or upgrading this skill from a trusted upstream source. Triggers include 项目上下文初始化, 先了解项目, 熟悉项目, 项目摸底, 真实命令, 真实入口, 不要猜, 文档和代码是否匹配, 生成 AGENTS.md, and code-context 升级.
 ---
 
 # Code Context

@@ -17,6 +17,8 @@ Turn future codebase work into executable, verifiable task packages before imple
 Use for prompts like:
 
 - `把这个需求拆成可执行计划`
+- `先给计划，不要直接改`
+- `先拆方案，再决定是否执行`
 - `每一步都要能验证`
 - `哪些可以并行处理`
 - `分多个子代理处理`

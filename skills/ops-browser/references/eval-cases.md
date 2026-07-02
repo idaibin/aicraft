@@ -7,6 +7,7 @@ Use these cases when changing `ops-browser` triggers, modes, state-safety rules,
 | User prompt | Expected result | Why |
 | --- | --- | --- |
 | `复用已有浏览器标签页验证这个页面。` | Should trigger `ops-browser`. | Browser operation with tab reuse. |
+| `后台检查这个网页，不要抢我当前窗口。` | Should trigger `ops-browser`. | Background-safe browser operation. |
 | `帮我在网页里填写表单并上传这个文件。` | Should trigger `ops-browser`. | Form and upload workflow. |
 | `看一下这个页面的 console 和 network 报错。` | Should trigger `ops-browser`. | Browser debugging evidence. |
 

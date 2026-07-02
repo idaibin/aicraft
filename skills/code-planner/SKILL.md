@@ -1,6 +1,6 @@
 ---
 name: code-planner
-description: Use when planning future codebase work before implementation, splitting implementation/refactor/migration into independent executable and verifiable tasks, defining owned scope, validation, done/reject gates, or coordinating auditable subagents. Triggers include 代码计划, 任务拆分, 可执行, 可验证, 分阶段, 子代理, 打回, and contract-impact planning.
+description: Use when planning future codebase work before implementation, splitting implementation/refactor/migration into independent executable and verifiable tasks, defining owned scope, validation, done/reject gates, or coordinating auditable subagents. Triggers include 代码计划, 先给计划, 先拆方案, 不要直接改, 任务拆分, 可执行, 可验证, 分阶段, 子代理, 打回, and contract-impact planning.
 ---
 
 # Code Planner

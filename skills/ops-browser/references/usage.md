@@ -7,6 +7,7 @@ Use `ops-browser` for browser-based operations where existing tabs, sessions, st
 ## Trigger Examples
 
 - `复用已有页面检查这个问题。`
+- `后台打开页面验证一下，不要抢我当前窗口。`
 - `打开后台页面填一下这个表单，但不要影响我现在的标签页。`
 - `上传这个文件后确认页面状态。`
 - `看一下浏览器 console/network 里为什么失败。`

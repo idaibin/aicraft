@@ -7,6 +7,7 @@ Use these cases when changing `code-context` triggers, workflow, outputs, or met
 | User prompt | Expected result | Why |
 | --- | --- | --- |
 | `先了解这个仓库，确认真实命令和入口，不要猜。` | Should trigger `code-context`. | Repository grounding. |
+| `别猜启动方式，先确认真实命令和入口。` | Should trigger `code-context`. | Command and entry-point grounding. |
 | `检查现有项目文档和代码是否匹配。` | Should trigger `code-context`. | Doc/code alignment. |
 | `从 GitHub 更新 code-context，先对比。` | Should trigger `code-context`. | Skill upgrade preview. |
 

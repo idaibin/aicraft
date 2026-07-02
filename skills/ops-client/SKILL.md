@@ -1,6 +1,6 @@
 ---
 name: ops-client
-description: Use when operating or verifying a real desktop client app window, currently focused on Tauri apps, including screenshot evidence, process/window diagnosis, runtime-source checks, Accessibility/AXPress actions, AI-operable DOM/control design, or rejecting browser-preview substitutes. Triggers include 客户端操作, Tauri 调试, 真实窗口验证, CGWindowID, AXPress, and 不抢鼠标.
+description: Use when operating or verifying a specified real desktop/client app window, when a repository contains Tauri/Electron/native client code that needs launch-command or runtime-source review, or when browser previews are invalid. Covers process/window diagnosis, CGWindowID screenshots, Accessibility/AXPress, AI-operable DOM/control design, and startup commands. Triggers include 客户端操作, 指定客户端, Tauri 调试, 启动命令审查, 真实窗口验证, CGWindowID, AXPress, and 不抢鼠标.
 ---
 
 # Ops Client
@@ -11,17 +11,19 @@ Operate and verify real desktop client windows. Current guidance is Tauri-focuse
 
 ## Workflow
 
-1. Identify the target app name, process, PID, visible window, and requested evidence.
-2. Confirm runtime source: `pnpm tauri dev`, debug bundle, release app, or other explicit client runtime.
-3. Enumerate real windows and identify the matching `CGWindowID` by owner, PID, title, and bounds.
-4. Capture the real window without relying on foreground focus:
+1. Identify the specified client target: app name, repository path, package/app directory, process, PID, visible window, and requested evidence.
+2. If working from a repository, confirm whether it contains a desktop/client app by checking manifests and source layout such as `src-tauri/`, `tauri.conf.*`, Electron configs, native app targets, package scripts, justfile tasks, or README run instructions.
+3. Confirm the startup command and runtime source before verification: `pnpm tauri dev`, debug bundle, release app, Electron/native run command, or `Not found`/`Not verified` when unclear.
+4. Enumerate real windows and identify the matching `CGWindowID` by owner, PID, title, and bounds.
+5. Capture the real window without relying on foreground focus:
    `screencapture -x -l<CGWindowID> /private/tmp/desktop-client-window.png`
-5. Inspect screenshots with `view_image` before claiming visual evidence.
-6. Prefer background-safe inspection and Accessibility actions such as `AXPress` on named controls.
-7. Rebuild/restart the intended client instance after relevant UI, bundle, or Accessibility changes before re-verifying.
+6. Inspect screenshots with `view_image` before claiming visual evidence.
+7. Prefer background-safe inspection and Accessibility actions such as `AXPress` on named controls.
+8. Rebuild/restart the intended client instance after relevant UI, bundle, or Accessibility changes before re-verifying.
 
 ## Modes
 
+- **Launch Review:** identify the repository-owned client app and its startup command before running or verifying it.
 - **Window Evidence:** prove process, runtime, window identity, and screenshot source.
 - **Interaction:** use Accessibility/control-tree paths before coordinate clicks.
 - **AI-Operable UI:** improve DOM and Accessibility surfaces so agents can identify controls reliably.
@@ -29,13 +31,14 @@ Operate and verify real desktop client windows. Current guidance is Tauri-focuse
 ## Hard Rules
 
 - Do not treat browser previews, dev server pages, or region screenshots as desktop-client evidence unless the user explicitly asks for browser-only checking.
+- Do not start or restart a client before confirming the startup command source and whether it could disturb an existing app instance, active window, or user workflow.
 - Do not steal the user's mouse, move the pointer, activate unrelated windows, or coordinate-click unless no stable control path exists and the risk is acceptable.
 - Prefer semantic controls, accessible names, `aria-label`, `title`, `sr-only`, associated form labels, and stable `data-testid` selectors for critical controls.
 - Say `Not verified` when process, runtime, window source, or interaction evidence is unchecked.
 
 ## Output Contract
 
-Report the target process/runtime, real-window evidence, screenshot source, interaction method, accessibility or DOM gaps, restart/rebuild status, and anything `Not verified`.
+Report the specified client target, repository/client ownership evidence, startup command or `Not found`, target process/runtime, real-window evidence, screenshot source, interaction method, accessibility or DOM gaps, restart/rebuild status, and anything `Not verified`.
 
 ## Skill Maintenance
 

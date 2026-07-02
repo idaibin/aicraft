@@ -29,20 +29,31 @@ The active content should help an agent start with real project context, preserv
 
 ## Install Skills From GitHub
 
-Install or upgrade skills from GitHub with the standard `skills` npm CLI flow:
+Install all skills globally for supported agents:
 
 ```bash
-npx skills add https://github.com/idaibin/aicraft
-npx skills update
+npx skills add https://github.com/idaibin/aicraft -g
+npx skills update -g
 ```
 
-To install only selected skills:
+To install only selected skills globally:
 
 ```bash
-npx skills add https://github.com/idaibin/aicraft --skill ops-browser ops-client
+npx skills add https://github.com/idaibin/aicraft -g --skill ops-browser ops-client
 ```
 
-For the full command list and available skill names, see [`INSTALL.md`](INSTALL.md).
+Without `-g`, the `skills` CLI installs into the current project scope. For the full command list and available skill names, see [`INSTALL.md`](INSTALL.md).
+
+## Skills
+
+| Skill | Use when |
+| --- | --- |
+| `code-context` | Grounding repository work in real commands, paths, entry points, docs, and project context before guessing. |
+| `code-planner` | Planning future codebase work, splitting tasks, defining validation gates, and coordinating auditable subagents before implementation. |
+| `code-review` | Reviewing existing local changes, dirty-tree ownership, contract chains, commit grouping, and exact staging before commit. |
+| `code-security` | Reviewing code, API, auth, permission, token/session, upload, logging, dependency, config, or release changes for security risks. |
+| `ops-browser` | Operating browser pages, forms, uploads, console/network checks, background-safe browser verification, and tab/session cleanup. |
+| `ops-client` | Operating or verifying specified desktop clients, repository-contained Tauri/Electron/native apps, startup commands, real windows, and Accessibility actions. |
 
 ## Validate Local Skills
 
@@ -58,7 +69,7 @@ Useful targeted checks:
 python3 scripts/validate-skills.py --skill code-planner
 ```
 
-End-user installation and updates should use `npx skills add` and `npx skills update`.
+End-user installation and updates should use `npx skills add -g` and `npx skills update -g` for global installs.
 
 ## Principles
 
