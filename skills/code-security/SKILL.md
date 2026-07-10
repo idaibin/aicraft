@@ -1,13 +1,13 @@
 ---
 name: code-security
-description: Use when code, API, config, dependency, upload/download, logging, auth, authorization, token/session, CORS/CSRF, secret, privacy, or release changes need security-risk review.
+description: "Use when a known code change or scoped API, config, dependency, upload/download, logging, auth, authorization, token/session, CORS/CSRF, secret, privacy, or release surface needs a lightweight evidence-grounded security review rather than a repository-wide or deep vulnerability scan."
 ---
 
 # Code Security
 
 ## Overview
 
-Review code and configuration changes for concrete security risks. Use this after repository scope is clear, especially for auth, permission, API, sensitive-data, dependency, or release-sensitive changes.
+Review known code and configuration changes for concrete security risks. Use this after the target surface is clear, especially for auth, permission, API, sensitive-data, dependency, or release-sensitive changes. Route repository-wide or deep vulnerability scanning to the dedicated security scan workflow.
 
 ## Workflow
 
@@ -28,6 +28,7 @@ Review code and configuration changes for concrete security risks. Use this afte
 
 - API contract alignment, dirty-tree ownership, staging, commit grouping, or commit messages; use `code-review`.
 - Whole-system threat modeling unless the user requests that scope; use `security-threat-model` when available.
+- Repository-wide, deep, exhaustive, or multi-pass vulnerability scanning; use the available security scan workflow.
 - First-pass repository discovery or future implementation planning; use `code-context` or `code-planner`.
 - Browser/client operation evidence; use `ops-browser` or `ops-client`.
 

@@ -2,12 +2,12 @@
 
 ## Summary
 
-Use `code-delivery` when the user wants reviewed repository changes moved to a final local or remote state. It is for delivery actions, not for first-pass discovery or broad implementation.
+Use `code-delivery` when the user wants reviewed repository changes moved to a final local or remote Git state without opening a pull request. It is for delivery actions that stop before PR creation, not for first-pass discovery or broad implementation.
 
 ## Best For
 
 - Local commit after review scope is approved.
-- Push current branch after validation.
+- Push only the current branch after validation, without creating a PR.
 - Sync the current branch with its upstream.
 - Squash a completed branch into `main` when repo guidance requires it.
 - Delete temporary branches after final state is verified.
@@ -16,7 +16,7 @@ Use `code-delivery` when the user wants reviewed repository changes moved to a f
 ## Trigger Examples
 
 - `Review the staged scope, commit, and push this branch.`
-- `Push only the current branch after checking the diff.`
+- `Push only the current branch after checking the diff; do not open a PR.`
 - `Squash this completed branch into main and push main.`
 - `Sync this branch to remote; do not switch branches.`
 - `Commit these reviewed changes and show the final remote ref.`
@@ -30,6 +30,7 @@ Use `code-delivery` when the user wants reviewed repository changes moved to a f
 - Dirty-tree ownership, mixed-hunk review, or commit grouping before delivery scope is clear; use `code-review`.
 - Security-only review; use `code-security`.
 - Browser or desktop-client evidence collection; use `ops-browser` or `ops-client`.
+- A full GitHub publish flow that explicitly includes creating a draft or ready pull request; use the available GitHub publishing workflow.
 
 ## Output
 

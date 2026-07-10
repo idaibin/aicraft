@@ -7,7 +7,7 @@ description: "Use when operating or verifying browser pages: screenshots, visual
 
 ## Overview
 
-Operate browser pages as stateful user sessions and collect web evidence. Preserve existing tabs, windows, accounts, and foreground activity; leave frontend code and architecture changes to `frontend-implementation`.
+Operate browser pages as stateful user sessions and collect web evidence. Preserve existing tabs, windows, accounts, and foreground activity; leave frontend code and architecture changes to `implement-frontend`.
 
 ## Workflow
 
@@ -33,7 +33,7 @@ Operate browser pages as stateful user sessions and collect web evidence. Preser
 ## Do Not Use For
 
 - Real Tauri, Electron, or native desktop-client runtime/window proof; use `ops-client`.
-- Frontend code changes, component architecture, design-system decisions, or UI implementation; use `frontend-implementation`.
+- Frontend code changes, component architecture, design-system decisions, or UI implementation; use `implement-frontend`.
 - Repository onboarding, planning, local diff review, or security-only review; use the relevant `code-*` skill.
 - Browser-only evidence when the user explicitly requested a real desktop app window.
 

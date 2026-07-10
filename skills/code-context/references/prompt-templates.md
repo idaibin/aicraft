@@ -45,6 +45,9 @@ Required sections:
 - Directory structure
 - Typical file chain for page, API, backend, CLI, or worker changes
 - Components, services, state, styles, tests, and config locations
+- Existing reusable pages, layouts, components, hooks, services, and shared UI relevant to common tasks
+- Existing Rust/API routes, handlers, services, repositories, traits/types, DTOs, errors, migrations, callers, and tests relevant to common tasks
+- Reference implementations, naming/placement patterns, and new-file decision rule
 - Frequent edit areas
 - High-risk areas
 - Recommended reading order for new tasks
@@ -67,6 +70,7 @@ Review against:
 - workspace membership and package boundaries
 - source entry points, routes, modules, services, and tests
 - current repo guidance files
+- repository-defined project class, directory, naming, reuse, and structural lifecycle rules
 
 Classify findings:
 
@@ -74,6 +78,7 @@ Classify findings:
 - missing: important current commands, paths, constraints, or risks are absent
 - incorrect: docs contradict code or config
 - duplicated: command truth is repeated in multiple docs and likely to drift
+- structural drift: manifests, exports, commands, tests, CI/deploy paths, architecture docs, or indexes disagree after add/reuse/move/delete work
 - unverifiable: claim could not be checked from current repo evidence
 
 Output:
@@ -94,10 +99,12 @@ Required first pass:
 - run `git status --short`
 - identify allowed and disallowed edit scope
 - identify existing commands needed for verification
+- inventory relevant existing implementations before proposing a new page, component, endpoint, handler, service, repository, trait, type/DTO, hook, or helper
 
 Output:
 
 - current context in one short paragraph
 - proposed edit boundary
+- direct reuse candidate, nearest reference implementation, or `Not found` with new-file justification
 - verification commands to run after changes
 - risks or blockers before editing

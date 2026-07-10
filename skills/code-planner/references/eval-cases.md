@@ -10,6 +10,7 @@ Use these cases when changing `code-planner` triggers, task contracts, owner mod
 | `Plan first; do not edit yet.` | Should trigger `code-planner`. | Explicit planning before implementation. |
 | `Use multiple subagents for implementation, review, and commit readiness.` | Should trigger `code-planner`. | Delegated planning. |
 | `No subagents; keep it sequential in the main thread, but plan first.` | Should trigger sequential mode. | Explicit no-delegation override. |
+| `Plan this module move and include manifests, exports, tests, CI, docs, indexes, and rollback.` | Should trigger `code-planner`. | Structure-impact planning. |
 
 ## Non-Trigger Eval
 
@@ -28,6 +29,7 @@ Use these cases when changing `code-planner` triggers, task contracts, owner mod
 | Task package | Includes required reads, owned scope, do-not-touch, dependencies, steps, validation, done criteria, and reject criteria. | Leaves hidden decisions or no validation. |
 | Subagent plan | Uses subagents only when tools are available, scopes independent, ownership clear, and audit possible. | Delegates forbidden, unnecessary, unclear, or tightly coupled work. |
 | Contract-impact | Marks risk and routes final chain review to `code-review`. | Pretends planning replaces commit review. |
+| Structure-impact | Identifies project class and includes manifest, export, command, test, CI/deploy, docs, index, stale-reference, and migration/rollback work. | Treats a directory move as source-only renaming. |
 | Publish readiness | Keeps the package self-contained, updates eval cases and metadata, and validates with `python3 scripts/validate-skills.py`. | Requires repository-local prompts or skips source validation. |
 
 ## Scoring

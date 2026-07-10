@@ -27,7 +27,7 @@ Use `diagnose` when there is a concrete failure to understand before editing cod
 - Planning a new feature; use `code-planner`.
 - Reviewing existing local changes for commit safety; use `code-review`.
 - Browser operation or screenshots without repository diagnosis; use `ops-browser`.
-- Frontend implementation after the cause is known; use `frontend-implementation`.
+- Frontend implementation after the cause is known; use `implement-frontend`.
 
 ## Output
 

@@ -7,7 +7,7 @@ description: Use when operating or verifying a specified real desktop client win
 
 ## Overview
 
-Operate and verify real desktop client windows. Use this when browser previews are not valid evidence; route frontend code and webview architecture changes to `frontend-implementation`.
+Operate and verify real desktop client windows. Use this when browser previews are not valid evidence; route frontend code and webview architecture changes to `implement-frontend`.
 
 ## Workflow
 
@@ -31,7 +31,7 @@ Operate and verify real desktop client windows. Use this when browser previews a
 ## Do Not Use For
 
 - Plain browser pages, web previews, form workflows, downloads, or browser console/network checks; use `ops-browser`.
-- Frontend implementation, desktop webview architecture, IPC layering, or design-system work; use `frontend-implementation`.
+- Frontend implementation, desktop webview architecture, IPC layering, or design-system work; use `implement-frontend`.
 - Ordinary repository discovery unless the user asks for client launch review, real-window verification, or browser-preview invalidation.
 - Browser preview evidence when the task requires proof from a Tauri, Electron, or native desktop runtime.
 - Local diff review, planning, or security-only review; use the relevant `code-*` skill.
@@ -42,7 +42,7 @@ Operate and verify real desktop client windows. Use this when browser previews a
 - Do not start or restart a client before confirming the startup command source and whether it could disturb an existing app instance, active window, or user workflow.
 - Do not steal the user's mouse, move the pointer, activate unrelated windows, or coordinate-click unless no stable control path exists and the risk is acceptable.
 - Prefer semantic controls, accessible names, `aria-label`, `title`, `sr-only`, associated form labels, and stable `data-testid` selectors for critical controls.
-- For code changes to add those surfaces, use `frontend-implementation`; return here to verify the real desktop window.
+- For code changes to add those surfaces, use `implement-frontend`; return here to verify the real desktop window.
 - Say `Not verified` when process, runtime, window source, or interaction evidence is unchecked.
 
 ## Output Contract

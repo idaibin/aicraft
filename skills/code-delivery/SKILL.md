@@ -1,13 +1,13 @@
 ---
 name: code-delivery
-description: "Use when reviewed repository changes need final delivery: path-limited staging, verification, commit, push, branch sync, squash-to-main, temporary branch cleanup, or proof that local and remote state match."
+description: "Use when reviewed local repository changes need Git delivery that stops before pull-request creation: path-limited staging, verification, local commit, current-branch push or sync, squash-to-main, temporary branch cleanup, or proof that local and remote refs match."
 ---
 
 # Code Delivery
 
 ## Overview
 
-Deliver already-scoped repository changes from local worktree to the requested remote state. Use this after the change scope is understood and review risks are clear.
+Deliver already-scoped repository changes from local worktree to the requested local or remote state. Use this after the change scope is understood and review risks are clear. This skill never opens a pull request; route an explicit branch-plus-PR publish request to the available GitHub publishing workflow.
 
 ## Workflow
 
@@ -36,6 +36,7 @@ Deliver already-scoped repository changes from local worktree to the requested r
 - Existing local diff review, ownership classification, mixed-hunk analysis, or commit grouping before delivery scope is clear; use `code-review`.
 - Security-only review; use `code-security`.
 - Browser or desktop-client runtime evidence; use `ops-browser` or `ops-client`.
+- Branch publishing that explicitly includes creating a draft or ready pull request; use the available GitHub publishing workflow.
 
 ## Hard Rules
 
@@ -47,6 +48,7 @@ Deliver already-scoped repository changes from local worktree to the requested r
 - Preserve user-provided commit text verbatim.
 - Prefer exact path or hunk staging; verify the staged diff before every commit.
 - Say `Not verified` when validation, remote refs, CI, deployed state, or branch cleanup were not checked.
+- Do not create or update pull requests; this workflow stops after the requested Git ref and cleanup state are verified.
 
 ## Output Contract
 

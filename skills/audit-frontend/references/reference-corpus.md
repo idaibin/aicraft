@@ -1,0 +1,31 @@
+# Reference Corpus
+
+Reviewed 2026-07-10. All repository links are pinned to the inspected commit.
+Rules derived here remain subordinate to the target repository.
+
+| Source | Observed pattern | Adopted rule | Not directly adopted | Reason |
+| --- | --- | --- | --- | --- |
+| [Twenty `a35aa6c`](https://github.com/twentyhq/twenty/tree/a35aa6ce7f5770c6b3722efeb259ca0ebb726f4e) | Feature modules, dedicated [UI package](https://github.com/twentyhq/twenty/tree/a35aa6ce7f5770c6b3722efeb259ca0ebb726f4e/packages/twenty-ui), local/global state distinctions in [CLAUDE.md](https://github.com/twentyhq/twenty/blob/a35aa6ce7f5770c6b3722efeb259ca0ebb726f4e/CLAUDE.md); [`SettingsRoutes.tsx`](https://github.com/twentyhq/twenty/blob/a35aa6ce7f5770c6b3722efeb259ca0ebb726f4e/packages/twenty-front/src/modules/app/components/SettingsRoutes.tsx) concentrates 1099 lines of route imports/registration | feature ownership, shared primitive boundary, focused validation; large route as review signal | Jotai, Apollo, Linaria, Nx, kebab/file suffix rules, numeric file limits | stack and naming are repository choices; length alone does not prove bad ownership |
+| [Outline `f0f935e`](https://github.com/outline/outline/tree/f0f935e38e8ceb396580fb0222a31b208fb0d269) | [Architecture](https://github.com/outline/outline/blob/f0f935e38e8ceb396580fb0222a31b208fb0d269/docs/ARCHITECTURE.md) separates scenes, reusable components, stores, and small shared code; component-local state/styles are colocated; list/page code exposes loading/error/empty/retry patterns | colocate feature concerns, keep shared scope narrow, make feedback states explicit | MobX, styled-components, React Router version, JSDoc policy | local implementation choices conflict with other valid stacks |
+| [Appwrite Console `d305af6`](https://github.com/appwrite/console/tree/d305af6bd8adc30868386ab6d4d589e5d428b78a) | [AGENTS.md](https://github.com/appwrite/console/blob/d305af6bd8adc30868386ab6d4d589e5d428b78a/AGENTS.md) documents route-co-located components/stores, shared Console elements/layout, SDK adapters, cache dependency invalidation, notifications, and SvelteKit feedback | use existing Console primitives, route/cache ownership, explicit loading/error/invalidations | Svelte, Bun, barrel exports, rune migration, exact SDK | framework and migration state are product-specific |
+| [GitButler `958f088`](https://github.com/gitbutlerapp/gitbutler/tree/958f08853db4f3129a90a97c23fae3fa7f462caa) | Frontend [backend interface](https://github.com/gitbutlerapp/gitbutler/blob/958f08853db4f3129a90a97c23fae3fa7f462caa/apps/desktop/src/lib/backend/backend.ts) and [Tauri adapter](https://github.com/gitbutlerapp/gitbutler/blob/958f08853db4f3129a90a97c23fae3fa7f462caa/apps/desktop/src/lib/backend/tauri.ts); [Rust guidance](https://github.com/gitbutlerapp/gitbutler/blob/958f08853db4f3129a90a97c23fae3fa7f462caa/crates/AGENTS.md) keeps transport DTOs/API wrappers above domain crates; [menu events](https://github.com/gitbutlerapp/gitbutler/blob/958f08853db4f3129a90a97c23fae3fa7f462caa/crates/gitbutler-tauri/src/menu.rs) bridge native menus to frontend shortcut services | typed frontend adapter, thin command/API boundary, domain ownership, event cleanup, progress/error contract | Svelte/Redux choices, crate names, command identifiers, generated SDK mechanism | only the dependency direction and lifecycle are portable |
+| [shadcn/ui `21e4ceb`](https://github.com/shadcn-ui/ui/tree/21e4ceb94418096e21a7f1990027741a8f9b085d) | The [official introduction](https://ui.shadcn.com/docs) defines open code, composition, and distribution; repository [composition guidance](https://github.com/shadcn-ui/ui/blob/21e4ceb94418096e21a7f1990027741a8f9b085d/apps/v4/content/docs/changelog/2026-04-component-composition.mdx); [Button](https://github.com/shadcn-ui/ui/blob/21e4ceb94418096e21a7f1990027741a8f9b085d/apps/v4/registry/bases/radix/ui/button.tsx) uses variants/slot; [Dialog](https://github.com/shadcn-ui/ui/blob/21e4ceb94418096e21a7f1990027741a8f9b085d/apps/v4/registry/bases/radix/ui/dialog.tsx) composes accessible primitives | inspect local source, prefer composition/variants, preserve compound hierarchy and primitive accessibility | mandatory shadcn adoption, exact Tailwind classes, Radix/Base UI choice | target project's component system remains authoritative |
+| [React `useMemo`](https://react.dev/reference/react/useMemo) | memoization is a performance optimization; production-like measurement and local state are recommended | no default memoization; trace and measure | any fixed timing threshold | workload and device determine significance |
+| [Tauri commands](https://v2.tauri.app/develop/calling-rust/) | commands return typed results/errors, heavy work should be async, channels stream progress | typed adapter, async heavy work, channel/event progress and cancellation contract | one command shape for every app | command/domain architecture is repository-owned |
+| [WAI-ARIA modal dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) | focus enters and stays within a modal, Escape closes, focus returns logically, dialog is named | keyboard/focus/label/restore checks | ARIA-first custom primitives | native/tested primitives are safer than reimplementing semantics |
+| [TanStack Router docs](https://tanstack.com/router/latest/docs/framework/react/guide/file-based-routing) | file routes own router configuration, params/search, loaders, and route lifecycle | preserve router contracts and keep route-owned state in URL/loader boundaries | a mandatory folder layout or ban on all route logic | keeping large business workflows out of routes is an explicit local governance decision, not a Router API rule |
+
+## Explicit Local Decisions
+
+- Use the rule-priority order in `SKILL.md`.
+- Require reuse investigation before creating general components or layers.
+- Keep route/page files primarily compositional.
+- Do not use occurrence counts or file-line limits as automatic extraction rules.
+- Require architecture documentation and indexes to stay synchronized with
+  structural code changes.
+
+These are governance decisions supported by recurring repository evidence, not
+claims that every framework mandates the same structure.
+
+`packages/twenty-new-ui` was `Not found` in the inspected Twenty commit. No rule
+or claim in this skill depends on that path.

@@ -14,13 +14,13 @@ Use local `git` first. Use `gh` or GitHub tooling only when PR, CI, compare URL,
 ## Loop
 
 1. Prepare the fix branch and review package.
-2. Send the package to ChatGPT only after the relevant gate.
+2. Send the package to a standard chat or Project after explicit authorization or the relevant gate.
 3. Write or append ChatGPT output to `review.md`.
 4. Verify every finding locally.
 5. Fix confirmed issues only.
 6. Run matching validation.
 7. Commit only if requested and only for approved scope.
-8. Repeat only when requested or workflow-defined.
+8. Repeat up to the explicitly authorized round count; require new authorization before additional external rounds.
 
 ChatGPT may review and suggest patches, but Codex applies changes locally after inspection.
 
@@ -45,6 +45,7 @@ Each pass should include:
 - pass timestamp or id
 - branch and commit/diff basis
 - ChatGPT URL or `Not verified`
+- standard-chat or Project surface, plus verified account workspace or `Not verified`
 - input method and size
 - reviewer findings
 - Codex verification notes
@@ -53,4 +54,4 @@ Each pass should include:
 
 ## Stop Conditions
 
-Stop when ChatGPT has no actionable findings and Codex agrees, validation needs user input, browser/account state is wrong, unrelated dirty work cannot be separated, content would expose secrets, or the next review/commit/push was not authorized.
+Stop when ChatGPT has no actionable findings and Codex agrees, the authorized round count is complete, validation needs user input, browser/account state is wrong, unrelated dirty work cannot be separated, content would expose secrets, or the next review/commit/push was not authorized.

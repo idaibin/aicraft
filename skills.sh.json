@@ -12,7 +12,10 @@
         "code-review",
         "chatgpt-review-bridge",
         "code-delivery",
-        "frontend-implementation",
+        "implement-frontend",
+        "implement-rust",
+        "audit-frontend",
+        "audit-rust",
         "code-security"
       ]
     },

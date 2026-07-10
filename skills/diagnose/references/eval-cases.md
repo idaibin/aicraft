@@ -20,7 +20,7 @@ Use these cases when changing `diagnose` triggers, workflow, output contract, or
 | `Plan the implementation across three packages.` | Should prefer `code-planner`. | Future work planning. |
 | `Review all dirty changes and split commits.` | Should prefer `code-review`. | Dirty-tree review and staging plan. |
 | `Verify this page in the browser and collect console/network evidence.` | Should prefer `ops-browser`. | Browser operation task. |
-| `Now implement the known frontend fix.` | Should prefer `frontend-implementation`. | Cause already known; implementation task. |
+| `Now implement the known frontend fix.` | Should prefer `implement-frontend`. | Cause already known; implementation task. |
 
 ## Quality Eval
 

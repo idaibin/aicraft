@@ -9,6 +9,7 @@ Use these cases when changing `code-review` triggers, ownership labels, staging 
 | `Review all changes and split commits.` | Should trigger `code-review`. | Full dirty-tree review. |
 | `Commit only the current session changes locally, but do not push.` | Should trigger `code-review`. | Scoped local commit after full review. |
 | `Review the API contract chain; check fields from backend to page.` | Should trigger `code-review`. | Contract-chain review. |
+| `Review this module deletion and confirm manifests, exports, CI, docs, and indexes are clean.` | Should trigger `code-review`. | Structural completeness review. |
 
 ## Non-Trigger Eval
 
@@ -21,6 +22,8 @@ Use these cases when changing `code-review` triggers, ownership labels, staging 
 | `Verify the real desktop client window with CGWindowID.` | Should prefer `ops-client`. | Desktop-client evidence task. |
 | `Review, commit, push, then squash this branch into main.` | Should prefer `code-delivery` after review scope is clear. | End-to-end delivery and remote sync. |
 | `Implement this feature directly; no review needed.` | Should not require `code-review`. | Implementation task. |
+| `Audit this Rust service for concurrency, memory, and SQLite risks without changing code.` | Should prefer `audit-rust`. | Domain-wide read-only audit. |
+| `Audit this frontend architecture for reuse, state, accessibility, and performance.` | Should prefer `audit-frontend`. | Domain-wide read-only audit. |
 
 ## Quality Eval
 
@@ -30,6 +33,7 @@ Use these cases when changing `code-review` triggers, ownership labels, staging 
 | Ownership and mixed hunks | Labels ownership, marks `mixed-hunk`, avoids whole-file staging, and verifies staged diff. | Stages mixed files with whole-file `git add`. |
 | Minimal scope | Walks candidate diff lines for task necessity and excludes opportunistic cleanup or future-flexibility changes. | Includes unrelated cleanup because it was nearby. |
 | Contract-chain review | Traces route/method/fields to helpers, types, callers, shaping, and runtime evidence or `Not verified`. | Stops at endpoint names. |
+| Structural completeness | Verifies manifests, exports, commands, tests, CI/deploy paths, docs, indexes, consumer ownership, and stale references for add/reuse/move/delete work. | Reviews source diff only or accepts speculative shared extraction. |
 | Commit plan | Groups by semantic unit with exact staging scope, validation status, risks, and commit messages. | Uses broad staging or auto-commits. |
 | Publish readiness | Keeps the package self-contained, updates eval cases and metadata, and validates with `python3 scripts/validate-skills.py`. | Requires repository-local prompts or skips source validation. |
 

@@ -2,7 +2,7 @@
 
 ## Summary
 
-Review code and configuration changes for security risks after the target surface is clear. It complements `code-review`; it does not replace contract alignment, dirty-tree ownership, staging, or commit planning.
+Review a known code change or scoped API/configuration surface for security risks after the target is clear. It complements `code-review`; it is not a repository-wide or deep vulnerability scan and does not replace contract alignment, dirty-tree ownership, staging, or commit planning.
 
 ## Best For
 
@@ -24,10 +24,11 @@ Use for prompts like:
 - `Check whether token/session/cookie handling is safe.`
 - `Check whether this upload API has security issues.`
 - `Run a lightweight pre-release security check.`
+- `Run a lightweight security review of this scoped API change, not a repository-wide scan.`
 - `Check whether sensitive data can leak.`
 - `use code-security`
 
-Do not use for general repository onboarding, future task planning, API contract alignment, commit grouping, or system-wide threat modeling; prefer `code-context`, `code-planner`, `code-review`, or `security-threat-model` for those.
+Do not use for general repository onboarding, future task planning, API contract alignment, commit grouping, system-wide threat modeling, or repository-wide/deep vulnerability scanning; prefer the corresponding context, planning, review, threat-model, or security-scan workflow.
 
 ## Output
 

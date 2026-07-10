@@ -1,4 +1,4 @@
 interface:
   display_name: "Code Planner"
   short_description: "Plan code tasks with owned scope and verifiable gates"
-  default_prompt: "Use $code-planner to split future codebase work into scoped, executable, verifiable task packages. Use subagents only when ownership is independent and auditable; route final dirty-tree or contract review to $code-review."
+  default_prompt: "Use $code-planner to split future codebase work into scoped, executable, verifiable task packages. Mark contract and structure impacts, use subagents only when ownership is independent and auditable, and route final dirty-tree review to $code-review."

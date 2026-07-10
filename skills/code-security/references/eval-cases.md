@@ -9,6 +9,7 @@ Use these cases when changing `code-security` triggers, scope, outputs, or metad
 | `Review this API for authorization or IDOR risk.` | Should trigger `code-security`. | Permission and IDOR risk. |
 | `Check whether token/session/cookie handling is safe.` | Should trigger `code-security`. | Auth/session security. |
 | `Run a lightweight pre-release security check.` | Should trigger `code-security`. | Release security review. |
+| `Run a lightweight security review of this scoped API change, not a repository-wide scan.` | Should trigger `code-security`. | Scoped change review rather than vulnerability scanning. |
 | `Does this upload API have path traversal or sensitive data exposure risk?` | Should trigger `code-security`. | Upload and data exposure risk. |
 
 ## Non-Trigger Eval
@@ -17,6 +18,7 @@ Use these cases when changing `code-security` triggers, scope, outputs, or metad
 | --- | --- | --- |
 | `Review whether frontend and backend API fields align, then split commits.` | Should prefer `code-review`. | Contract alignment and commit planning. |
 | `Create a full threat model for this system.` | Should prefer `security-threat-model`. | System-wide threat modeling. |
+| `Run a deep repository-wide vulnerability scan with multiple passes.` | Should prefer a dedicated deep security scan workflow. | Repository-wide scanning is outside scoped change review. |
 | `Split this requirement into executable tasks.` | Should prefer `code-planner`. | Future implementation planning. |
 | `Understand this repository's real commands and directory structure first.` | Should prefer `code-context`. | Repository grounding. |
 | `Review all local changes and generate commit groups.` | Should prefer `code-review`. | Dirty-tree review and commit planning. |

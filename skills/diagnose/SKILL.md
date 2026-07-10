@@ -33,7 +33,7 @@ Diagnose technical failures with a tight feedback loop, evidence-backed hypothes
 - Future implementation planning before a failure or bug exists; use `code-planner`.
 - Existing local diff review, staging, commit grouping, or pre-commit review; use `code-review`.
 - Browser-only operation, screenshots, console, network, uploads, downloads, or session evidence; use `ops-browser`.
-- Frontend implementation or style refactors after the root cause is known; use `frontend-implementation`.
+- Frontend implementation or style refactors after the root cause is known; use `implement-frontend`.
 
 ## Hard Rules
 

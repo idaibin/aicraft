@@ -1,0 +1,4 @@
+interface:
+  display_name: "Frontend Audit"
+  short_description: "Audit frontend architecture and consistency"
+  default_prompt: "Use $audit-frontend to perform a read-only, evidence-backed frontend audit across architecture, reuse, ownership, state, data, layout, accessibility, performance, documentation, and desktop boundaries. Report severity-ranked findings and route requested fixes to $implement-frontend."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rust Audit"
+  short_description: "Audit Rust architecture and runtime risks"
+  default_prompt: "Use $audit-rust to perform a read-only, evidence-backed Rust audit across toolchain baselines, architecture, structural lifecycle, ownership, concurrency, performance, memory, SQLite, unsafe code, tests, and documentation. Report severity-ranked findings and route requested fixes to $implement-rust."

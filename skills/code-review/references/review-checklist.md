@@ -31,6 +31,13 @@ Use this checklist before planning or making commits in a dirty worktree or revi
 - Verify changed code follows local naming, style, and implementation conventions.
 - Verify docs were updated when contracts, commands, or paths changed.
 - Verify docs and code do not contradict each other.
+- For added, reused, moved, renamed, or deleted structural code, verify:
+  - manifests, workspace membership, module exports, and dependency declarations
+  - commands, tests, examples, fixtures, and generated-source ownership
+  - CI, packaging, release, deploy, service, updater, and runtime paths
+  - architecture docs, project maps, indexes, adoption records, and migration notes
+  - targeted stale-reference search after the change
+- For shared extraction, verify real consumers, product neutrality, stable API, named ownership, shared tests, and consumer validation; reject speculative sharing.
 - For interface or contract changes, verify the real contract chain end to end:
   - backend route, endpoint path, request method, and field definitions
   - request helper, URL shaping, response unwrapping, and error handling
@@ -58,6 +65,7 @@ Use this checklist before planning or making commits in a dirty worktree or revi
 
 - Feature work with tests and contract docs: one commit if the files describe the same change.
 - Artifact or path renames across `justfile`, Dockerfiles, and workflows: one deploy commit.
+- Crate/package/module moves: keep manifests, exports, commands, tests, CI/deploy paths, and ownership docs in the semantic change that makes the move valid.
 - Repository docs and readmes that only describe the new contract: one docs commit.
 - Generated outputs such as build caches or release artifacts: do not commit unless the artifact itself is the deliverable.
 - User-owned local edits mixed with task files: stage only the requested slice and mention the excluded files.

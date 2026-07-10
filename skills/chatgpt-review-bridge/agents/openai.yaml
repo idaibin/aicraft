@@ -1,4 +1,4 @@
 interface:
   display_name: "ChatGPT Review Bridge"
-  short_description: "Route ChatGPT reviews with browser and Codex CLI gates"
-  default_prompt: "Use $chatgpt-review-bridge to prepare the review package, apply the required browser/Codex gates, route to ChatGPT, capture review.md, and verify findings before fixes."
+  short_description: "Coordinate ChatGPT Project and Codex review loops"
+  default_prompt: "Use $chatgpt-review-bridge to route repository review through a standard ChatGPT chat or Project in the Codex in-app Browser, separately verify the active account workspace, capture attributed review rounds, and have Codex verify findings before fixes."

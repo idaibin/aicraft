@@ -1,0 +1,4 @@
+interface:
+  display_name: "Frontend Implementation"
+  short_description: "Implement lean frontend UI while preserving contracts"
+  default_prompt: "Use $implement-frontend to implement or modify frontend UI. Consume $code-context or perform a targeted existing-page/component search first; reuse directly, adapt the nearest reference, and create new only with justification. Keep the shortest valid DOM/CSS path, parent-owned Flex alignment, adaptive children, single-owner page spacing, and no duplicate CSS declarations. Route systematic read-only frontend audits to $audit-frontend."

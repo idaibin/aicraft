@@ -1,4 +1,4 @@
 interface:
   display_name: "Code Security"
-  short_description: "Review code and API changes for security risks"
-  default_prompt: "Use $code-security to review code, API, auth, permission, config, dependency, logging, token, session, upload, or release changes for grounded security risks. Use $code-review first when the frontend/backend API contract chain is not already mapped."
+  short_description: "Review scoped code and API changes for security risks"
+  default_prompt: "Use $code-security for a lightweight, evidence-grounded security review of a known code or API surface. Use $code-review first when the contract chain is not mapped, and use a dedicated security scan workflow for repository-wide or deep vulnerability scanning."

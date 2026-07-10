@@ -11,8 +11,10 @@ Use this checklist when applying `code-planner` to split codebase requirements i
    - repo rules supplied in the chat
 2. Run `git status --short`.
 3. Read directly related docs, specs, command files, configs, manifests, route definitions, schemas, API wrappers, tests, and source entry points.
-4. Verify runtime, logs, API behavior, browser state, database state, or build output when the task depends on real current behavior.
-5. Mark missing files, commands, tools, or runtime evidence as `Not found` or `Not verified`.
+4. Identify project class, directory/toolchain standard, protected paths, and documented exceptions.
+5. Identify whether the task adds, reuses, moves, renames, or deletes a project, app, crate, package, feature, module, route, migration, or shared surface.
+6. Verify runtime, logs, API behavior, browser state, database state, or build output when the task depends on real current behavior.
+7. Mark missing files, commands, tools, or runtime evidence as `Not found` or `Not verified`.
 
 ## Dirty Tree Ownership Checklist
 
@@ -32,7 +34,7 @@ Use this template for each main-thread or subagent task. Keep it concrete enough
 
 ```text
 Task: <short task name>
-Type: <feature | bugfix | refactor | migration | review | contract-impact>
+Type: <feature | bugfix | refactor | migration | review | contract-impact | structure-impact>
 Owner model: <main-thread | sequential-main-thread | subagent-role>
 Objective:
   <behavior or outcome this task completes>
@@ -92,6 +94,7 @@ Stay sequential when:
 
 - Feature work: split by vertical behavior, API/page pair, module, or user workflow.
 - Contract-impact work: mark the task as `contract-impact`, identify affected interface surfaces, and require downstream `code-review` for the complete pre-commit chain review. `code-planner` should not duplicate that full checklist.
+- Structure-impact work: include manifest/workspace membership, exports, commands, tests, CI/deploy paths, architecture/project-map docs, indexes, stale-reference search, migration/rollback boundaries, and downstream `code-review`.
 - Refactor work: split by ownership boundary and preserve visible behavior explicitly.
 - Migration work: split by compatibility boundary, build gate, and rollback boundary.
 - Review work: split by changed-file group, API contract surface, UI surface, runtime behavior, or commit group.
@@ -104,6 +107,7 @@ The main thread should verify:
 - returned changes are within owned scope
 - unrelated local changes were not reverted or staged
 - required docs, types, wrappers, routes, tests, and config were updated together
+- structural additions, reuse, moves, renames, and deletions closed manifests, exports, commands, tests, CI/deploy paths, docs, indexes, and stale references
 - validation commands or probes match the changed surface
 - failures are fixed or explicitly reported
 - runtime or contract claims are backed by evidence

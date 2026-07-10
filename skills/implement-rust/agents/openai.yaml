@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rust Implementation"
+  short_description: "Implement reuse-first production Rust safely"
+  default_prompt: "Use $implement-rust to implement, port, modify, or refactor Rust code. Consume $code-context or trace existing docs and contract chains first; reuse or extend before creating interfaces, preserve behavior before cleanup, contain FFI and unsafe behind explicit ownership and lifetime contracts, then run repository-defined checks plus risk-matched release, platform, Miri, sanitizer, leak, stress, or fuzz gates. Route systematic read-only Rust audits to $audit-rust."

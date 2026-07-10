@@ -1,4 +1,4 @@
 interface:
   display_name: "Code Review"
   short_description: "Review dirty-tree ownership, contract chains, and commit plans"
-  default_prompt: "Use $code-review to inspect existing local changes, classify ownership, review contract chains and validation, then propose semantic commit groups with exact path-limited staging. Do not commit unless explicitly asked."
+  default_prompt: "Use $code-review to inspect existing local changes, classify ownership, review contract and structural completeness, then propose semantic commit groups with exact path-limited staging. Route domain-wide read-only technical audits to $audit-frontend or $audit-rust. Do not commit unless explicitly asked."

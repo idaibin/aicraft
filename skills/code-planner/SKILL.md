@@ -14,9 +14,10 @@ Turn a codebase requirement into scoped work units with required reads, owned sc
 1. Read repo guidance first: root `AGENTS.md`, nearest subproject `AGENTS.md`, `AGENT.md`, or chat-supplied rules.
 2. Run `git status --short` before planning writes, assigning work, staging, or committing.
 3. Inspect only the docs, code, diffs, contracts, commands, logs, or runtime state needed to make the plan executable.
-4. Split work into independent task packages with required reads, owned scope, do-not-touch boundaries, dependencies, implementation steps, validation, done criteria, and reject criteria.
-5. Choose the owner model.
-6. Keep the main thread responsible for integration, review, and final acceptance.
+4. Identify project class, repository standards, protected paths, and whether the work adds, reuses, moves, renames, or deletes a structural boundary.
+5. Split work into independent task packages with required reads, owned scope, do-not-touch boundaries, dependencies, implementation steps, validation, done criteria, and reject criteria.
+6. Choose the owner model.
+7. Keep the main thread responsible for integration, review, and final acceptance.
 
 ## Owner Model
 
@@ -26,7 +27,7 @@ Turn a codebase requirement into scoped work units with required reads, owned sc
 
 ## Task Contract
 
-Each task must include objective, required reads, owned scope, do-not-touch boundaries, dependencies, implementation steps, validation, done criteria, and reject criteria. Mark interface-heavy work as `contract-impact` and route final chain review to `code-review` before commit.
+Each task must include objective, required reads, owned scope, do-not-touch boundaries, dependencies, implementation steps, validation, done criteria, and reject criteria. Mark interface-heavy work as `contract-impact`; mark add/reuse/move/delete work as `structure-impact`. Route final chain and completeness review to `code-review` before commit.
 
 ## Do Not Use For
 
@@ -43,10 +44,11 @@ Each task must include objective, required reads, owned scope, do-not-touch boun
 - Do not accept subagent output without inspecting returned findings, diffs, or artifacts.
 - If a required command, tool, browser, or runtime is missing, say `Not found` or `Not verified`; do not substitute silently.
 - Keep staging, commits, and pushes path-limited unless the user explicitly requests broader scope.
+- For `structure-impact`, include manifests/workspace membership, module exports, commands, tests, CI/deploy paths, architecture/project-map docs, indexes, stale-reference search, and rollback or migration boundaries when applicable.
 
 ## Output Contract
 
-Start with verified current state and dirty-tree risks. Then provide task packages with owner model, dependencies, validation, done criteria, reject criteria, integration gates, non-goals, assumptions, and `Not verified` items.
+Start with verified current state, project class, standards, and dirty-tree risks. Then provide task packages with owner model, dependencies, validation, done criteria, reject criteria, structure/contract integration gates, non-goals, assumptions, and `Not verified` items.
 
 ## Skill Maintenance
 

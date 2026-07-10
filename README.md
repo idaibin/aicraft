@@ -1,18 +1,12 @@
 # AICraft
 
-AICraft is the source repository for reusable AI workflow assets: prompts, skills, workflow templates, and shared automation standards.
+AICraft is the source repository for reusable AI workflow assets: skills, prompts, workflow templates, and shared automation standards.
 
 It defines reusable AI capabilities and execution rules. Downstream repositories such as `blog` and `feeds-hub` consume those standards, then keep their own repository-specific task specs locally.
 
 ## Goal
 
-AICraft turns repeated AI working habits into durable assets with clear boundaries:
-
-- `prompts/` stores reusable task templates and workflow instructions.
-- `skills/` packages stable workflows into portable agent capabilities.
-- `docs/standards/` defines shared execution rules for automation, GitHub branching, and content quality.
-- `docs/templates/` stores reusable task-document templates.
-- `docs/task-registry.md` indexes concrete scheduled-task implementations in downstream repositories.
+AICraft turns repeated AI working habits into durable assets with clear boundaries. It prioritizes portable skill packages first, then supports them with reusable prompts, workflow templates, and shared standards.
 
 The active content should help an agent start with real project context, preserve local changes, follow exact tool and command constraints, verify work, and report results clearly.
 
@@ -70,7 +64,7 @@ Install selected skills:
 
 ```bash
 npx skills add https://github.com/idaibin/aicraft \
-  --skill code-context code-planner diagnose code-review chatgpt-review-bridge code-delivery frontend-implementation code-security ops-browser ops-client writing-editor
+  --skill code-context code-planner code-review code-delivery code-security chatgpt-review-bridge diagnose implement-frontend implement-rust audit-frontend audit-rust ops-browser ops-client writing-editor
 ```
 
 List available skills without installing:
@@ -85,17 +79,30 @@ For the full command list and available skill names, see [`INSTALL.md`](INSTALL.
 
 | Skill | Use when |
 | --- | --- |
-| `code-context` | Grounding repository work in real commands, paths, entry points, docs, and project context before guessing. |
+| `code-context` | Grounding repository work in real commands, paths, entry points, docs, project classes, and existing reuse/reference candidates before guessing. |
 | `code-planner` | Planning future codebase work, splitting tasks, defining validation gates, and coordinating auditable subagents before implementation. |
-| `diagnose` | Diagnosing bugs, failing tests, regressions, flaky behavior, build failures, and performance problems before proposing fixes. |
 | `code-review` | Reviewing existing local changes, dirty-tree ownership, contract chains, commit grouping, and exact staging before commit. |
-| `chatgpt-review-bridge` | Routing ChatGPT review packages through browser, Playwright, and Codex CLI gates, then capturing `review.md` and verifying findings. |
 | `code-delivery` | Delivering reviewed local changes with validation, path-limited staging, commits, pushes, branch sync, and remote proof. |
-| `frontend-implementation` | Implementing or reviewing frontend UI, routes, forms, tables, dashboards, responsive behavior, DOM/CSS structure, and architecture while preserving existing design-system and API contracts. |
+| `audit-frontend` | Auditing frontend architecture, ownership, reuse, state/data, layout, accessibility, performance, Tauri boundaries, and documentation consistency. |
+| `audit-rust` | Auditing Rust baselines, architecture, ownership, concurrency, performance, memory, SQLite, unsafe/FFI, quality gates, and documentation alignment. |
 | `code-security` | Reviewing code, API, auth, permission, token/session, upload, logging, dependency, config, or release changes for security risks. |
+| `chatgpt-review-bridge` | Routing repository review packages through standard ChatGPT chats or Projects using Codex Browser or explicit Chrome/Playwright routes, then capturing and locally verifying findings. |
+| `diagnose` | Diagnosing bugs, failing tests, regressions, flaky behavior, build failures, and performance problems before proposing fixes. |
+| `implement-frontend` | Implementing frontend UI reuse-first, using existing pages/components as references while preserving lean DOM/CSS, design-system, layout, and API contracts. |
+| `implement-rust` | Implementing or porting Rust reuse-first with explicit ownership, FFI/unsafe boundaries, behavior parity, idiomatic APIs, and risk-matched validation. |
 | `ops-browser` | Operating browser pages and collecting screenshots, visual/responsive checks, form/upload/download evidence, console/network data, and session-safe verification. |
 | `ops-client` | Verifying or operating specified Tauri/Electron/native desktop clients with launch-command, runtime-source, CGWindowID, real-window, and Accessibility evidence. |
 | `writing-editor` | Editing Chinese personal technical writing to reduce AI-template prose while preserving viewpoint, tradeoffs, and technical accuracy. |
+
+### Implementation And Audit Boundaries
+
+- `implement-frontend` and `implement-rust` own requested code changes,
+  refactors, ports, and implementation self-checks.
+- `audit-frontend` and `audit-rust` are read-only by default, own systematic
+  domain audits, and lead with severity-ranked evidence and remediation scope.
+- `code-review` starts from existing Git changes and owns dirty-tree
+  classification, contract and structural completeness, staging, and commit
+  readiness. `code-delivery` owns push, squash-to-main, and remote proof.
 
 ## Validate Local Skills
 
@@ -103,9 +110,10 @@ For repository development, validate source skill packages before publishing cha
 
 ```bash
 python3 scripts/validate-skills.py
+python3 scripts/test_validate_skills.py
 ```
 
-Useful targeted checks:
+Useful targeted package check:
 
 ```bash
 python3 scripts/validate-skills.py --skill code-planner

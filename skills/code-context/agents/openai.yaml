@@ -1,4 +1,4 @@
 interface:
   display_name: "Code Context"
-  short_description: "Initialize or align codebase context docs"
-  default_prompt: "Use $code-context to ground repository work in real files, commands, and docs. Stay read-only unless writes are explicitly requested; preview generated docs before applying them."
+  short_description: "Map codebase context and reusable surfaces"
+  default_prompt: "Use $code-context when the user requests repository grounding, directory or documentation alignment, or a targeted reuse/interface inventory. Map real files, commands, project classes, and docs; for requested frontend or Rust inventories, identify reuse, extension, and reference candidates without implementing changes."

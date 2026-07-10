@@ -10,13 +10,16 @@ Install only these skill package directories:
 - `skills/code-review`
 - `skills/chatgpt-review-bridge`
 - `skills/code-delivery`
-- `skills/frontend-implementation`
+- `skills/implement-frontend`
+- `skills/implement-rust`
+- `skills/audit-frontend`
+- `skills/audit-rust`
 - `skills/code-security`
 - `skills/ops-browser`
 - `skills/ops-client`
 - `skills/writing-editor`
 
-Do not install the repository root, `prompts/`, `docs/`, or legacy skill names such as `repo-context`, `commit-reviewer`, or `planner`.
+Do not install the repository root, `prompts/`, `docs/`, or legacy skill names such as `repo-context`, `commit-reviewer`, `planner`, `frontend-implementation`, `frontend-governance`, or `rust-engineering-governance`.
 
 ## Recommended Install
 
@@ -36,7 +39,7 @@ Install selected skills:
 
 ```bash
 npx skills add https://github.com/idaibin/aicraft \
-  --skill code-context code-planner diagnose code-review chatgpt-review-bridge code-delivery frontend-implementation code-security ops-browser ops-client writing-editor
+  --skill code-context code-planner diagnose code-review chatgpt-review-bridge code-delivery implement-frontend implement-rust audit-frontend audit-rust code-security ops-browser ops-client writing-editor
 ```
 
 For multiple selected skills, pass the names after `--skill` as shown above.
@@ -75,6 +78,7 @@ Use this only when developing this repository:
 
 ```bash
 python3 scripts/validate-skills.py
+python3 scripts/test_validate_skills.py
 ```
 
 This validates source packages without installing them. End-user installation and updates should use `npx skills add` and `npx skills update`.

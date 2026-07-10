@@ -16,9 +16,10 @@ Review local git changes before commit, protect unrelated edits, verify contract
 3. Classify each changed file as `task-owned`, `related-existing`, `unrelated-existing`, `mixed-hunk`, or `unknown`.
 4. Inspect actual diffs for every file that may enter a commit group.
 5. For API or interface changes, trace route/method/fields through request helpers, types, callers, data shaping, and runtime evidence or mark gaps `Not verified`.
-6. Run or request checks that match the change; report failures and skipped checks.
-7. Split by semantic unit and output exact commit groups.
-8. Commit only when the user explicitly asks.
+6. For structural changes, trace manifests, exports, commands, tests, CI/deploy paths, docs, indexes, migrations, and stale references.
+7. Run or request checks that match the change; report failures and skipped checks.
+8. Split by semantic unit and output exact commit groups.
+9. Commit only when the user explicitly asks.
 
 ## Modes
 
@@ -30,6 +31,9 @@ Review local git changes before commit, protect unrelated edits, verify contract
 - First-pass repository onboarding or docs/code alignment; use `code-context`.
 - Future implementation planning before changes exist; use `code-planner`.
 - Security-only audit after ownership and contract surfaces are already known; use `code-security`.
+- Domain-wide frontend or Rust architecture, performance, memory, concurrency,
+  SQLite, accessibility, or reuse audit without a Git change set; use
+  `audit-frontend` or `audit-rust`.
 - Browser or desktop-client operation evidence; use `ops-browser` or `ops-client`.
 - End-to-end delivery that includes push, branch sync, squash-to-main, remote cleanup, or post-push verification; use `code-delivery`.
 
@@ -43,10 +47,11 @@ Review local git changes before commit, protect unrelated edits, verify contract
 - Stop before committing if staged files outside the current group already exist.
 - Do not stage generated artifacts unless they are the requested deliverable.
 - Do not commit automatically.
+- Do not approve add/reuse/move/rename/delete work while source, manifests, exports, commands, tests, CI/deploy paths, architecture/project-map docs, or indexes still disagree.
 
 ## Output Contract
 
-Start with local change scope, ownership classification, and main risks. Include review findings before the commit plan. For each commit group, include purpose, exact files or hunk-level staging approach, validation status, risks, and a concise Conventional Commit message. Say `Not found` for missing files, layers, or commands; say `Not verified` for unchecked claims.
+Start with local change scope, ownership classification, project/structure risks, and main findings. Include contract and structural completeness before the commit plan. For each commit group, include purpose, exact files or hunk-level staging approach, validation status, risks, and a concise Conventional Commit message. Say `Not found` for missing files, layers, or commands; say `Not verified` for unchecked claims.
 
 ## Skill Maintenance
 

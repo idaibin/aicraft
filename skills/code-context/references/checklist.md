@@ -7,11 +7,16 @@ Use this checklist when applying `code-context` to understand a repository, boot
 1. Read `AGENTS.md` first when present; use nearest subproject `AGENTS.md` and `AGENT.md` only as fallback.
 2. Run `git status --short` to capture real dirty-tree state.
 3. Read `README.md`, root manifests, lockfiles, and framework/build configs.
-4. If the repo is a monorepo, identify the workspace root and then inspect only the app/package boundaries relevant to the request.
-5. Map the real source tree only to the depth needed for the current answer.
-6. Read the files that implement project-specific conventions when those conventions affect the requested context.
-7. Run baseline checks only with commands already defined by the repo.
-8. Detect context doc state:
+4. Classify the project from evidence: web app, Web/Rust service, Rust library/CLI, Tauri/native client, compact service, content site, multi-process system, or a repository-defined equivalent.
+5. Read repository standards for toolchain, package manager, directory, naming, reuse, and add/move/delete lifecycle when present.
+6. For page/component tasks, use a targeted file and symbol search to inventory existing routes, pages, layouts, components, hooks, services, shared UI, tests, and analogous implementations.
+7. For Rust/API tasks, inventory relevant architecture/API docs, route registration, handlers, services, repositories, traits/impls, types/DTOs, error types and response mapping, migrations, callers/consumers, tests, examples, and analogous feature modules.
+8. Classify each relevant candidate as directly reusable, extensible, reference-only, unrelated, or `Not found` before proposing a new file or interface.
+9. If the repo is a monorepo, identify the workspace root and then inspect only the app/package boundaries relevant to the request.
+10. Map the real source tree only to the depth needed for the current answer.
+11. Read the files that implement project-specific conventions when those conventions affect the requested context.
+12. Run baseline checks only with commands already defined by the repo.
+13. Detect context doc state:
    - missing or sparse docs: use Bootstrap mode
    - existing docs with current-truth claims: use Alignment mode
 
@@ -22,6 +27,11 @@ Use this checklist when applying `code-context` to understand a repository, boot
 - Runtime requirements
 - Startup, dev, serve, preview, build, lint, typecheck, and test commands
 - Real paths for entry points, routes, shared components, application layers or services, state, styles, and tests
+- Project class, reference layout, current exceptions, and protected runtime/deployment boundaries
+- Structural lifecycle rules for adding, reusing, moving, renaming, or deleting owned code
+- Existing page/component/layout/shared-UI inventory relevant to the task
+- Existing Rust/API interface chain relevant to the task: docs, route, handler, service, repository, trait/type, errors, persistence, caller, and tests
+- Direct reuse candidates, nearest reference implementations, naming/placement patterns, and the reason any new file is necessary
 - Files that are absent, reported as `Not found`
 - Dirty worktree state and unrelated changes that must be preserved
 - Checks performed, failures, and `Not verified` items
@@ -53,6 +63,12 @@ Use this checklist when applying `code-context` to understand a repository, boot
 
 - Use when project docs already exist.
 - Compare docs against manifests, configs, commands, source entry points, routes/modules, tests, and workspace membership.
+- Compare project classification and directory claims against the real app, crate, package, process, and framework boundaries.
+- Check whether add/reuse/move/delete rules cover manifests, exports, commands, tests, CI/deploy paths, architecture/project-map docs, and indexes.
+- Check whether docs identify the actual reusable page/component/layout surfaces and whether duplicate implementations or competing naming/placement patterns have appeared.
+- Check whether Rust/API docs match the current route, method, auth/permission, request/response types, serialization, error mapping, persistence, callers, tests, and module placement.
+- Check whether a proposed new interface can extend an existing trait, handler/service/repository pattern, DTO family, error type, or feature module before creating a parallel contract.
+- Treat different project classes as separate standards; do not recommend a mechanical directory rewrite without an explicit migration requirement.
 - Report stale, missing, incorrect, duplicated, or unverifiable doc claims.
 - Suggest exact doc changes or sections to update.
 - Do not modify docs unless the user explicitly asks.

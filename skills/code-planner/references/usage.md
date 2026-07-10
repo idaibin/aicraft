@@ -11,6 +11,7 @@ Turn future codebase work into executable, verifiable task packages before imple
 - Work that must be split by module, page, API, or layer
 - Subagent coordination with review and reject gates
 - Contract-impact planning before `code-review`
+- Project-structure migrations and add/reuse/move/delete lifecycle planning
 
 ## Triggers
 
@@ -24,12 +25,13 @@ Use for prompts like:
 - `Use multiple subagents.`
 - `No subagents; keep it sequential in the main thread.`
 - `Mark contract-impact and route the final review to code-review.`
+- `Plan this crate move and include Cargo membership, exports, CI, docs, and stale-reference checks.`
 
 Do not use for first-pass repo onboarding, existing dirty-tree review, or commit grouping; prefer `code-context` or `code-review` for those.
 
 ## Output
 
-Expect task packages with required reads, owned scope, do-not-touch boundaries, dependencies, implementation steps, validation, done criteria, reject criteria, owner model, and integration gates.
+Expect task packages with required reads, owned scope, do-not-touch boundaries, dependencies, implementation steps, validation, done criteria, reject criteria, owner model, and contract/structure integration gates.
 
 ## Maintenance
 

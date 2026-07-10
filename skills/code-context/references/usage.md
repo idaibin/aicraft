@@ -10,6 +10,9 @@ Ground an agent in a repository before it guesses. Use it to map real commands, 
 - Real command and entry-point discovery
 - `AGENTS.md` or project-map draft previews
 - Doc/code alignment checks
+- Project-class, directory-standard, and structural lifecycle alignment
+- Existing page/component inventory and reuse/reference discovery before implementation
+- Existing Rust/API interface-chain inventory before adding endpoints, traits, types, or modules
 
 ## Triggers
 
@@ -20,13 +23,19 @@ Use for prompts like:
 - `Confirm the real directories, commands, and entry points.`
 - `Confirm real commands and real entry points before choosing a launch path.`
 - `Check whether project docs match the code.`
+- `Classify these projects and check whether same-class directories and commands follow one standard.`
+- `Check whether adding, reusing, moving, or deleting modules updates manifests and docs.`
+- `List the existing pages and components relevant to this screen before creating anything.`
+- `Find a reusable or reference implementation and explain whether a new component is necessary.`
+- `Before adding this Rust endpoint, trace the existing docs, route, handler, service, repo, types, errors, callers, and tests.`
+- `Find whether an existing trait or interface can be extended before creating another one.`
 - `Draft AGENTS.md first; preview before writing.`
 
 Do not use for generic feature initialization, dirty-tree commit review, or implementation planning; prefer `code-review` or `code-planner` for those.
 
 ## Output
 
-Expect verified current truth, real paths and commands, missing items as `Not found`, unchecked areas as `Not verified`, and previews before any write.
+Expect verified current truth, project class, targeted directory/file inventory, direct reuse candidates, nearest reference implementations, new-file justification, real paths and commands, standards drift, structural lifecycle gaps, missing items as `Not found`, unchecked areas as `Not verified`, and previews before any write.
 
 ## Maintenance
 

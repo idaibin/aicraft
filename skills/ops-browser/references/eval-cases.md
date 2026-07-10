@@ -22,7 +22,7 @@ Use these cases when changing `ops-browser` triggers, modes, state-safety rules,
 | User prompt | Expected result | Why |
 | --- | --- | --- |
 | `Review current git changes and give me commit groups.` | Should prefer `code-review`. | Repository review task. |
-| `Implement this admin dashboard using the existing component system.` | Should prefer `frontend-implementation`. | Frontend code implementation. |
+| `Implement this admin dashboard using the existing component system.` | Should prefer `implement-frontend`. | Frontend code implementation. |
 | `Verify the real Tauri client window; do not use a browser preview.` | Should prefer `ops-client`. | Real desktop-client operation. |
 | `Confirm the Electron release app window with CGWindowID.` | Should prefer `ops-client`. | Real desktop-client runtime proof. |
 | `Understand this repository's directories and commands first.` | Should prefer `code-context`. | Repository context task. |

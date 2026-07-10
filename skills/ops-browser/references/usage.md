@@ -2,7 +2,7 @@
 
 ## Summary
 
-Use `ops-browser` for browser-based operations where existing tabs, sessions, state, visual evidence, or artifacts matter. It covers inspection, visual/responsive verification, debugging, form filling, upload/download, and browser evidence collection. Use `frontend-implementation` for code changes.
+Use `ops-browser` for browser-based operations where existing tabs, sessions, state, visual evidence, or artifacts matter. It covers inspection, visual/responsive verification, debugging, form filling, upload/download, and browser evidence collection. Use `implement-frontend` for code changes.
 
 ## Trigger Examples
 
@@ -22,7 +22,7 @@ Use `ops-browser` for browser-based operations where existing tabs, sessions, st
 
 - Repository-only code review without browser execution.
 - Pure API inspection that does not require a browser session.
-- Frontend implementation, component refactors, or design-system choices; use `frontend-implementation`.
+- Frontend implementation, component refactors, or design-system choices; use `implement-frontend`.
 - Desktop client verification that must inspect a real app window; use `ops-client`.
 
 ## Operation Notes

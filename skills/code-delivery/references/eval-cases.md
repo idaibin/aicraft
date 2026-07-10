@@ -7,7 +7,7 @@ Use these cases when changing `code-delivery` triggers, modes, staging rules, pu
 | User prompt | Expected result | Why |
 | --- | --- | --- |
 | `Review the staged scope, commit, and push this branch.` | Should trigger `code-delivery`. | Commit plus push delivery. |
-| `Push only the current branch after checking the diff.` | Should trigger `code-delivery`. | Current-branch remote delivery. |
+| `Push only the current branch after checking the diff; do not open a PR.` | Should trigger `code-delivery`. | Current-branch delivery without GitHub PR publishing. |
 | `Squash this completed branch into main and push main.` | Should trigger `code-delivery`. | Squash-to-main delivery. |
 | `Sync this branch to remote; do not switch branches.` | Should trigger `code-delivery`. | Branch-specific remote sync. |
 | `After verification, delete the temporary branch.` | Should trigger `code-delivery`. | Delivery cleanup. |
@@ -21,6 +21,7 @@ Use these cases when changing `code-delivery` triggers, modes, staging rules, pu
 | `Review all dirty changes and propose commit groups.` | Should prefer `code-review`. | Pre-delivery review scope is not clear. |
 | `Check this endpoint for authorization risk.` | Should prefer `code-security` after scope is clear. | Security-only review. |
 | `Verify this web page in the browser before release.` | Should prefer `ops-browser`. | Runtime browser evidence. |
+| `Commit this branch, push it, and open a draft PR.` | Should prefer the GitHub publishing workflow. | PR creation is outside Git-only delivery. |
 
 ## Quality Eval
 
@@ -33,6 +34,7 @@ Use these cases when changing `code-delivery` triggers, modes, staging rules, pu
 | Push and remote proof | Pushes only requested refs and verifies final remote refs. | Claims push success without remote evidence. |
 | Squash-to-main | Refreshes target branch, produces exactly one final commit when required, pushes `main`, and verifies `origin/main`. | Leaves iterative branch commits on `main` or skips final proof. |
 | Cleanup | Deletes temporary branches only after final target state is verified and cleanup is requested or repo-required. | Deletes branches before proving delivery. |
+| Pull-request boundary | Stops after Git delivery and routes an explicit PR request to the GitHub publishing workflow. | Creates or updates a pull request. |
 
 ## Scoring
 
