@@ -416,8 +416,14 @@ def validate_eval_cases(
 
     scoring_start = eval_text.find("## Scoring")
     scoring = eval_text[scoring_start:] if scoring_start >= 0 else ""
-    if "Minimum pass:" not in scoring or not re.search(r"scores? at least (?:[7-9]|10)", scoring):
-        errors.append(f"{label}: scoring must define a minimum quality score of at least 7")
+    has_minimum = "Minimum pass:" in scoring
+    has_numeric_gate = re.search(r"scores? at least (?:[7-9]|10)", scoring)
+    has_defect_gate = "no P0 or P1 defect remains" in scoring
+    if not has_minimum or not (has_numeric_gate or has_defect_gate):
+        errors.append(
+            f"{label}: scoring must define either a minimum quality score of at least 7 "
+            "or a no-P0/P1 defect gate"
+        )
 
     if skill_name is not None:
         errors.extend(
@@ -650,7 +656,7 @@ def print_package_list(title: str, packages: list[SkillPackage]) -> None:
 
 
 def print_quality_report(packages: list[SkillPackage], metrics: dict[str, QualityMetrics]) -> None:
-    print("Quality coverage:")
+    print("Documented eval coverage (not executed behavior):")
     print("  skill                     desc  lines  trigger  non-trigger  quality")
     for package in packages:
         item = metrics.get(package.name)

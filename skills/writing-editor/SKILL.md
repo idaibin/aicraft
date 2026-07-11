@@ -1,112 +1,84 @@
 ---
 name: writing-editor
-description: Use when editing Chinese personal technical blogs, project retrospectives, product thinking, developer-facing notes, open-source personal writing, or adapting draft material for Reddit developer-community posts without making it promotional or technically inaccurate.
+description: Use when drafting, rewriting, diagnosing, or adapting Chinese short posts, factual soft copy, personal technical essays, tutorials, project retrospectives, and developer-community posts while preserving the author's evidence, voice, and technical accuracy.
 ---
 
 # Writing Editor
 
 ## Overview
 
-Edit personal technical writing into clearer, more specific prose while preserving the author's viewpoint, constraints, tradeoffs, uncertainty, and technical meaning. Resolve draft/conversation conflicts through an explicit source order. Use the writer profile and before/after examples only for style calibration, never as factual content.
+Turn supplied notes or drafts into publishable writing that sounds like a specific person with real experience, not a generic content generator. The skill supports Chinese short-form writing, factual soft copy, technical long-form writing, tutorials, retrospectives, and developer-community adaptation.
 
 ## Workflow
 
-1. Read the draft plus relevant conversation context. Separate supported facts, author judgments, uncertainty, examples, commands, versions, metrics, filler, and conflicting claims.
-2. Decide whether context is sufficient:
-   - **Sufficient:** the draft or conversation establishes the topic, concrete facts, and intended point; proceed without asking for information already available.
-   - **Partially sufficient:** edit the supported material and preserve explicit gaps or placeholders rather than inventing details.
-   - **Insufficient:** when the requested finished piece requires missing project facts or a position that cannot be inferred safely, say `Not enough context` and name the minimum missing input.
-3. Choose the mode: Diagnose, Rewrite, Direct Edit, or Reddit Adaptation.
-4. Detect low-information prose: empty openings, template transitions, repeated summaries, inflated adjectives, mechanical headings, forced uplift, vague judgments, fake balance, or conclusions unsupported by the body.
-5. Delete before expanding. Remove cliches, duplicate explanations, generic scene-setting, unnecessary meta commentary, and conclusions that merely repeat headings.
-6. Preserve the author's actual decision chain: context, constraint, options considered, tradeoff, choice, result, and remaining limitation when present in the source.
-7. Rewrite with a restrained personal technical voice: concrete nouns and verbs, visible judgment, natural paragraph rhythm, and only the amount of structure needed by the material.
-8. Preserve or clarify claims only from supplied evidence. Do not invent facts, metrics, versions, incidents, user feedback, production usage, revenue, benchmarks, or decisions.
-9. For Reddit adaptation, convert the supplied material into direct developer-community English: concrete context, what changed, why, tradeoffs, evidence, and a non-sales discussion prompt only when supported.
-10. Run the final calibration check before output: compare meaning, factual claims, uncertainty, voice, density, and promotional tone against the source and bundled examples.
-
-## Source Precedence
-
-Resolve content in this order:
-
-1. Current-turn explicit instructions, corrections, and any source the user names as authoritative.
-2. A later direct user correction in the conversation that clearly supersedes an earlier fact or judgment.
-3. The supplied draft as the primary content source.
-4. Older relevant conversation only to fill gaps that do not conflict with the draft.
-5. Writer profile, style guides, and before/after examples for tone and editing moves only; they are never sources of facts, opinions, experiences, or project decisions.
-
-If draft and conversation conflict without an explicit correction, keep the draft as the content source and do not import the conflicting conversation claim. In Diagnose mode, report the conflict. If the conflict makes a requested finished artifact factually unsafe, ask for the minimum source-of-truth clarification or use `Not enough context` under the existing sufficiency rule.
+1. **Lock the source.** Build the source ledger and apply the precedence, provenance, semantic-fidelity, relationship, and disclosure rules in `references/fact-integrity.md`. Treat profiles and examples as style-only. Do not write past the evidence.
+2. **Set the target.** Identify the reader, purpose, content mode, platform, length, desired action, and any current platform-required disclosures or labels. Use the author's own platform brief when supplied. Treat current official platform rules as requirements; use public examples only to calibrate recurring shape and density.
+3. **Calibrate the voice.** Prefer the user's writing sample. Otherwise use a direct, restrained, experience-based Chinese voice with visible tradeoffs and natural paragraph rhythm.
+4. **Choose the structure.** Build around the real question, scene, decision, or task. Do not default to `背景 / 现状 / 优势 / 总结 / 展望`.
+5. **Draft or edit for substance.** Delete empty framing, expose the actual judgment, connect claims to details, and keep the technical chain reproducible.
+6. **Run the human-writing pass.** Detect clusters of template behavior, not isolated words or punctuation. Preserve genuine habits, uncertainty, asymmetry, and specific details.
+7. **Run the integrity pass.** Apply the hard gates in `references/fact-integrity.md`, plus `references/revision-transparency.md` for already-published material. Any failed integrity gate blocks publication regardless of prose quality.
+8. **Run the quality gate.** Use `references/quality-rubric.md` to find remaining editorial defects. Do not treat a self-assigned number as evidence that the text is ready, and do not expose internal assessment unless requested.
+9. **Return the requested artifact.** Default to the finished text only.
 
 ## Modes
 
-- **Diagnose:** identify exact weak phrases, missing evidence, repeated ideas, and tone problems before rewriting.
-- **Rewrite:** output only the edited article unless the user asks for explanation, diff, or notes.
-- **Direct Edit:** when the user asks for only the final text, output only the edited text with no preface or change summary.
-- **Reddit Adaptation:** output a concrete Reddit title and post body based on supplied material; do not simulate community feedback or claim subreddit fit.
+- **Diagnose:** identify low-information prose, weak logic, unsupported claims, voice drift, and platform mismatch.
+- **Rewrite:** rebuild a supplied draft while preserving its facts, position, and protected technical content.
+- **Draft from source:** write from supplied notes, logs, code evidence, or verified sources without filling gaps with plausible fiction.
+- **Short-form:** produce one focused post, caption, announcement, or product note with a clear point and no preamble.
+- **Factual soft copy:** persuade through a real situation, concrete value, proof, limitation, transparent interest, and honest next step rather than hype.
+- **Technical long-form:** write a tutorial, architecture note, engineering retrospective, or implementation essay with reproducible details and explicit tradeoffs.
+- **Platform adaptation:** keep the same facts, viewpoint, attribution, and disclosures while changing shape, density, opening, and formatting for the named platform.
+
+Load `references/content-modes.md` and `references/platform-calibration.md` when the requested form or platform changes the structure materially.
 
 ## Do Not Use For
 
-- Legal contracts, academic papers, serious news reports, official documents, or marketing copy that intentionally needs a sales voice.
-- English-only writing tasks unrelated to technical personal writing, project retrospectives, open-source notes, or Reddit developer-community posts.
-- Technical correctness review as the primary task; use a code, architecture, or security review skill first when accuracy is the main risk.
-- Generating project facts, benchmarks, incidents, or product claims from a topic alone.
+- Legal contracts, regulatory filings, formal academic papers, serious news reporting, or official policy documents.
+- Technical correctness review as the primary task; verify the code, architecture, security, or current external facts first.
+- Fiction, poetry, roleplay, or imitation of a living author's distinctive style.
+- Requests to evade AI detection or manufacture false personal experience.
 
 ## Hard Rules
 
-- Preserve the author's original topic, position, and technical meaning.
-- Prefer deletion over decorative rewriting.
-- Keep uncertainty, constraints, rejected alternatives, and “why not another option” when they explain the author's judgment.
-- Do not turn technical writing into emotional essays, public-account uplift, launch copy, brand storytelling, or engagement bait.
-- Do not turn Reddit posts into promotional announcements, fake humility, fake questions, link-first self-promotion, or unsupported community claims.
-- Preserve commands, parameters, versions, architecture boundaries, performance claims, measured results, and risk notes exactly unless the source itself is ambiguous; flag ambiguity rather than silently correcting it.
-- Do not claim subreddit fit, rules compliance, user numbers, benchmarks, revenue, open-source status, production usage, or external validation unless supplied.
-- Use conversation context as valid source material when it clearly establishes facts or decisions; do not ask the user to repeat information already present.
-- Apply Source Precedence before merging draft and conversation material; never silently blend conflicting versions.
-- Do not make prose “more human” by adding anecdotes, emotions, hesitation, rhetorical questions, or first-person opinions absent from the source.
-- Keep paragraph and heading structure proportional to content. Do not force every article into numbered sections, three-part summaries, or a final motivational conclusion.
-- When shortening, remove redundancy before removing constraints, caveats, evidence, or tradeoffs.
-- When expanding, add only explanation already implied or supported by the source; do not manufacture examples.
-- Say `Not enough context` only when a finished artifact cannot be factual without missing information. Do not use it as a substitute for editing the material that is already usable.
-
-## Calibration Check
-
-Before final output, verify:
-
-- **Meaning:** no decision, constraint, uncertainty, or technical contract changed.
-- **Claims:** every concrete fact can be traced to the winning source under Source Precedence.
-- **Conflicts:** every conflicting claim follows Source Precedence, with no silent merge.
-- **Density:** each paragraph contributes new information or necessary reasoning.
-- **Voice:** judgment remains specific and restrained rather than generic or promotional.
-- **Structure:** headings and lists reflect real conceptual boundaries, not a template.
-- **Reddit adaptation:** title and body are useful without exaggerated hooks, unsupported metrics, or sales language.
-
-Use `references/before-after-examples.md` and `references/writer-profile.md` as qualitative golden examples. They calibrate style; they do not authorize copying facts, opinions, experiences, project decisions, or phrases into unrelated drafts.
+- Never invent experience, incidents, users, metrics, dates, versions, benchmarks, quotations, testimonials, rankings, or source attribution.
+- Never turn an uncertain statement into a confident one to improve flow.
+- `references/fact-integrity.md` is the normative integrity contract. Apply it before improving style or platform fit; no mode or platform reference may weaken it.
+- Treat anti-AI patterns as diagnostic evidence, not a banned-word replacement table. One transition, dash, heading, list, or short sentence is not proof of AI writing.
+- Do not add random flaws, slang, fragments, personal confessions, or rhetorical questions merely to appear human.
+- Keep real disagreement, discomfort, uncertainty, rejected alternatives, and costs when they explain the author's decision.
+- For soft copy, do not fabricate urgency, scarcity, guarantees, customer stories, social proof, or comparative superiority.
+- Treat platform publishing rules as current external claims. Verify current official rules before claiming that a platform-ready artifact satisfies disclosure or labeling requirements.
+- Do not infer a platform voice or mandatory format from one featured, promoted, institutional, or unusually voiced article. When public examples matter, compare multiple recent, relevant samples; carry over only recurring structural conventions, preserve the user's voice, and never copy distinctive phrasing or import unsupported claims.
+- For already-published material, apply `references/revision-transparency.md`; do not disguise a material correction as copyediting.
+- When source material is insufficient, say `Not enough context` and name the missing facts instead of generating filler.
+- Do not add editing notes, scores, or explanations unless requested.
 
 ## Output Contract
 
-Default output is only the edited article.
+- **Rewrite, draft, short-form, soft copy, and technical long-form:** return only the finished text by default.
+- **Diagnose:** return concrete excerpts, the issue in each excerpt, and the editing direction.
+- **Platform adaptation:** return the platform-ready artifact in the platform's natural format, without strategy commentary.
+- **Insufficient evidence:** return `Not enough context:` followed by the minimum missing facts.
+- Preserve frontmatter and code fences when editing repository content unless the user asks to change them.
 
-For Reddit adaptation requests, output only:
+## Maintenance
 
-```text
-Title: ...
-
-...
-```
-
-For diagnose requests, output concrete source phrases, why they fail, the evidence or tradeoff that is missing, and the editing direction. Provide key changes, removed expressions, or before/after notes only when the user asks for explanation.
-
-## Skill Maintenance
-
-When maintaining this package, update `references/eval-cases.md`, `references/usage.md`, `references/writer-profile.md`, `references/before-after-examples.md`, and `agents/openai.yaml` if triggers, modes, calibration, or output contracts change. In AICraft, run `python3 scripts/validate-skills.py --skill writing-editor` before publishing; end-user installs use `npx skills add https://github.com/idaibin/aicraft`, and end-user updates use `npx skills update`.
+When changing triggers, modes, or output behavior, update `references/eval-cases.md`, the quality rubric, platform calibration, examples, and `agents/openai.yaml`. In AICraft, run `python3 scripts/validate-skills.py --skill writing-editor` and `python3 scripts/test_validate_skills.py` before publishing.
 
 ## References
 
-- See [references/usage.md](references/usage.md) for triggers, modes, and examples.
-- See [references/writer-profile.md](references/writer-profile.md) for the target author voice and editing boundaries.
-- See [references/banned-ai-expressions.md](references/banned-ai-expressions.md) for AI-template expression detection.
-- See [references/chinese-tech-blog-style.md](references/chinese-tech-blog-style.md) for preferred Chinese technical-blog voice.
-- See [references/reddit-posting-style.md](references/reddit-posting-style.md) for Reddit developer-community adaptation.
-- See [references/edit-checklist.md](references/edit-checklist.md) for final review criteria.
-- See [references/before-after-examples.md](references/before-after-examples.md) for rewrite calibration examples.
-- See [references/eval-cases.md](references/eval-cases.md) for trigger and quality evals.
+- See [references/usage.md](references/usage.md) for triggers, mode selection, and output behavior.
+- See [references/writer-profile.md](references/writer-profile.md) for the default author voice and voice-fingerprint method.
+- See [references/fact-integrity.md](references/fact-integrity.md) for source locking and unsupported-claim prevention.
+- See [references/revision-transparency.md](references/revision-transparency.md) for published correction and update handling.
+- See [references/content-modes.md](references/content-modes.md) for short-form, soft-copy, tutorial, retrospective, and long-form structures.
+- See [references/platform-calibration.md](references/platform-calibration.md) for target-platform adaptation.
+- See [references/banned-ai-expressions.md](references/banned-ai-expressions.md) for clustered AI-template detection and false positives.
+- See [references/chinese-tech-blog-style.md](references/chinese-tech-blog-style.md) for Chinese sentence, paragraph, and technical-prose editing.
+- See [references/reddit-posting-style.md](references/reddit-posting-style.md) for Reddit and Hacker News-style developer-community posts.
+- See [references/edit-checklist.md](references/edit-checklist.md) for the final editing pass.
+- See [references/quality-rubric.md](references/quality-rubric.md) for hard gates, defect severity, and optional score calibration.
+- See [references/before-after-examples.md](references/before-after-examples.md) for calibrated examples.
+- See [references/eval-cases.md](references/eval-cases.md) for trigger, safety, regression, and scoring cases.

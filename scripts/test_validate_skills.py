@@ -24,6 +24,14 @@ validate_repository_indexes = VALIDATOR.validate_repository_indexes
 validate_skill_invocations = VALIDATOR.validate_skill_invocations
 validate_specialized_eval_contracts = VALIDATOR.validate_specialized_eval_contracts
 
+BEHAVIOR_EVAL_PATH = Path(__file__).with_name("eval-writing-editor.py")
+BEHAVIOR_SPEC = importlib.util.spec_from_file_location("eval_writing_editor", BEHAVIOR_EVAL_PATH)
+if BEHAVIOR_SPEC is None or BEHAVIOR_SPEC.loader is None:
+    raise RuntimeError(f"Cannot load behavior eval: {BEHAVIOR_EVAL_PATH}")
+BEHAVIOR_EVAL = importlib.util.module_from_spec(BEHAVIOR_SPEC)
+sys.modules[BEHAVIOR_SPEC.name] = BEHAVIOR_EVAL
+BEHAVIOR_SPEC.loader.exec_module(BEHAVIOR_EVAL)
+
 
 VALID_EVAL = """# Eval Cases
 
@@ -134,6 +142,38 @@ class ValidateSkillsTests(unittest.TestCase):
 
         self.assertTrue(any("duplicate" in error for error in errors))
         self.assertTrue(any("score" in error for error in errors))
+
+    def test_eval_validation_accepts_defect_gate(self) -> None:
+        defect_gate_eval = VALID_EVAL.replace(
+            "every quality case scores at least 7",
+            "no P0 or P1 defect remains",
+        )
+        with tempfile.TemporaryDirectory() as temp_dir:
+            eval_file = Path(temp_dir) / "eval-cases.md"
+            eval_file.write_text(defect_gate_eval, encoding="utf-8")
+            errors, _ = validate_eval_cases(eval_file, label="test")
+
+        self.assertEqual([], errors)
+
+    def test_writing_editor_behavior_fixtures_pass(self) -> None:
+        results = BEHAVIOR_EVAL.run_fixtures(BEHAVIOR_EVAL.DEFAULT_FIXTURES)
+
+        self.assertGreaterEqual(len(results), 10)
+        self.assertTrue(all(result.passed for result in results))
+
+    def test_writing_editor_behavior_fixture_detects_bad_output(self) -> None:
+        result = BEHAVIOR_EVAL.evaluate_case(
+            {
+                "id": "regression",
+                "expected_pass": True,
+                "output": "整体性能提升 10 倍。",
+                "must_contain": ["类型检查", "官方"],
+                "must_not_contain": ["整体性能"],
+            }
+        )
+
+        self.assertFalse(result.passed)
+        self.assertTrue(result.failures)
 
     def test_local_link_validation_rejects_missing_targets(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

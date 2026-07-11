@@ -1,6 +1,6 @@
-# Reddit Developer-Community Style
+# Reddit and Hacker News Developer-Community Style
 
-Use this when adapting supplied material for Reddit or similar developer communities.
+Use this when adapting supplied material for Reddit, Hacker News, or a similar developer community.
 
 All titles, openings, and project facts below are style illustrations. Reuse
 their shape only when the supplied draft or winning conversation source supports
@@ -8,65 +8,64 @@ the same facts and author judgment.
 
 ## Shape
 
-Prefer:
+A strong post usually contains:
 
-```text
-Title: I tried using AI to maintain a small feed product instead of just generating posts
-
-I built Feeds Hub as a small test: can an AI workflow keep a real content product updated, with frontmatter, covers, validation, and build checks?
-
-...
-```
-
-The post should usually contain:
-
-- one concrete title
-- one short opening sentence with the actual project or problem
-- what was built or changed
-- the constraint or tradeoff
-- what surprised the author or changed their judgment
-- a real question only when the draft provides one
+- a plain, concrete title
+- one short paragraph stating what happened or what was built
+- the technical or product context
+- one meaningful tradeoff or limitation
+- what changed the author's judgment
+- a precise question only when feedback is genuinely needed
 
 ## Tone
 
 Use plain developer English:
 
-- first person is fine
-- short paragraphs
+- first person when the source is personal
+- transparent self-interest
 - concrete nouns and verbs
-- transparent limitations
-- no launch voice
-- no hype adjectives
-- no fake community intimacy
+- short paragraphs
+- implementation detail proportional to the claim
+- limitations stated without apology theater
 
 Avoid:
 
-- "I'm excited to share"
-- "game changer"
-- "revolutionary"
-- "would love feedback" unless the post names the exact feedback wanted
-- opening with a link or product pitch
-- pretending the post is neutral when it is self-promotion
+- `Introducing`
+- `game changer`
+- `super excited`
+- `revolutionary`
+- `built with passion`
+- `roast my project`
+- fake humility
+- vague `would love feedback`
+- opening with a link
 
-## Title Rules
+## Titles
 
-Good titles are specific and modest:
+Prefer:
 
-- `I tried using AI to maintain a small feed product, not just generate content`
-- `What I learned building a tiny AI-maintained content workflow`
-- `I made AI handle frontmatter, covers, validation, and builds for a feed site`
+- `I moved repeated AI repository rules into versioned skills`
+- `What broke when I tried to automate a small information feed`
+- `Using Git includeIf to keep work and public commit identities separate`
 
 Avoid:
 
 - title-case slogans
-- "Introducing..."
-- "The future of..."
-- "I built a revolutionary..."
-- vague titles like `My AI workflow`
+- `The future of...`
+- unsupported outcome claims
+- vague titles such as `My AI workflow`
 
-## Output Rules
+## Community Integrity
 
-Default output:
+- Do not pretend a promotional post is neutral.
+- Do not claim subreddit fit or rules compliance unless checked in the current session.
+- Do not add a community question unless the author has a real decision or problem to ask about.
+- Keep links after enough context for the post to stand on its own.
+- Preserve technical limitations that prevent the post from becoming launch copy.
+
+## Output
+
+Return:
 
 ```text
 Title: ...
@@ -74,4 +73,4 @@ Title: ...
 ...
 ```
 
-Do not add subreddit recommendations, rule claims, posting strategy, or explanation unless the user asks. If a target subreddit is named and current rule compliance matters, say the rules are `Not verified` unless checked in the current session.
+Do not add posting strategy, subreddit recommendations, or explanatory notes unless requested.

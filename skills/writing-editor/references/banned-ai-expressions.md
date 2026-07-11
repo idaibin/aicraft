@@ -1,75 +1,191 @@
-# Banned AI-Template Expressions
+# AI-Template Pattern Detection
 
-Use this as a detection list, not a mechanical replacement list. If an expression carries real information in context, rewrite it instead of deleting it blindly.
+Use this as a diagnostic map, not a replacement dictionary. A phrase is a problem only when it performs no useful job or appears in a cluster of template behavior.
 
-## Empty Openings
+## Pattern Clusters
 
-- 在当今快速发展的时代
-- 随着技术的不断发展
-- 近年来，随着……
-- 在数字化转型的大背景下
-- 面对日益复杂的业务需求
-- 众所周知
-- 不得不提的是
+### Empty framing
 
-## Template Transitions
+Typical signals:
 
-- 值得注意的是
-- 不难发现
-- 可以看出
-- 从某种意义上说
-- 在这个过程中
-- 与此同时
-- 进一步来说
-- 毫无疑问
+- `随着技术不断发展`
+- `在数字化转型背景下`
+- `众所周知`
+- `本文将从几个方面展开`
+- a heading followed by a sentence that merely repeats the heading
 
-## Empty Summaries
+Editing move: start with the actual event, question, decision, or task.
 
-- 具有重要意义
-- 提供了新的思路
-- 带来了更多可能性
-- 是一个值得深入思考的问题
-- 为后续发展奠定了基础
-- 未来仍有很大的想象空间
+### Inflated significance
 
-## Mechanical Structure
+Typical signals:
 
-- 首先，其次，最后
-- 一方面，另一方面
-- 不仅如此，更重要的是
-- 综上所述
-- 总而言之
-- 本文将从以下几个方面展开
+- `具有重要意义`
+- `标志着关键转折`
+- `为未来奠定基础`
+- `开启新的篇章`
+- `带来无限可能`
 
-## Inflated Adjectives
+Editing move: state what changed in the work, system, or decision.
 
-- 极大提升
-- 显著增强
-- 全面赋能
-- 深度融合
-- 高效协同
-- 智能化升级
-- 闭环能力
-- 生态体系
-- 革命性的
-- 魔法般的
-- 生态闭环
+### Vague authority
 
-## Reddit Launch Tropes
+Typical signals:
 
-- I built X, check it out
-- Game changer
-- Super excited to share
-- Would love your thoughts
-- Any feedback is welcome
-- Built with passion
-- Finally launched
-- No-code/AI-powered magic
-- I made this over the weekend
-- Roast my project
+- `业内普遍认为`
+- `有研究表明`
+- `专家指出`
+- `用户一致认可`
+- `实践证明`
 
-## Rewrite Rule
+Editing move: name the source and evidence, qualify the claim, or remove it.
 
-When a sentence only frames the article and adds no information, delete it.
+### Symmetric template structure
 
-When a sentence hides a judgment behind abstract wording, replace it only with a judgment, tradeoff, or project constraint already supported by the winning source. Otherwise delete it or flag the missing evidence in Diagnose mode.
+Typical signals:
+
+- forced `首先 / 其次 / 最后`
+- repeated three-item lists
+- every section having the same paragraph count
+- one benefit sentence followed by one generic example and one summary sentence
+
+Editing move: organize by the actual decision chain. Asymmetry is acceptable when the material is asymmetric.
+
+### Abstract management vocabulary
+
+Typical signals:
+
+- `全面赋能`
+- `深度融合`
+- `高效协同`
+- `能力闭环`
+- `生态体系`
+- `抓手`
+- `方法论沉淀`
+
+Editing move: replace the abstraction with the actor, action, boundary, or observable result.
+
+### Fake depth
+
+Typical signals:
+
+- `真正的问题是`
+- `从本质上看`
+- `归根结底`
+- `值得深思的是`
+- `这不仅是 X，更是 Y`
+
+Editing move: make the concrete claim directly. Keep the phrase only when the contrast is real and supported.
+
+### Manufactured drama
+
+Typical signals:
+
+- several one-sentence paragraphs in a row
+- repeated `不是...而是...`
+- staged punchlines
+- aphorisms such as `X 是 Y 的语言`
+- fake-candid openers such as `说实话？`
+
+Editing move: restore normal sentence connections and let one detail carry the emphasis.
+
+### Generic positive conclusion
+
+Typical signals:
+
+- `未来可期`
+- `值得期待`
+- `继续探索更多可能`
+- `这只是开始`
+- `相信会越来越好`
+
+Editing move: end with the current decision, limitation, next verified step, or unresolved question.
+
+### Promotional gloss
+
+Typical signals:
+
+- `革命性`
+- `颠覆式`
+- `极致体验`
+- `强大而灵活`
+- `无缝`
+- `轻松实现`
+- repeated product name and benefit claims
+
+Editing move: describe the mechanism, evidence, fit, and limitation.
+
+### Chatbot residue
+
+Typical signals:
+
+- `当然可以`
+- `希望这对你有帮助`
+- `下面让我们深入探讨`
+- `如果你愿意，我还可以`
+- meta-comments about the rewrite
+
+Editing move: remove the conversation wrapper from the publishable text.
+
+### Fake personal experience
+
+Typical signals:
+
+- a newly invented timeline
+- unprovided emotions
+- generic `踩了很多坑`
+- specific numbers without source
+- a polished origin story absent from the notes
+
+Editing move: use only supplied experience. Missing detail stays missing.
+
+### Repetitive recap
+
+Typical signals:
+
+- introduction previews every section
+- every section ends with a mini-summary
+- final section repeats the introduction and all headings
+
+Editing move: keep the strongest statement once.
+
+## False Positives
+
+Do not flag an item by itself:
+
+- one dash
+- one transition word
+- one short sentence
+- one list
+- first person
+- polished grammar
+- a formal term
+- a heading
+- a rhetorical question
+- an unusual personal phrase
+
+Look for clusters and low-information function.
+
+## Human Signals to Preserve
+
+- exact, hard-to-fabricate details
+- mixed feelings
+- uncertainty with a reason
+- rejected alternatives
+- self-correction
+- locally natural slang or technical shorthand
+- varied sentence length
+- a paragraph that is longer because the idea is actually denser
+- repetition used deliberately for emphasis
+
+## Decision Rule
+
+For each suspected pattern, ask:
+
+1. What information does this sentence add?
+2. Is the wording stronger than the evidence?
+3. Does it sound like this author?
+4. Does the structure follow the material or a template?
+5. Would deleting it lose anything?
+
+Delete, rewrite, or keep based on those answers.

@@ -92,7 +92,7 @@ For the full command list and available skill names, see [`INSTALL.md`](INSTALL.
 | `implement-rust` | Implementing or porting Rust reuse-first with explicit ownership, FFI/unsafe boundaries, behavior parity, idiomatic APIs, and risk-matched validation. |
 | `ops-browser` | Operating browser pages and collecting screenshots, visual/responsive checks, form/upload/download evidence, console/network data, and session-safe verification. |
 | `ops-client` | Verifying or operating specified Tauri/Electron/native desktop clients with launch-command, runtime-source, CGWindowID, real-window, and Accessibility evidence. |
-| `writing-editor` | Editing Chinese personal technical writing to reduce AI-template prose while preserving viewpoint, tradeoffs, and technical accuracy. |
+| `writing-editor` | Drafting, rewriting, diagnosing, and adapting human-quality Chinese short posts, factual soft copy, technical essays, tutorials, retrospectives, and developer-community posts while preserving facts and voice. |
 
 ### Implementation And Audit Boundaries
 
