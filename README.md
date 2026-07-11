@@ -49,6 +49,7 @@ docs/repo-scope.md
 docs/standards/cron-automation.md
 docs/standards/github-branching.md
 docs/standards/ai-content-quality.md
+docs/standards/skill-routing.md
 ```
 
 ## Install Skills From GitHub
@@ -64,7 +65,7 @@ Install selected skills:
 
 ```bash
 npx skills add https://github.com/idaibin/aicraft \
-  --skill code-context code-planner code-review code-delivery code-security chatgpt-review-bridge diagnose implement-frontend implement-rust audit-frontend audit-rust ops-browser ops-client writing-editor
+  --skill repo-context code-planner diagnose code-review repo-review code-delivery audit-security chatgpt-review-bridge implement-frontend implement-rust audit-frontend audit-rust ops-browser ops-client writing-editor
 ```
 
 List available skills without installing:
@@ -79,30 +80,42 @@ For the full command list and available skill names, see [`INSTALL.md`](INSTALL.
 
 | Skill | Use when |
 | --- | --- |
-| `code-context` | Grounding repository work in real commands, paths, entry points, docs, project classes, and existing reuse/reference candidates before guessing. |
+| `repo-context` | Grounding repository work in real commands, paths, entry points, docs, project classes, and existing reuse/reference candidates before guessing. |
 | `code-planner` | Planning future codebase work, splitting tasks, defining validation gates, and coordinating auditable subagents before implementation. |
-| `code-review` | Reviewing existing local changes, dirty-tree ownership, contract chains, commit grouping, and exact staging before commit. |
-| `code-delivery` | Delivering reviewed local changes with validation, path-limited staging, commits, pushes, branch sync, and remote proof. |
-| `audit-frontend` | Auditing frontend architecture, ownership, reuse, state/data, layout, accessibility, performance, Tauri boundaries, and documentation consistency. |
-| `audit-rust` | Auditing Rust baselines, architecture, ownership, concurrency, performance, memory, SQLite, unsafe/FFI, quality gates, and documentation alignment. |
-| `code-security` | Reviewing code, API, auth, permission, token/session, upload, logging, dependency, config, or release changes for security risks. |
-| `chatgpt-review-bridge` | Routing repository review packages through standard ChatGPT chats or Projects using Codex Browser or explicit Chrome/Playwright routes, then capturing and locally verifying findings. |
-| `diagnose` | Diagnosing bugs, failing tests, regressions, flaky behavior, build failures, and performance problems before proposing fixes. |
-| `implement-frontend` | Implementing frontend UI reuse-first, using existing pages/components as references while preserving lean DOM/CSS, design-system, layout, and API contracts. |
+| `diagnose` | Reproducing technical failures, isolating variables, confirming root causes, and handing verified remediation to the matching implementation skill. |
+| `code-review` | Reviewing existing local Git changes, dirty-tree ownership, contract chains, commit grouping, and exact staging plans before commit. |
+| `repo-review` | Independently reviewing an immutable repository snapshot, branch comparison, commit range, pull request, release candidate, or verified review package with consolidated P0-P3 findings. |
+| `code-delivery` | Delivering reviewed local changes with path-limited staging, commits, pushes, branch sync, squash-to-main, cleanup, and remote proof. |
+| `audit-security` | Auditing known code, API, auth, permission, token/session, upload, logging, dependency, config, or release surfaces for scoped security risks. |
+| `chatgpt-review-bridge` | Routing prepared repository review material through standard ChatGPT chats or Projects using capability-aware browser paths, then capturing and locally verifying findings. |
+| `implement-frontend` | Implementing frontend UI reuse-first, using existing pages/components as references while preserving lean DOM/CSS, design-system, layout, state, and API contracts. |
 | `implement-rust` | Implementing or porting Rust reuse-first with explicit ownership, FFI/unsafe boundaries, behavior parity, idiomatic APIs, and risk-matched validation. |
+| `audit-frontend` | Auditing selected frontend profiles across React, Vue, UI/design systems, state/data, accessibility, performance, and Tauri boundaries without splitting by framework. |
+| `audit-rust` | Auditing selected Rust profiles for architecture, ownership, concurrency, performance, memory, SQLite, unsafe/FFI, quality gates, and documentation alignment. |
 | `ops-browser` | Operating browser pages and collecting screenshots, visual/responsive checks, form/upload/download evidence, console/network data, and session-safe verification. |
 | `ops-client` | Verifying or operating specified Tauri/Electron/native desktop clients with launch-command, runtime-source, CGWindowID, real-window, and Accessibility evidence. |
 | `writing-editor` | Drafting, rewriting, diagnosing, and adapting human-quality Chinese short posts, factual soft copy, technical essays, tutorials, retrospectives, and developer-community posts while preserving facts and voice. |
 
-### Implementation And Audit Boundaries
+### Core Routing Boundaries
 
-- `implement-frontend` and `implement-rust` own requested code changes,
-  refactors, ports, and implementation self-checks.
-- `audit-frontend` and `audit-rust` are read-only by default, own systematic
-  domain audits, and lead with severity-ranked evidence and remediation scope.
-- `code-review` starts from existing Git changes and owns dirty-tree
-  classification, contract and structural completeness, staging, and commit
-  readiness. `code-delivery` owns push, squash-to-main, and remote proof.
+```text
+repo-context = what exists, where it lives, and what can be reused
+code-review  = whether current local uncommitted changes are safe and ready to commit
+repo-review  = what defects exist in an immutable repository/range/PR/release basis
+```
+
+These skills all read repository evidence but must remain separate because their primary object, authorization boundary, stop condition, and output contract differ.
+
+### Implementation, Audit, Review, And Delivery Boundaries
+
+- `implement-frontend` and `implement-rust` own requested code changes, refactors, ports, and implementation self-checks.
+- `audit-frontend`, `audit-rust`, and `audit-security` are read-only domain specialists. They select only applicable profiles and return bounded findings.
+- `code-review` owns local dirty-tree inventory, mixed-hunk classification, contract completeness, staging plans, and commit readiness.
+- `repo-review` owns independent review of immutable repository snapshots, ranges, PRs, release candidates, or verified review packages and coordinates bounded specialists.
+- `diagnose` owns reproduction and root-cause confirmation; permanent fixes transition to the matching implementation skill.
+- `code-delivery` is the sole owner of staging, commits, pushes, squash, cleanup, and other Git mutation after review acceptance.
+
+See [`docs/standards/skill-routing.md`](docs/standards/skill-routing.md) for the design and split/merge criteria.
 
 ## Validate Local Skills
 
@@ -113,10 +126,14 @@ python3 scripts/validate-skills.py
 python3 scripts/test_validate_skills.py
 ```
 
-Useful targeted package check:
+Useful targeted package checks:
 
 ```bash
-python3 scripts/validate-skills.py --skill code-planner
+python3 scripts/validate-skills.py --skill repo-context
+python3 scripts/validate-skills.py --skill repo-review
+python3 scripts/validate-skills.py --skill diagnose
+python3 scripts/validate-skills.py --skill audit-frontend
+python3 scripts/validate-skills.py --skill audit-security
 ```
 
 End-user installation and updates should use the standard `npx skills add` and `npx skills update` flow.
@@ -127,6 +144,8 @@ End-user installation and updates should use the standard `npx skills add` and `
 - keep prompt and skill assets directly accessible
 - keep publishable skills self-contained; repo-local prompts can supplement them but should not be required
 - let prompts capture task language, and let skills capture stable execution workflows
+- split a public skill only when user intent, authority, workflow, output contract, and non-trigger set are materially distinct
+- prefer internal profiles when framework or checklist variants share the same ownership and output contract
 - keep skill trigger/eval cases in `references/eval-cases.md` and validate packages before publishing
 - keep shared automation standards in `docs/standards/`
 - keep downstream repository task details out of AICraft except for the registry index

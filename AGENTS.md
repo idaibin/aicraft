@@ -7,10 +7,13 @@ This file defines how AI agents should work on this repository. It is not the pr
 - For repository development, documentation edits, prompt edits, skill package edits, reviews, or commits, follow the repository work rules below.
 - Only when the user explicitly asks to install skills from `https://github.com/idaibin/aicraft`, read `INSTALL.md` and follow that installation flow.
 - Do not switch into installation mode just because this repository contains `skills/`.
-- Use `implement-frontend` or `implement-rust` for requested code changes. Use
-  `audit-frontend` or `audit-rust` for read-only domain audits. Use
-  `code-review` for existing Git changes, staging plans, and commit readiness;
-  use `code-delivery` for staging, commits, pushes, and other Git mutations.
+- Use `repo-context` for separate repository grounding, reuse inventory, or docs/code alignment.
+- Use `diagnose` for concrete failures; permanent remediation transitions to the matching implementation skill.
+- Use `implement-frontend` or `implement-rust` for requested code changes.
+- Use `audit-frontend`, `audit-rust`, or `audit-security` for bounded read-only domain audits.
+- Use `code-review` for existing local Git changes, dirty-tree ownership, staging plans, and commit readiness.
+- Use `repo-review` for immutable repository snapshots, branch comparisons, commit ranges, pull requests, release candidates, or review packages.
+- Use `code-delivery` for staging, commits, pushes, squash, cleanup, and other Git mutations.
 
 ## Repository Work Rules
 
@@ -30,7 +33,7 @@ This file defines how AI agents should work on this repository. It is not the pr
 - `scripts/validate-skills.py` validates source skill packages for repository development.
 - `scripts/test_validate_skills.py` runs validator regression tests.
 
-When editing or adding skill packages under `skills/`, also read `skills/AGENTS.md` and `docs/skills/skill-standard.md`.
+When editing or adding skill packages under `skills/`, also read `skills/AGENTS.md`, `docs/skills/skill-standard.md`, and `docs/standards/skill-routing.md`.
 
 ## Skill Validation
 
@@ -41,5 +44,4 @@ python3 scripts/validate-skills.py
 python3 scripts/test_validate_skills.py
 ```
 
-Also run `git diff --check` and report any runtime or external behavior that was
-not verified.
+Also run `git diff --check` and report any runtime or external behavior that was not verified.

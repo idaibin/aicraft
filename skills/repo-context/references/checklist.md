@@ -1,6 +1,6 @@
-# Code Context Checklist
+# Repository Context Checklist
 
-Use this checklist when applying `code-context` to understand a repository, bootstrap missing context docs, or review existing docs against code. Trigger phrases include `repository context`, `understand this project`, `do not guess`, `real commands`, `real entry points`, and `doc/code alignment`.
+Use this checklist when applying `repo-context` to understand a repository, bootstrap missing context docs, or review existing docs against code. Trigger phrases include `repository context`, `understand this project`, `do not guess`, `real commands`, `real entry points`, and `doc/code alignment`.
 
 ## Scan Order
 
@@ -17,8 +17,8 @@ Use this checklist when applying `code-context` to understand a repository, boot
 11. Read the files that implement project-specific conventions when those conventions affect the requested context.
 12. Run baseline checks only with commands already defined by the repo.
 13. Detect context doc state:
-   - missing or sparse docs: use Bootstrap mode
-   - existing docs with current-truth claims: use Alignment mode
+    - missing or sparse docs: use Bootstrap mode
+    - existing docs with current-truth claims: use Alignment mode
 
 ## What To Report
 
@@ -83,6 +83,7 @@ Use this checklist when applying `code-context` to understand a repository, boot
 ## Draft Output Outline
 
 ### AGENTS.md
+
 - Repository purpose
 - Directory structure
 - Working rules
@@ -92,6 +93,7 @@ Use this checklist when applying `code-context` to understand a repository, boot
 - Disallowed actions
 
 ### docs/project-map.md
+
 - Tech stack
 - Install / start / test / build commands
 - Directory structure

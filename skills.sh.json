@@ -3,20 +3,39 @@
   "notGrouped": "bottom",
   "groupings": [
     {
-      "title": "Code",
-      "description": "Skills for repository grounding, planning, implementation guardrails, review, delivery, and security checks.",
+      "title": "Workflow",
+      "description": "Skills for repository grounding, planning, diagnosis, local change review, and Git delivery.",
       "skills": [
-        "code-context",
+        "repo-context",
         "code-planner",
         "diagnose",
         "code-review",
-        "chatgpt-review-bridge",
-        "code-delivery",
+        "code-delivery"
+      ]
+    },
+    {
+      "title": "Review Orchestration",
+      "description": "Skills for independent repository review and external ChatGPT review coordination.",
+      "skills": [
+        "repo-review",
+        "chatgpt-review-bridge"
+      ]
+    },
+    {
+      "title": "Implementation",
+      "description": "Skills that own requested source-code implementation and refactoring within their domains.",
+      "skills": [
         "implement-frontend",
-        "implement-rust",
+        "implement-rust"
+      ]
+    },
+    {
+      "title": "Audit",
+      "description": "Read-only specialist skills for frontend, Rust, and scoped security assessment.",
+      "skills": [
         "audit-frontend",
         "audit-rust",
-        "code-security"
+        "audit-security"
       ]
     },
     {

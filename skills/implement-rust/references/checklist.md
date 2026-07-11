@@ -29,7 +29,7 @@
 
 ## Interface Reuse Gate
 
-- Start from a current `code-context` inventory, or reproduce the same targeted
+- Start from a current `repo-context` inventory, or reproduce the same targeted
   search when it is unavailable or stale.
 - Read architecture/API docs and trace the nearest analogous route registration,
   handler, service, repository, trait/impl, types/DTOs, errors, migrations,

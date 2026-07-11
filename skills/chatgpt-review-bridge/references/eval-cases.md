@@ -26,7 +26,7 @@ Use these cases when triggers, capability gates, external authorization, routing
 | `Review my local diff and propose commit groups.` | Prefer `code-review`. |
 | `Open the app and check whether the modal overflows.` | Prefer `ops-browser`. |
 | `Push this branch and merge to main.` | Prefer `code-delivery`. |
-| `Review this endpoint for token leakage.` | Prefer `code-security`. |
+| `Review this endpoint for token leakage.` | Prefer `audit-security`. |
 | `Run Codex CLI locally to implement this feature; do not use ChatGPT.` | Do not trigger; this is local-only execution. |
 | `Open ChatGPT and check whether its composer is visible.` | Prefer `ops-browser`; no repository review bridge is requested. |
 

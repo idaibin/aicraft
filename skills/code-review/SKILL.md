@@ -7,7 +7,7 @@ description: "Use when existing local git changes need pre-commit review: classi
 
 ## Overview
 
-Review local Git changes read-only before commit, protect all existing worktree content, verify contracts, and produce safe commit groups with exact staging scope. Scale review depth to the diff risk; this is not an implementation or repository-wide audit skill.
+Review existing local Git changes read-only before commit, protect all worktree content, verify contracts, and produce safe commit groups with exact staging scope. Scale review depth to the diff risk. The primary object is the current local worktree/index and its commit readiness; use `repo-review` for immutable repository snapshots, branch comparisons, commit ranges, pull requests, release candidates, or review packages.
 
 ## Workflow
 
@@ -21,7 +21,7 @@ Review local Git changes read-only before commit, protect all existing worktree 
 5. Inspect actual diffs for every file that may enter a commit group. Focused review may omit unrelated file bodies but must still inventory and classify them.
 6. For API or interface changes, trace route/method/fields through request helpers, types, callers, data shaping, and runtime evidence or mark gaps `Not verified`.
 7. For structural changes, trace manifests, exports, commands, tests, CI/deploy paths, docs, indexes, migrations, generated files, and stale references.
-8. For High-risk changed surfaces, invoke `audit-frontend`, `audit-rust`, or `code-security` as a scoped read-only specialist subreview when their domain evidence is required. Keep dirty-tree ownership, staging plans, and final acceptance here.
+8. For High-risk changed surfaces, invoke `audit-frontend`, `audit-rust`, or `audit-security` as a bounded read-only specialist subreview when their domain evidence is required. Keep dirty-tree ownership, staging plans, and final commit-readiness acceptance here.
 9. Run or request checks that match the change and selected depth; report failures and skipped checks.
 10. Split by semantic unit and output exact commit groups and staging instructions. Route requested staging, commits, pushes, or other Git mutations to `code-delivery` after review acceptance.
 
@@ -29,15 +29,17 @@ Review local Git changes read-only before commit, protect all existing worktree 
 
 - **Focused review:** inspect the complete small diff, verify ownership, immediate callers/tests, and exact staging; avoid producing a full architecture checklist when no boundary changed.
 - **Standard review:** inspect all candidate changes, contract chains, tests, structural lifecycle, and semantic commit grouping.
-- **High-risk review:** add domain-specific validation and, when needed, coordinate a scoped specialist subreview while retaining one read-only Git-change review coordinator.
+- **High-risk review:** add domain-specific validation and, when needed, coordinate a bounded specialist subreview while retaining one read-only Git-change review coordinator.
 - **Commit-readiness review:** produce semantic groups, exact path- or hunk-level staging instructions, validation status, and commit messages for `code-delivery`; do not stage or commit.
 
 ## Do Not Use For
 
-- First-pass repository onboarding or docs/code alignment; use `code-context`.
+- First-pass repository onboarding, reuse inventory, or docs/code alignment; use `repo-context`.
+- Independent review of a repository snapshot, branch comparison, commit range, pull request, release candidate, or review package; use `repo-review`.
 - Future implementation planning before changes exist; use `code-planner`.
-- Security-only audit after ownership and contract surfaces are already known; use `code-security`.
-- Domain-wide frontend or Rust architecture, performance, memory, concurrency, SQLite, accessibility, or reuse audit without a Git change set; use `audit-frontend` or `audit-rust`.
+- Security-only audit after ownership and contract surfaces are already known; use `audit-security`.
+- Domain-wide frontend or Rust architecture, performance, memory, concurrency, SQLite, accessibility, or reuse audit without a local Git change set; use `audit-frontend` or `audit-rust`.
+- Root-cause diagnosis of a concrete failure; use `diagnose`.
 - Browser or desktop-client operation evidence; use `ops-browser` or `ops-client`.
 - Staging, local commits, pushes, branch sync, squash-to-main, remote cleanup, or post-push verification; use `code-delivery` after review scope is accepted.
 
@@ -57,14 +59,15 @@ Review local Git changes read-only before commit, protect all existing worktree 
 - Do not approve add/reuse/move/rename/delete work while source, manifests, exports, commands, tests, CI/deploy paths, architecture/project-map docs, indexes, generated outputs, migrations, or stale references still disagree.
 - Do not invent runtime, CI, deployment, migration, or consumer evidence. Use `Not verified` when the available diff cannot prove it.
 - Review severity must be based on concrete impact and reachability, not file size, style preference, or hypothetical future use.
+- Do not expand a local dirty-tree review into a whole-repository assessment merely because adjacent committed code is visible. Escalate only through an explicitly requested `repo-review` basis.
 
 ## Output Contract
 
-Start with selected review depth, local change scope, ownership classification, staged-state risks, and severity-ranked findings. Include contract and structural completeness before the commit plan. For each commit group, include purpose, exact files or hunk-level staging approach, validation status, risks, and a concise Conventional Commit message. State excluded changes, failed or skipped checks, and `Not found` or `Not verified` evidence gaps.
+Start with selected review depth, local change scope, ownership classification, staged-state risks, and severity-ranked findings. Include contract and structural completeness before the commit plan. For each commit group, include purpose, exact files or hunk-level staging approach, validation status, risks, and a concise Conventional Commit message. State excluded changes, failed or skipped checks, and `Not found` or `Not verified` evidence gaps. Do not claim whole-repository, branch-range, PR, or release-candidate coverage.
 
 ## Skill Maintenance
 
-When maintaining this package, update `references/eval-cases.md`, `references/usage.md`, and `agents/openai.yaml` with trigger, ownership, staging-plan, specialist-subreview, or contract-review changes. In AICraft, run `python3 scripts/validate-skills.py` before publishing; end-user installs use `npx skills add https://github.com/idaibin/aicraft`, and end-user updates use `npx skills update`.
+When maintaining this package, update `references/eval-cases.md`, `references/usage.md`, and `agents/openai.yaml` with trigger, ownership, staging-plan, specialist-subreview, repository-review boundary, or contract-review changes. In AICraft, run `python3 scripts/validate-skills.py --skill code-review` before publishing.
 
 ## References
 

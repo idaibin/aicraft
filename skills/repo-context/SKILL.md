@@ -1,17 +1,13 @@
 ---
-name: code-context
+name: repo-context
 description: "Use when the user explicitly asks to ground repository work, map real files, commands, entry points, project docs or classes, preview AGENTS/project-map content, inventory existing page/component or Rust interface reuse candidates, or compare docs and code before implementation."
 ---
 
-# Code Context
+# Repository Context
 
 ## Overview
 
-Establish repository context from real files, not assumptions. Use this when the
-requested deliverable is onboarding, a targeted reuse/interface inventory, doc
-bootstrap, or doc/code alignment. Generic implementation stays with
-`implement-frontend`, `implement-rust`, or the repository's implementation
-workflow, which performs its own targeted search when no current context report exists.
+Establish repository context from real files, not assumptions. Use this when the requested deliverable is onboarding, a targeted reuse/interface inventory, doc bootstrap, or doc/code alignment. Generic implementation stays with `implement-frontend`, `implement-rust`, or the repository's implementation workflow, which performs its own targeted search when no current context report exists. This skill explains what exists and where ownership lives; it does not judge a repository, range, or change set for defects.
 
 ## Workflow
 
@@ -40,10 +36,12 @@ workflow, which performs its own targeted search when no current context report 
 ## Do Not Use For
 
 - Ordinary implementation when the user did not ask for a separate context deliverable; implementation skills must perform their own bounded grounding.
-- Existing local diff review, commit grouping, or staging plans; use `code-review`.
+- Existing local diff review, dirty-tree ownership, commit grouping, or staging plans; use `code-review`.
+- Independent review of a repository snapshot, branch comparison, commit range, pull request, release candidate, or review package; use `repo-review`.
 - Future implementation planning or subagent task splitting; use `code-planner`.
+- Root-cause investigation of a concrete failure; use `diagnose`.
 - Browser page operation or real desktop-client verification; use `ops-browser` or `ops-client`.
-- Security-only review after the target surface is known; use `code-security`.
+- Security-only review after the target surface is known; use `audit-security`.
 
 ## Hard Rules
 
@@ -54,18 +52,19 @@ workflow, which performs its own targeted search when no current context report 
 - Treat local `prompts/` as optional; bundled references must be sufficient after publishing.
 - Preview generated docs before writing unless implementation is explicitly requested.
 - Preserve unrelated local changes.
+- Do not turn inventory observations into P0-P3 findings or claim review approval; route evaluative review requests to `code-review` or `repo-review` according to the target basis.
 - Do not impose one directory or toolchain template across different project classes. Treat documented legacy, prototype, multi-process, framework-native, and protected production layouts as explicit evidence.
 - Do not recommend a new page, component, endpoint, handler, service, repository, trait, type/DTO, helper, hook, composable, store, or shared layer before reading relevant docs and running a targeted existing-file and symbol search. Report the nearest reusable or reference implementation, or state `Not found` and justify the new path or interface.
-- Do not duplicate a full context report inside a later implementation response. Reuse the current inventory, refresh only stale facts, and report the changed evidence.
+- Do not duplicate a full context report inside a later implementation or review response. Reuse the current inventory, refresh only stale facts, and report changed evidence.
 - Do not measure quality by file count read. Every inspected path must answer a named context question.
 
 ## Output Contract
 
-Start with the selected profile, verified current truth, project class, and the reason the read stopped. Then report the targeted directory/file inventory, reuse and reference candidates, missing items, standards drift, doc/code mismatches, or proposed docs. Include commands run, new-file justification, validation status, escalation reason when applicable, structural lifecycle gaps, and anything `Not verified`.
+Start with the selected profile, verified current truth, project class, and the reason the read stopped. Then report the targeted directory/file inventory, reuse and reference candidates, missing items, standards drift, doc/code mismatches, or proposed docs. Include commands run, new-file justification, validation status, escalation reason when applicable, structural lifecycle gaps, and anything `Not verified`. Do not produce severity-ranked defect findings unless the user separately requests a review workflow.
 
 ## Skill Maintenance
 
-When maintaining this package, update `references/eval-cases.md`, `references/usage.md`, and `agents/openai.yaml` with trigger, mode, or output changes. In AICraft, run `python3 scripts/validate-skills.py` before publishing; end-user installs use `npx skills add https://github.com/idaibin/aicraft`, and end-user updates use `npx skills update`.
+When maintaining this package, update `references/eval-cases.md`, `references/usage.md`, and `agents/openai.yaml` with trigger, mode, boundary, or output changes. In AICraft, run `python3 scripts/validate-skills.py --skill repo-context` before publishing.
 
 ## References
 

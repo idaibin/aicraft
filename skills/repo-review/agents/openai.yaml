@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repository Review"
+  short_description: "Review repositories, ranges, PRs, or release candidates"
+  default_prompt: "Use $repo-review for a read-only independent review of a repository snapshot, branch comparison, commit range, pull request, release candidate, or verified review package. Resolve an immutable basis, select only required repository, frontend, Rust, security, and validation profiles, and retain final scope and severity ownership while using $audit-frontend, $audit-rust, or $audit-security only as bounded specialists. Report consolidated P0-P3 findings with exact evidence, impact, remediation, verification, exclusions, and Not verified gaps. Route local dirty-tree commit readiness to $code-review, context mapping to $repo-context, fixes to the matching implement skill, and Git mutation to $code-delivery."

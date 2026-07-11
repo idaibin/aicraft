@@ -1,29 +1,57 @@
 # Frontend Audit Usage
 
+## Summary
+
+Use `audit-frontend` as one read-only frontend audit entrypoint. Detect the actual framework and local API style, then select only the profiles required by the request. React, Vue, UI/design-system, accessibility, performance, and Tauri concerns are internal profiles rather than separate public skills because they share the same evidence basis, ownership model, mutation boundary, and final report contract.
+
+## Profiles
+
+- **Architecture/Reuse:** routes, features, shared layers, dependency direction, abstractions, lifecycle, and docs.
+- **State/Data/Contracts:** server/cache, URL, forms, business/local state, React/Vue reactivity, stores, schemas, requests, errors, cancellation, and IPC contracts.
+- **Component/Layout/Design System:** primitives, variants, tokens, DOM/CSS, density, responsive layout, spacing, scrolling, and duplicate systems.
+- **Accessibility:** semantics, keyboard, focus, accessible names, dialogs/popovers, forms, errors, and async status.
+- **Performance:** render/reactivity/data paths, fan-out, request duplication, bundle/runtime/IPC cost, long tasks, and measurement quality.
+- **Desktop Boundary:** frontend adapters, Tauri/native commands, DTO/errors, progress, cancellation, menus, shortcuts, windows, and real-client evidence.
+
+Always state selected profiles and mark all other profiles `Out of scope`.
+
+## Framework Profiles
+
+- **React:** hooks/effects, context/store subscriptions, render boundaries, Router/Next/TanStack contracts.
+- **Vue Composition:** refs/reactive/computed/watch/watchEffect, composables, Pinia, Router, provide/inject, keep-alive, scopes, and cancellation.
+- **Vue Options:** data/computed/watch/`this.$watch`, methods, provide/inject, component guards, lifecycle, keep-alive, and cancellation without Composition conversion.
+- **Other:** repository-native concepts; unsupported assumptions remain `Not verified`.
+
 ## Trigger Examples
 
-- `Review this Console for duplicate tables, dialogs, spacing, stores, and request mechanisms.`
-- `Audit this frontend architecture for component reuse, state ownership, accessibility, performance, and documentation drift; there is no current Git change set.`
-- `Check whether this hook, service, or store belongs in the feature or shared layer.`
-- `Audit this Vue 3 feature for SFC/API consistency, reactivity escape, watcher dependencies, provide/inject ownership, Router guard teardown, and keep-alive request cleanup.`
-- `Audit this Tauri frontend boundary for progress, cancellation, errors, menus, and shortcuts.`
-- `As a read-only specialist under code-review, inspect only the changed Vue files for state, lifecycle, accessibility, and performance risks.`
+- `Audit this Console for architecture/reuse and state/data only; leave accessibility and performance out of scope.`
+- `Audit this Vue 3 feature for reactivity, watcher dependencies, Pinia ownership, Router teardown, and request cancellation.`
+- `Audit this frontend design system for duplicated primitives, variants, tokens, spacing, and scroll ownership.`
+- `Review accessibility and performance for this React table using browser evidence where static inspection is insufficient.`
+- `Audit this Tauri frontend boundary for adapters, progress, cancellation, errors, menus, and shortcuts.`
+- `Under repo-review, inspect only the changed frontend paths for selected state/data and layout profiles.`
 
 ## Non-Triggers
 
-- `Change this button label in the known component.` — prefer
-  `implement-frontend`.
-- `Find why this page crashes.` — prefer `diagnose` until the cause is known.
-- `Verify the page in a browser.` — prefer `ops-browser`.
-- `Review all dirty files, decide ownership, stage commits, and declare commit readiness.` — use `code-review` for the read-only inventory, staging plan, specialist coordination, and readiness decision, then `code-delivery` for authorized staging and commit creation. `audit-frontend` owns neither.
-- `Review the current frontend diff for reuse, state, accessibility, and performance.` — `code-review` owns the read-only change-set review and may delegate an explicit frontend path to `audit-frontend`; `code-delivery` owns any later Git mutation.
+- `Change this button label in the known component.` — use `implement-frontend`.
+- `Find why this page crashes.` — use `diagnose` until the cause is confirmed.
+- `Verify the page in a browser.` — use `ops-browser`.
+- `Review all local dirty files, split commits, and prepare staging.` — use `code-review`.
+- `Review the whole repository or a commit range and coordinate all domains.` — use `repo-review`, which may delegate a bounded frontend surface here.
+- `Stage, commit, or push the accepted changes.` — use `code-delivery`.
+
+## Why Not Separate `audit-react`, `audit-vue`, and `audit-ui`
+
+Do not split solely by framework or checklist category. These concerns share:
+
+- the same repository guidance and target inventory;
+- the same route/feature/component/state ownership map;
+- the same read-only boundary and fix owner;
+- the same need to combine state, layout, accessibility, and performance evidence;
+- the same final severity and validation contract.
+
+A new public skill is justified only when it has a distinct user intent, authorization boundary, workflow, output contract, and non-trigger set. A future screenshot/Figma-first product-experience audit may qualify as `audit-ux`; ordinary source-backed UI review remains a profile here.
 
 ## Expected Report
 
-Lead with severity-ranked findings, then report direct-audit or specialist mode,
-delegated paths and `code-review` read-only Git-change review owner when applicable, inspected evidence,
-project class/framework profile, reuse candidates, ownership assessment,
-state/reactivity/data/native boundaries, component/injection/router/lifetime
-contracts, feedback states, token/layout owners, accessibility/performance
-evidence, documentation lifecycle, validation, and residual `Not verified`
-risks.
+Lead with product/framework profile, selected profiles, excluded profiles, coordinating owner when delegated, and severity-ranked findings. Then report inspected evidence, reuse candidates, ownership map, selected state/data/layout/accessibility/performance/desktop evidence, component/injection/router/lifetime contracts, structural/documentation lifecycle, validation, and residual `Not verified` risks.

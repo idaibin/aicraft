@@ -14,7 +14,7 @@ Implement Rust changes against the repository's real toolchain, project class, c
 1. Read repository guidance and run `git status --short` before edits.
 2. Identify the Rust project class: library workspace, application workspace, HTTP service, CLI, Tauri/native backend, or compact single package.
 3. Inspect the relevant `Cargo.toml`, lockfile, toolchain, formatter, lint, command source, modules, tests, architecture docs, and API/interface docs.
-4. Consume a current `code-context` inventory or perform the same targeted search across route registration, handlers, services, repositories, traits/impls, types/DTOs, errors, migrations, callers, tests, and analogous features.
+4. Consume a current `repo-context` inventory or perform the same targeted search across route registration, handlers, services, repositories, traits/impls, types/DTOs, errors, migrations, callers, tests, and analogous features.
 5. Start with the **Baseline** validation contract, then select every applicable risk overlay. Overlays are composable, not severity levels:
    - **Contract:** public API, endpoint, DTO, error mapping, crate/module boundary, feature flag, or downstream consumer change.
    - **Concurrency/runtime:** Tokio tasks, channels, locks, cancellation, blocking work, overload, or shutdown.
@@ -39,12 +39,12 @@ Implement Rust changes against the repository's real toolchain, project class, c
 
 ## Do Not Use For
 
-- First-pass repository discovery; use `code-context`.
+- First-pass repository discovery; use `repo-context`.
 - Future multi-step migration planning; use `code-planner`.
 - Unknown root-cause investigation; use `diagnose`.
 - Dirty-tree ownership, staging plans, or commit grouping; use `code-review`. Use `code-delivery` for actual staging or commits after review.
 - Systematic Rust architecture, performance, memory, concurrency, SQLite, unsafe, or FFI audit without requested edits; use `audit-rust`.
-- Security-only review after the Rust surface is mapped; use `code-security`.
+- Security-only audit after the Rust surface is mapped; use `audit-security`.
 - Frontend or webview UI changes; use `implement-frontend`.
 
 ## Hard Rules

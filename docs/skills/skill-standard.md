@@ -2,6 +2,8 @@
 
 This file defines the project standard for publishable or reusable skill packages under `skills/<skill-name>/`.
 
+Read `../standards/skill-routing.md` together with this document when adding, splitting, merging, or changing a skill boundary.
+
 ## Package Shape
 
 Each skill package must use this structure:
@@ -20,41 +22,56 @@ Optional `scripts/` or `assets/` are allowed only when they directly support the
 
 - Directory name and `SKILL.md` frontmatter `name` must match.
 - Skill names must use lowercase letters, numbers, and hyphens only.
-- Prefer short verb-led names. Implementation skills use
-  `implement-<domain>`, such as `implement-frontend` or `implement-rust`.
-- Domain audit skills use `audit-<domain>`, such as `audit-frontend` or
-  `audit-rust`. They are read-only by default, lead with evidence-backed
-  findings, and route requested fixes to the corresponding `implement-*` skill.
-- Keep `code-review` distinct from `audit-*` and `code-delivery`: `code-review`
-  owns existing Git changes, dirty-tree classification, contract and structural
-  completeness, staging plans, and commit readiness; `audit-*` owns domain-wide
-  or reviewer-invoked scoped specialist analysis; `code-delivery` owns staging,
-  commits, pushes, and other Git mutations after review.
-- Do not use unclear abbreviations such as `imp-*` or mix
-  `<domain>-implementation` with `implement-<domain>`.
+- Prefer short verb-led names.
+- Implementation skills use `implement-<domain>`, such as `implement-frontend` or `implement-rust`, and own requested source changes only.
+- Domain audit skills use `audit-<domain>`, such as `audit-frontend`, `audit-rust`, or `audit-security`. They are read-only, select only applicable profiles, lead with evidence-backed findings, and route fixes to the corresponding implementation skill.
+- `repo-context` owns separate repository grounding, real commands/paths, reuse inventory, and docs/code alignment. It does not rank defects or declare review readiness.
+- `diagnose` owns failure reproduction, minimization, hypothesis testing, and root-cause confirmation. Permanent remediation transitions to the matching implementation skill.
+- `code-review` owns current local Git changes, dirty-tree classification, contract/structural completeness, mixed hunks, staging plans, and commit readiness.
+- `repo-review` owns immutable repository snapshots, branch comparisons, commit ranges, pull requests, release candidates, and verified review packages. It coordinates bounded specialists and consolidates final P0-P3 findings.
+- `audit-security` owns bounded security assessment and may act as a specialist under `code-review` or `repo-review`; it does not replace either coordinator.
+- `code-delivery` is the sole owner of staging, commits, pushes, squash, cleanup, and other Git mutation after review acceptance.
+- Do not use unclear abbreviations such as `imp-*` or mix `<domain>-implementation` with `implement-<domain>`.
 - `description` must start with `Use when`.
 - `description` must describe trigger conditions, not the full workflow.
 - Quote frontmatter string values when they contain YAML-significant punctuation such as `: `.
 - Keep the frontmatter concise; target description length is under 500 characters.
 - Do not use long `Triggers include ...` lists in frontmatter. Put rich trigger examples in `references/usage.md` and `references/eval-cases.md`.
-- Use English trigger phrases and realistic user wording by default for public, reusable skills. Add localized trigger phrases only when the skill is explicitly audience-specific.
-- Do not keep obsolete skill names inside a skill package. Put migration or
-  rejection notes in root documentation, where package-level stale-name checks
-  do not treat them as active routing instructions.
+- Use English trigger phrases and realistic user wording by default for public, reusable skills. Add localized triggers only when the skill is explicitly audience-specific.
+- Do not keep obsolete skill names inside a skill package. Put migration or rejection notes in root documentation, where package-level stale-name checks do not treat them as active routing instructions.
+
+## Public Skill Or Internal Profile
+
+A public skill must represent a distinct user intent and execution owner. Create one only when all of the following are materially distinct from existing skills:
+
+- primary object;
+- authorization or mutation boundary;
+- workflow and stop conditions;
+- output contract;
+- nearest non-trigger set;
+- repeated real use across several tasks or repositories.
+
+Use an internal mode or profile when technology or checklist variants share the same evidence inventory, owner, mutation boundary, and output contract.
+
+Examples:
+
+- React, Vue Composition, Vue Options, UI/design-system, accessibility, performance, and Tauri checks remain profiles inside `audit-frontend`.
+- Architecture, ownership/errors, concurrency, performance/memory, SQLite, and unsafe/FFI remain profiles inside `audit-rust`.
+- Do not create `audit-react`, `audit-vue`, or `audit-ui` solely to divide checklists.
 
 ## SKILL.md Body
 
 `SKILL.md` should stay lean and procedural. It should include:
 
-- Overview: one short paragraph explaining the capability.
-- Workflow or Modes: the core execution path and mode selection.
-- Do Not Use For: explicit routing boundaries for adjacent skills when overlap is likely.
-- Hard Rules: scope, safety, write, staging, tool, or verification constraints.
-- Output Contract: what the agent must report.
+- Overview: one short paragraph explaining the capability and primary object.
+- Workflow or Modes/Profiles: the core execution path and selection rules.
+- Do Not Use For: explicit routing boundaries for the closest neighboring skills.
+- Hard Rules: scope, safety, write, staging, tool, authorization, and verification constraints.
+- Output Contract: what the agent must report or produce.
 - References: direct links to reference files that may be loaded only when needed.
-- Maintenance: a short note to update eval cases and metadata when triggers, modes, or output contracts change.
+- Maintenance: a short note to update eval cases, metadata, and indexes when triggers, profiles, or output contracts change.
 
-Keep detailed examples, checklists, templates, and trigger/quality evals in `references/`.
+Keep detailed examples, checklists, templates, and evals in `references/`.
 
 ## References
 
@@ -62,10 +79,11 @@ Reference files must be one level deep under `references/` and linked from `SKIL
 
 Use references for:
 
-- detailed checklists
-- examples
-- trigger, non-trigger, and quality eval cases
-- bundled prompt or document templates
+- detailed checklists;
+- modes/profiles and selection criteria;
+- examples and anti-patterns;
+- trigger, non-trigger, scenario, and quality eval cases;
+- bundled prompt or document templates.
 
 References must be self-contained when the published skill needs them. Local `prompts/` files may supplement a skill, but a published skill must not require them to run.
 
@@ -79,52 +97,68 @@ Each skill should include `agents/openai.yaml` with:
 - `short_description`
 - `default_prompt`
 
-These values must match the current `SKILL.md`. Update them whenever the skill name, modes, or major triggers change. The repository validator checks metadata structure, lengths, required self-routing, and referenced Skill names; semantic synchronization with workflow, mutation boundaries, and current behavior remains a required human review step unless a package defines an additional machine-readable contract.
+These values must match the current `SKILL.md`. Update them whenever the skill name, modes/profiles, primary object, mutation boundary, major triggers, or output contract changes.
 
-Inside `default_prompt`, bare `$name` syntax is reserved for routing to a shipped
-skill and is validated against `skills/*`. Write shell variables in braced form
-such as `${target}` (or positional form such as `$1`); member syntax such as
-`this.$watch` is not a skill route.
+The repository validator checks metadata structure, lengths, required self-routing, and referenced Skill names. Semantic synchronization remains a required review step.
 
-## Safety Rules
+Inside `default_prompt`, bare `$name` syntax is reserved for routing to a shipped skill and is validated against `skills/*`. Write shell variables in braced form such as `${target}` or positional form such as `$1`; member syntax such as `this.$watch` is not a skill route.
 
-Every skill that touches repositories must:
+## Safety And Authority Rules
 
-- read relevant `AGENTS.md` or nearest repo guidance first when present
-- check `git status --short` before planning writes or commits
-- preserve unrelated local changes
-- use real paths, commands, configs, and code evidence
-- say `Not found` for missing files, layers, or commands
-- say `Not verified` for unchecked claims
-- avoid substituting required tools, browsers, branches, or commands
-- preview generated docs before writing unless the user explicitly asks for implementation
+Every repository-facing skill must:
 
-Commit-related skills must additionally avoid broad staging such as `git add .` unless the user explicitly approves that exact scope.
+- read relevant `AGENTS.md` or nearest repo guidance first when present;
+- check `git status --short` before planning writes or commits;
+- preserve unrelated local changes;
+- use real paths, commands, configs, revisions, and code evidence;
+- say `Not found` for missing files, layers, commands, or artifacts;
+- say `Not verified` for unchecked claims;
+- avoid substituting required tools, browsers, branches, or commands;
+- preview generated docs before writing unless the user explicitly asks for implementation.
+
+Authority boundaries:
+
+- context, planning, diagnosis, review, audit, and security skills are read-only unless their own documented artifact boundary explicitly permits a local output file;
+- `diagnose` does not apply permanent fixes;
+- `implement-*` may edit task-owned source but must not stage, commit, push, or create PRs;
+- `code-review` and `repo-review` do not edit or mutate Git/GitHub state;
+- `audit-security` does not expand beyond its bounded surface or take over review coordination;
+- `code-delivery` alone owns Git mutation;
+- browser, client, and external ChatGPT actions require explicit action authorization and capability verification.
+
+Commit-related skills must avoid broad staging such as `git add .` unless the user explicitly approves that exact scope.
 
 ## Engineering Alignment
 
-Repository-facing skills must treat engineering standards as project evidence,
-not as one universal directory template:
+Repository-facing skills must treat engineering standards as project evidence, not as one universal directory template:
 
-- identify the project class and nearest repository standard before proposing
-  directories, toolchains, package managers, scripts, or migrations
-- preserve the current stack and protected runtime contracts unless the user or
-  repository standard explicitly requests alignment work
-- keep equivalent projects consistent within the same class while allowing
-  framework-native layouts and documented legacy, prototype, multi-process, or
-  production exceptions
-- prefer existing local code and components before adding another implementation
-- require at least two real consumers and a named owner before extracting a
-  cross-repository shared capability, unless repository guidance is stricter
-- when adding, reusing, moving, renaming, or deleting structural code, update
-  manifests/workspace membership, module exports, commands, tests, CI/deploy
-  paths, architecture/project-map docs, and indexes that describe the boundary
-- keep validation commands read-only; use explicit `:fix`, write, or formatting
-  commands for source rewrites
+- identify the project class and nearest repository standard before proposing directories, toolchains, package managers, scripts, or migrations;
+- preserve the current stack and protected runtime contracts unless the user or repository standard explicitly requests alignment work;
+- keep equivalent projects consistent within the same class while allowing framework-native layouts and documented legacy, prototype, multi-process, or production exceptions;
+- prefer existing local code and components before adding another implementation;
+- require at least two real consumers and a named owner before extracting a cross-repository shared capability, unless repository guidance is stricter;
+- when adding, reusing, moving, renaming, or deleting structural code, update manifests/workspace membership, exports, commands, tests, CI/deploy paths, architecture/project-map docs, generated artifacts, migrations, consumers, and indexes that describe the boundary;
+- keep validation commands read-only during review; use explicit fix/write commands only during authorized implementation.
 
-Generic skills must not hardcode one organization's version numbers or directory
-names as universal rules. Put product-specific baselines in the target
-repository; teach the skill how to discover and enforce them.
+Generic skills must not hardcode one organization's version numbers or directory names as universal rules. Put product-specific baselines in the target repository; teach the skill how to discover and enforce them.
+
+## Eval Requirements
+
+Every skill must include realistic:
+
+- Trigger Eval cases;
+- Non-Trigger Eval cases;
+- Quality Eval cases;
+- Scoring rules.
+
+When a skill boundary changes, add pairwise trigger/non-trigger cases against every closest neighbor. For example:
+
+- `repo-context` versus `code-review`, `repo-review`, and `audit-security`;
+- `code-review` versus `repo-review`, `audit-security`, and `code-delivery`;
+- `diagnose` versus matching `implement-*` skills;
+- `audit-frontend` versus `code-review`, `repo-review`, and `implement-frontend`.
+
+High-value packages should target a minimum score of 8 even though the generic validator accepts lower historical thresholds.
 
 ## Distribution Rules
 
@@ -133,35 +167,37 @@ End-user installs and updates should use the standard skills.sh CLI flow:
 - `npx skills add https://github.com/idaibin/aicraft`
 - `npx skills update`
 
-Do not add package-local self-update modes, remote-source files, or custom update workflows unless a future source-maintenance workflow explicitly needs them. For normal users, document install and update behavior in `README.md` and `INSTALL.md`, not inside each skill package.
+Do not add package-local self-update modes, remote-source files, or custom update workflows unless a future source-maintenance workflow explicitly needs them. Document install and update behavior in `README.md` and `INSTALL.md`, not inside each skill package.
 
 ## Validation Checklist
 
 Before considering a skill package ready:
 
-- `python3 scripts/validate-skills.py`
-- `python3 scripts/test_validate_skills.py`
-- `rg -n "^name:|^description: Use when" skills/<skill-name>/SKILL.md`
-- `find skills/<skill-name> -maxdepth 3 -type f | sort`
-- `rg -n "Triggers include" skills/<skill-name>/SKILL.md` must return no results
-- `rg -n "[ \t]+$" skills/<skill-name>`
-- `git diff --check -- skills/<skill-name>`
+```bash
+python3 scripts/validate-skills.py
+python3 scripts/test_validate_skills.py
+rg -n "^name:|^description: Use when" skills/<skill-name>/SKILL.md
+find skills/<skill-name> -maxdepth 3 -type f | sort
+rg -n "Triggers include" skills/<skill-name>/SKILL.md
+git diff --check -- skills/<skill-name>
+```
 
-The repository validator also requires the source package set, README skill
-table, INSTALL package list, and `skills.sh.json` grouping index to match. Add,
-rename, or delete a skill only when all four surfaces are updated together.
-- confirm every `references/*.md` file is linked from `SKILL.md`
-- confirm `references/eval-cases.md` includes trigger, non-trigger, quality, and scoring cases
-- stale-name check for previous names or obsolete aliases
-- self-contained check for required external prompt or doc dependencies
-- `agents/openai.yaml` structural validator checks plus human review for stale display name, short description, default prompt, modes, mutation boundary, and routing semantics
+The `Triggers include` command must return no results. Also verify:
 
-After publishing to GitHub, users install with `npx skills add https://github.com/idaibin/aicraft` and update installed copies with `npx skills update`. Use `npx skills add https://github.com/idaibin/aicraft --list` only when you need to inspect discoverability without installing.
+- source package set, README table, INSTALL list, and `skills.sh.json` contain the same skill names;
+- every `references/*.md` file is linked from `SKILL.md`;
+- eval cases include trigger, non-trigger, quality, and scoring sections;
+- metadata and `SKILL.md` agree on primary object, profile/mode, mutation boundary, routing, and output;
+- pairwise evals cover the closest neighboring skills;
+- no stale names, placeholders, required repository-local prompt dependencies, or broken links remain;
+- `git diff --check` passes.
 
-For skills.sh repository pages, use a root-level `skills.sh.json` only for display grouping. It does not change CLI install behavior or any `SKILL.md` content.
+After publishing, users install with `npx skills add https://github.com/idaibin/aicraft` and update installed copies with `npx skills update`. Use `--list` only to inspect discoverability.
+
+For skills.sh repository pages, use root-level `skills.sh.json` only for display grouping. It does not change CLI install behavior or any `SKILL.md` content.
 
 ## Review Rubric
 
-- Pass: all required structure, metadata, safety, references, and validation checks are satisfied.
-- Needs attention: usable, but has wording drift, stale examples, weak triggers, missing references, or incomplete validation guidance.
-- Fail: missing `SKILL.md`, unsafe write behavior, required external dependency, broad staging by default, direct remote overwrite, or misleading trigger metadata.
+- Pass: required structure, metadata, authority, routing, references, evals, and validation are satisfied.
+- Needs attention: usable, but has wording drift, stale examples, weak pairwise routing, missing profile selection, or incomplete validation guidance.
+- Fail: missing package files, unsafe write behavior, ambiguous mutation owner, required external dependency, broad staging by default, direct remote overwrite, or misleading trigger metadata.

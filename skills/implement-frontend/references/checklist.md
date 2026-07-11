@@ -13,7 +13,7 @@ Use this checklist when implementing or reviewing frontend changes.
 
 ## Reuse-First Gate
 
-- Start from a current `code-context` directory/file inventory, or reproduce the same targeted search when it is unavailable or stale.
+- Start from a current `repo-context` directory/file inventory, or reproduce the same targeted search when it is unavailable or stale.
 - Search relevant routes, pages, layouts, components, hooks/composables, services, stores, shared UI, tests, exports, and symbols before creating anything.
 - Classify candidates as:
   - direct reuse: behavior and ownership already match

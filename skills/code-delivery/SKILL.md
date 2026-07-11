@@ -33,11 +33,11 @@ Deliver reviewed repository changes from a local worktree to the requested Git s
 
 ## Do Not Use For
 
-- First-pass repository discovery, real commands, or docs alignment; use `code-context`.
+- First-pass repository discovery, real commands, or docs alignment; use `repo-context`.
 - Future implementation planning or subagent task splitting; use `code-planner`.
 - Existing local diff review, ownership classification, mixed-hunk analysis, or commit grouping before delivery scope is clear; use `code-review`.
 - Review-only requests that do not authorize Git mutation; use `code-review`.
-- Security-only review; use `code-security`.
+- Security-only audit; use `audit-security`.
 - Browser or desktop-client runtime evidence; use `ops-browser` or `ops-client`.
 - Branch publishing that explicitly includes creating a draft or ready pull request; use the available GitHub publishing workflow.
 

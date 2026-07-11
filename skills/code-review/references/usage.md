@@ -25,10 +25,9 @@ Use for prompts like:
 - `Review this crate move and confirm manifests, exports, CI, docs, and stale references are closed.`
 - `Generate a commit message, but confirm file scope first.`
 
-Do not use for repo onboarding or future implementation planning before code exists; prefer `code-context` or `code-planner` for those. Use `code-delivery` for staging, local commits, pushes, sync, squash, cleanup, or remote proof after review.
-Use `audit-frontend` or `audit-rust` for domain-wide technical audits without an
-existing Git change set; return to `code-review` after fixes exist and need
-dirty-tree classification, completeness checks, staging plans, or commit readiness.
+Do not use for repository onboarding or future implementation planning before code exists; prefer `repo-context` or `code-planner`. Use `repo-review` for immutable repository, range, PR, release-candidate, or review-package assessment. Use `audit-security` for a bounded security-only audit after the target surface is known. Use `code-delivery` for staging, local commits, pushes, sync, squash, cleanup, or remote proof after review.
+
+Use `audit-frontend` or `audit-rust` for domain-wide technical audits without an existing Git change set; return to `code-review` after fixes exist and need dirty-tree classification, completeness checks, staging plans, or commit readiness.
 
 ## Output
 

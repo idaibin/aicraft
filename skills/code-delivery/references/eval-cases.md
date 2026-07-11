@@ -18,11 +18,11 @@ Use these cases when changing `code-delivery` triggers, modes, staging rules, pu
 
 | User prompt | Expected result | Why |
 | --- | --- | --- |
-| `Understand this repository's real commands and entry points first.` | Should prefer `code-context`. | Repository grounding. |
+| `Understand this repository's real commands and entry points first.` | Should prefer `repo-context`. | Repository grounding. |
 | `Split this future feature into tasks and owners.` | Should prefer `code-planner`. | Forward planning. |
 | `Review all dirty changes and propose commit groups.` | Should prefer `code-review`. | Pre-delivery review scope is not clear. |
 | `Review this diff and give me a commit message, but do not change Git state.` | Should prefer `code-review`. | Review-only request without delivery authorization. |
-| `Check this endpoint for authorization risk.` | Should prefer `code-security` after scope is clear. | Security-only review. |
+| `Check this endpoint for authorization risk.` | Should prefer `audit-security` after scope is clear. | Security-only audit. |
 | `Verify this web page in the browser before release.` | Should prefer `ops-browser`. | Runtime browser evidence. |
 | `Commit this branch, push it, and open a draft PR.` | Should prefer the GitHub publishing workflow. | PR creation is outside Git-only delivery. |
 

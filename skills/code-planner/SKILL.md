@@ -48,7 +48,7 @@ For a small task, these fields may be compressed into a single concise block. Co
 
 ## Do Not Use For
 
-- First-pass repository discovery, real commands, entry points, or docs alignment; use `code-context`.
+- First-pass repository discovery, real commands, entry points, or docs alignment; use `repo-context`.
 - Existing local diff review, commit grouping, staging plans, or commit messages; use `code-review`. Actual staging, commits, or pushes belong to `code-delivery` after review.
 - Direct implementation when the user asks for a small change and no plan.
 - Browser/client operation or runtime evidence collection; use `ops-browser` or `ops-client`.

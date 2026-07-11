@@ -30,7 +30,7 @@ Use these cases when changing `implement-frontend` triggers, stack guidance, lay
 
 | User prompt | Expected result | Why |
 | --- | --- | --- |
-| `Understand this repository's real commands and directory structure first.` | Should prefer `code-context`. | Repository grounding. |
+| `Understand this repository's real commands and directory structure first.` | Should prefer `repo-context`. | Repository grounding. |
 | `Plan the frontend rewrite across three apps before anyone edits code.` | Should prefer `code-planner`. | Future cross-scope planning. |
 | `Find the root cause before changing any code.` | Should prefer `diagnose`. | Diagnosis before implementation. |
 | `Review all dirty changes and propose commit groups.` | Should prefer `code-review`. | Dirty-tree review and staging plan. |
@@ -54,7 +54,7 @@ Use these cases when changing `implement-frontend` triggers, stack guidance, lay
 | Reuse and lifecycle | Reuses locally first and updates manifests, exports, routes, scripts, tests, CI/build/deploy paths, docs, indexes, and stale references for structural changes. | Extracts speculative shared packages or moves/deletes source paths without closing ownership records. |
 | Layout preservation | Keeps layout, spacing, routes, copy, and visual system unchanged unless requested. | Redesigns or restyles adjacent UI. |
 | Component consistency | Reuses existing components, wrappers, hooks/composables, services, stores, types, icons, aliases, and interaction helpers. | Introduces a parallel UI kit, helper layer, state layer, or icon library. |
-| Existing implementation search | Consumes a current `code-context` inventory or performs targeted file/symbol search across relevant pages, routes, layouts, components, hooks/composables, services, stores, shared UI, tests, and exports. | Starts coding from a guessed path or creates a file before checking existing code. |
+| Existing implementation search | Consumes a current `repo-context` inventory or performs targeted file/symbol search across relevant pages, routes, layouts, components, hooks/composables, services, stores, shared UI, tests, and exports. | Starts coding from a guessed path or creates a file before checking existing code. |
 | Reuse decision | Classifies candidates as direct reuse, reference-only, unrelated, or `Not found`; prefers reuse, then adaptation, then justified creation. | Duplicates an existing component or ignores the nearest established pattern. |
 | New-file placement | Explains why existing candidates are insufficient and follows the current directory, naming, props, state, styling, export, and test conventions. | Creates a parallel `shared`, `common`, `ui`, `components`, hook/composable, store, or service layer. |
 | DOM minimality | Removes or avoids wrappers, fragments, components, and classes that do not provide layout, semantics, state, accessibility, animation ownership, or reuse value. | Adds nested wrappers only to pass class names or group a single child. |

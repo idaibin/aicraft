@@ -2,7 +2,7 @@
 
 ## Summary
 
-Use `ops-browser` for browser-based operations where existing tabs, sessions, state, visual evidence, or artifacts matter. It covers inspection, visual/responsive verification, debugging, form filling, upload/download, and browser evidence collection. Use `implement-frontend` for code changes.
+Use `ops-browser` for browser-based operations where existing tabs, sessions, state, visual evidence, or artifacts matter. It covers inspection, visual/responsive verification, Browser Debug Evidence, form filling, upload/download, and browser evidence collection. Use `diagnose` for cross-system root-cause coordination and `implement-frontend` for code changes.
 
 ## Trigger Examples
 
@@ -56,12 +56,14 @@ Use `ops-browser` for browser-based operations where existing tabs, sessions, st
 - Close pages/windows opened only for the task.
 - If the browser tool exposes only partial tab or window metadata, report the available URL/title/session evidence and mark missing identity as `Not verified` instead of inferring it.
 
-## Debug Notes
+## Browser Debug Evidence
 
+- Enter this mode only after `diagnose` delegates the reproduction or the caller supplies an already-isolated browser-layer evidence request. Route unexplained or cross-system root-cause requests to `diagnose` before browser operation.
 - Build the browser feedback loop first: exact target URL, viewport or account state if relevant, action sequence, expected symptom, observed symptom, and the evidence source that can prove red/green.
 - Prefer a short repeatable browser script, deterministic DOM/console/network check, or documented manual sequence over exploratory clicking.
 - Wait for the page state that matters before inspecting dynamic apps; do not inspect stale DOM or pre-hydration markup and treat it as final.
 - Minimize the reproduction by removing steps, inputs, cache/auth isolation, and viewport changes one at a time while the symptom still appears.
 - Form one browser hypothesis at a time, then test it with the smallest safe action. Do not bundle cache clearing, reloads, account switches, and code changes into one experiment.
-- Tag temporary probes and artifacts with a unique task prefix so screenshots, downloads, console filters, local files, or injected logs can be removed or reported at the end.
+- Tag temporary state and evidence with a unique task prefix. Remove disposable probes, injected filters, and task-only tabs when safe; retain referenced screenshots, downloads, traces, and logs until embedded, archived, transferred, or accepted by the handoff owner, then report retention and cleanup separately.
 - If the issue cannot be reproduced, report the loop attempts, missing evidence, and what artifact would unblock diagnosis instead of guessing at a fix.
+- Confirm only browser-layer facts. Return DOM, console, network, storage, route, screenshot, and red/green evidence to `diagnose` or the caller; do not declare a final cross-system root cause or permanent remediation.

@@ -4,11 +4,12 @@
 
 | Prompt | Expected |
 | --- | --- |
-| `Audit a TanStack Router Console feature for shadcn reuse, ownership, and query-state boundaries.` | Trigger `audit-frontend`. |
-| `Audit a Vue 3 feature for reactivity loss, watcher loops, composable lifetime, Pinia ownership, and Router contracts.` | Trigger `audit-frontend`. |
-| `Under code-review, perform a read-only specialist audit of only the changed Vue SFCs for reactivity, lifecycle, accessibility, and performance.` | Trigger `audit-frontend` as a scoped specialist; keep `code-review` as the read-only Git-change review owner. |
-| `Audit the Tauri frontend/Rust boundary for progress, cancellation, errors, menus, and shortcuts.` | Trigger `audit-frontend`. |
-| `Check this frontend architecture for duplicated components, stores, services, spacing, and stale docs.` | Trigger `audit-frontend`. |
+| `Audit a TanStack Router Console feature for architecture/reuse and query-state contracts; leave accessibility out of scope.` | Trigger `audit-frontend` with Architecture/Reuse and State/Data/Contracts profiles. |
+| `Audit a Vue 3 feature for reactivity loss, watcher loops, composable lifetime, Pinia ownership, and Router contracts.` | Trigger State/Data/Contracts with the Vue Composition API framework profile. |
+| `Under code-review, perform a read-only specialist audit of only the changed Vue SFCs for state, lifecycle, accessibility, and performance.` | Trigger bounded `audit-frontend`; keep `code-review` as local Git-change review owner. |
+| `Under repo-review, inspect only the changed frontend paths for design-system duplication and accessibility.` | Trigger bounded `audit-frontend`; keep `repo-review` as repository/range review owner. |
+| `Audit the Tauri frontend/Rust boundary for progress, cancellation, errors, menus, and shortcuts.` | Trigger Desktop Boundary plus applicable State/Data/Contracts. |
+| `Audit this frontend design system for duplicated primitives, variants, tokens, spacing, and scroll ownership.` | Trigger Component/Layout/Design System. |
 
 ## Non-Trigger Eval
 
@@ -17,8 +18,9 @@
 | `Change one known component's copy and keep everything else unchanged.` | Prefer `implement-frontend`. |
 | `Find the unknown cause of this failing frontend test.` | Prefer `diagnose`. |
 | `Operate the real Tauri window and capture evidence.` | Prefer `ops-client`. |
-| `Review the whole dirty tree and prepare commits.` | Prefer `code-review`. |
-| `Own the current frontend diff, classify dirty files, stage it, and decide commit readiness.` | Use `code-review` for read-only classification, staging plan, and readiness, then `code-delivery` for authorized staging; do not route either ownership to `audit-frontend`. |
+| `Review the whole local dirty tree and prepare exact staging.` | Prefer `code-review`. |
+| `Review this entire repository range and coordinate frontend, Rust, security, CI, and docs.` | Prefer `repo-review`, which may delegate bounded frontend paths. |
+| `Stage and commit the accepted frontend fix.` | Prefer `code-delivery`. |
 
 ## Scenario Eval
 
@@ -26,43 +28,47 @@ Each scenario must produce the listed investigation, decision, rejection, and re
 
 | # | Input scenario | Investigate | Correct decision | Reject | Final report |
 | --- | --- | --- | --- | --- | --- |
-| 1 | Pages each implement Button, Dialog, Table, and spacing | imports, primitives, variants, tokens, interaction/accessibility differences | identify reuse or composition candidates and stable variants | copy-and-restyle or forced merger of unrelated workflows | candidates, recommended owner, duplicates, validation gaps |
-| 2 | New feature directory is unclear | router, adjacent features, aliases, docs, exports, business owner | follow nearest ownership pattern; justify every new layer | new `common/shared` tree for neatness | ownership map, new-file reasons, lifecycle updates |
-| 3 | Component is large but splitting adds navigation | responsibilities, change reasons, state/data/layout coupling, tests | keep cohesive or split only at a stable ownership seam | line-count-based extraction | evidence for keeping/splitting and residual complexity |
-| 4 | Global store holds local dialog state | consumers, persistence, route/window lifetime, existing local pattern | move local unless durable cross-tree behavior is proven | globalize to avoid props | state class, owner, affected consumers/tests |
-| 5 | TanStack route file contains business logic | params/search/loader contract, services, feature workflows, test seams | keep route composition/guards; move stable workflow to owner | empty wrapper layers or router contract changes | route contract preserved, moved owner, generated checks |
-| 6 | Vue Composition API component destructures reactive/Pinia state and uses broad watchEffect for API calls | SFC/API style; ref/reactive/computed and storeToRefs boundaries; synchronous watchEffect dependencies; invalidation; Router and keep-alive lifetime; request cancellation | preserve reactivity with local convention; use computed for derivation; keep automatic dependencies intentional and cancel stale work | React effect rules, mechanical `toRefs`, hidden global composable state, watcher-driven request loops, or assuming post-await reads are dependencies | exact reactivity break, dependency window, lifetime owner, request/cancel evidence, recommended fix owner |
-| 7 | UI, API helper, and Rust validate a form differently | schemas, transport DTO, authoritative backend constraints, error mapping | align on authoritative contract; share/generate when supported | three drifting rule copies or client-only authority | schema owners, compatibility, field/general error tests |
-| 8 | Tauri page invokes Rust on every keypress | call frequency, payload, latency, cache/batch/stream options | debounce/batch/cache or move/subscribe through adapter | direct high-frequency page invokes | before/after path, frequency evidence, native test gap |
-| 9 | SQLite task freezes UI without progress | command sync/async, task identity, milestones, cancel path, cleanup | async domain task with real progress, cancellation, terminal states | fake timer progress or uncancellable blocking invoke | channel/events, cancel semantics, real-client verification |
-| 10 | Similar pages use inconsistent spacing | shell/page/layout primitives, tokens, duplicated margins/breakpoints | assign one spacing/token owner and remove patches | new per-page magic values | owner, token/primitive reused, responsive visual proof |
-| 11 | Agent wants unrelated refactor | request scope, dirty ownership, dependency necessity | exclude unrelated changes and note separately | opportunistic cleanup | exact scope and excluded files/ideas |
-| 12 | Project convention conflicts with skill | user request, nearest guidance, existing code/docs, intent | follow rule priority and preserve local contract | enforce external reference or this skill | conflict, winning rule, preserved exception |
-| 13 | Code and architecture docs disagree | current runtime/source, docs/indexes, ownership history | identify authoritative evidence and report synchronized remediation scope or blocker | change code only and leave stale docs | mismatches, authority, required files, validation |
-| 14 | Vue feature has injected mutable state, temporary global guards, and cached routes | injection key/default/reactive and mutation owner; global/component guard registration/removal; activated/deactivated versus unmounted cleanup; duplicate listeners and stale requests | keep mutations with provider/store owner, unregister temporary guards, and align cleanup/cancellation with the real route/cache lifetime | untyped string injection, consumer-owned shared mutation, guard duplication, or unmount-only cleanup for keep-alive | provider/store/router owners, component contracts, teardown/cancellation evidence, runtime gap |
-| 15 | `code-review` delegates changed frontend paths for domain review | delegated paths, read-only Git review owner, framework evidence, relevant diff context, unrelated dirty files | inspect only delegated paths and return read-only specialist findings/gaps to `code-review` | reclassify whole dirty tree, stage, commit, claim readiness, or expand scope | specialist mode, path boundary, domain findings, validations, untouched Git state |
-| 16 | Pure Options API component uses `data`, `computed`, watch options, dynamic `this.$watch`, keep-alive, and component Router guards | local API convention; data/computed/watch ownership; unwatch handle; mounted/unmounted/activated/deactivated; beforeRouteUpdate/Leave; async cancellation | audit native Options semantics and retain the API style | require Composition helpers, treat watch options as Composition sources, or recommend incidental conversion | Options owners, dynamic cleanup, guard/request lifetime, runtime gap |
+| 1 | Pages each implement Button, Dialog, Table, and spacing | select Architecture/Reuse and Component/Layout profiles; imports, primitives, variants, tokens, behavior differences | identify reuse/composition candidates and stable variants | copy-and-restyle or forced merger of unrelated workflows | selected/excluded profiles, candidates, owner, duplicates, validation gaps |
+| 2 | New feature directory is unclear | Architecture/Reuse; router, adjacent features, aliases, docs, exports, business owner | follow nearest ownership pattern; justify every new layer | new shared/common tree for neatness | ownership map, new-file reasons, lifecycle updates |
+| 3 | Component is large but splitting adds navigation | selected architecture/state/layout evidence, responsibilities, state/data/layout coupling, tests | keep cohesive or split only at stable ownership seam | line-count-based extraction | evidence for keeping/splitting and residual complexity |
+| 4 | Global store holds local dialog state | State/Data; consumers, persistence, route/window lifetime, existing local pattern | move local unless durable cross-tree behavior is proven | globalize to avoid props | state class, owner, affected consumers/tests |
+| 5 | TanStack route file contains business logic | Architecture/Reuse and State/Data; params/search/loader contract, services, tests | keep route composition/guards; move stable workflow to owner | empty wrappers or router contract changes | route contract, owner, generated checks |
+| 6 | Vue Composition API component destructures reactive/Pinia state and uses broad watchEffect for API calls | State/Data; refs/computed/storeToRefs, synchronous watchEffect dependencies, invalidation, Router/keep-alive lifetime, cancellation | preserve reactivity with local convention; computed for derivation; intentional dependencies and stale-work cancellation | React effect rules, mechanical toRefs, hidden global composable state, watcher request loops | reactivity break, dependency window, lifetime owner, cancellation evidence |
+| 7 | UI, API helper, and Rust validate a form differently | State/Data; schemas, DTO, backend authority, error mapping | align authoritative contract and compatibility | three drifting copies or client-only authority | schema owners, compatibility, field/general error tests |
+| 8 | Tauri page invokes Rust on every keypress | State/Data, Performance, Desktop; frequency, payload, latency, cache/batch/stream options | debounce/batch/cache or adapter/subscription from evidence | direct high-frequency invokes or optimization by intuition | selected profiles, path/frequency evidence, native gap |
+| 9 | SQLite task freezes UI without progress | Desktop and Performance; command execution, milestones, cancel path, cleanup | async domain task with real progress, cancellation, terminal states | fake timer progress or uncancellable blocking invoke | channel/events, cancel semantics, real-client verification |
+| 10 | Similar pages use inconsistent spacing | Component/Layout; shell/page/layout primitives, tokens, duplicated margins/breakpoints | assign one spacing/token owner and remove patches | new page-specific magic values | owner, token/primitive reused, responsive proof |
+| 11 | Agent wants unrelated refactor | request scope, delegated boundary, dirty ownership | exclude unrelated changes and note separately | opportunistic cleanup | exact scope and excluded ideas |
+| 12 | Project convention conflicts with skill | user request, nearest guidance, existing code/docs | follow rule priority and preserve local contract | enforce external reference or skill preference | conflict, winning rule, preserved exception |
+| 13 | Code and architecture docs disagree | Architecture/Reuse; runtime/source, docs/indexes, ownership history | identify authority and complete synchronized remediation scope | change code only and leave stale docs | mismatch, authority, required files, validation |
+| 14 | Vue feature has injected mutable state, temporary global guards, and cached routes | State/Data; injection owner, guard registration/removal, activated/deactivated cleanup, duplicate listeners and stale requests | provider/store owns mutation, guards unregister, cleanup matches route/cache lifetime | string injection, consumer-owned shared mutation, duplicated guards, unmount-only cleanup | provider/store/router owners, teardown/cancellation evidence |
+| 15 | `code-review` delegates changed frontend paths for domain review | delegated paths, local dirty-tree owner, framework/profile evidence, relevant diff | inspect only delegated paths and return specialist findings to `code-review` | reclassify dirty tree, stage, commit, or claim readiness | specialist mode, path boundary, profiles, findings, untouched Git state |
+| 16 | Pure Options API component uses data, computed, watch options, dynamic this.$watch, keep-alive, and component guards | State/Data; local API convention, unwatch handle, lifecycle, guards, cancellation | audit native Options semantics and retain API style | require Composition helpers or incidental conversion | Options owners, cleanup, guard/request lifetime, runtime gap |
+| 17 | `repo-review` delegates a frontend range while Rust and CI are reviewed elsewhere | delegated immutable range/paths, selected profiles, cross-domain interfaces | return bounded frontend findings and gaps to `repo-review` | take final P0-P3 integration ownership or review unrelated backend paths | coordinator, range/path boundary, selected/excluded profiles, findings |
+| 18 | User asks only for accessibility audit of a stable page | Accessibility evidence, semantics, keyboard/focus, forms/status, browser capability | select Accessibility only and request runtime proof where needed | perform architecture/state/performance audit without evidence | selected Accessibility, excluded profiles, static/runtime gaps |
 
 ## Quality Eval
 
 | Case | Pass evidence | Reject if |
 | --- | --- | --- |
-| Grounding | reads guidance/status and inventories real framework, route, feature, primitives, data/state/reactivity, styles, tests, and docs | starts from a template |
-| Framework profile | identifies React, Vue 3, or repository-native concepts before reviewing hooks/composables, state, routing, and render/reactivity behavior | applies React memo/hook guidance to Vue or assumes framework semantics |
-| Priority | resolves conflicts using the declared order | overrides local conventions with reference-repo choices |
-| Reuse | classifies candidates and justifies creation | creates parallel components/layers before search |
-| Ownership | assigns page, feature, primitive, hook/composable, service, store, schema, and type responsibilities | uses vague global buckets or ceremonial wrappers |
-| State/reactivity | separates state classes; for Vue Composition verifies ref/reactive/computed, explicit watch sources, bounded synchronous watchEffect dependencies, reactivity escapes, store/composable scope, and cleanup; for Options verifies data/computed/watch/this.$watch, native lifecycle and guards; for both checks component, injection, Router, keep-alive, and cancellation contracts | cross-applies API styles, duplicates sources of truth, loses reactivity, applies React effect rules, hides global state, duplicates guards/listeners, or leaves stale requests |
-| Vue API-style fidelity | Audits Composition with its native refs/watchers/scopes and Options with data/computed/watch/this.$watch plus component lifecycle/guards, without cross-applying helper APIs. | Requires Composition imports in Options code, translates Options watchers mechanically, or converts API style without task evidence. |
-| Layout | uses tokens, one spacing/scroll owner, minimal DOM/CSS, centralized breakpoints | margin patches, duplicate CSS, or forced styling system |
-| Performance | traces and measures render/reactivity/data/bundle/IPC path | default memoization/computed changes or component-size claims |
-| Accessibility | verifies keyboard, focus, labels, non-color and async status | visual-only approval |
-| Desktop | uses adapter → command → Rust domain and long-task lifecycle | direct page invokes, blocking work, leaked Rust internals |
-| Lifecycle | identifies drift across routes/exports/generated files/tests/docs/indexes and the complete remediation scope | structural code and docs disagree without a finding |
-| Scope | preserves unrelated dirty work | performs drive-by cleanup |
-| Validation | runs real project commands and runtime proof or reports `Not verified` | invented commands or unsupported success claim |
-| Read-only boundary | leaves code and Git state unchanged and routes requested fixes to `implement-frontend`; in specialist mode reports only delegated frontend paths while `code-review` retains dirty-tree review, staging-plan, and commit-readiness ownership and `code-delivery` owns all Git mutation | edits, stages, commits, claims a fix/readiness, or takes ownership of unrelated dirty files during the audit |
+| Grounding | reads guidance/status and inventories only evidence needed for selected profiles | starts from a universal template or scans everything |
+| Profile selection | declares selected Architecture/Reuse, State/Data/Contracts, Component/Layout/Design System, Accessibility, Performance, or Desktop profiles and marks others Out of scope | implies every frontend dimension was reviewed |
+| Framework profile | identifies React, Vue Composition, Vue Options, or repository-native concepts before framework rules | applies React semantics to Vue or assumes framework behavior |
+| Priority | resolves conflicts using the declared order | overrides local conventions with reference choices |
+| Reuse | classifies candidates and justifies creation | creates parallel systems before search |
+| Ownership | assigns route/page, feature, primitive, hook/composable, service, store, schema, type, and adapter only where selected | uses vague global buckets or ceremonial wrappers |
+| State/reactivity | under State/Data, separates state classes and verifies framework-native reactivity, lifetime, cleanup, cancellation, Router and component contracts | duplicates truth, loses reactivity, cross-applies API styles, or leaves stale work |
+| Vue API-style fidelity | audits Composition with refs/watchers/scopes and Options with data/computed/watch/this.$watch and native lifecycle/guards without forced conversion | requires Composition imports in Options code or mechanically translates APIs |
+| Layout/design system | under Component/Layout, uses tokens, one spacing/scroll owner, minimal DOM/CSS, and centralized breakpoints | margin patches, duplicate CSS, or parallel styling system |
+| Performance | under Performance, traces and measures render/reactivity/data/request/bundle/IPC paths | default memoization/computed/cache advice or file-size claims |
+| Accessibility | under Accessibility, verifies keyboard, focus, labels, non-color and async status with runtime evidence or gaps | visual-only approval or unselected shallow checklist |
+| Desktop | under Desktop, verifies adapter-command-domain and long-task lifecycle | direct page invokes, blocking work, leaked Rust internals, or browser-only proof |
+| Lifecycle | under Architecture/Reuse, identifies route/export/generated/test/doc/index drift and complete remediation scope | structural code and docs disagree without a finding |
+| Coordinator boundary | distinguishes `code-review` local dirty-tree ownership from `repo-review` immutable repository/range/PR coordination | lets specialist take over whole review, staging, or final cross-domain severity |
+| Scope | preserves unrelated work and does not run excluded profiles | drive-by audit or cleanup |
+| Validation | runs relevant real commands/runtime proof or reports Not verified | invented commands or unsupported pass claim |
+| Read-only boundary | leaves code and Git/GitHub state unchanged, routes fixes to `implement-frontend`, and returns bounded findings to the coordinating reviewer | edits, stages, commits, comments, claims readiness, or expands scope |
 
 ## Scoring
 
-Minimum pass: score each quality case 0–10. Pass only when trigger/non-trigger routing is correct and every quality case scores at least 7.
+Minimum pass: score each quality case 0–10. Pass only when trigger/non-trigger routing is correct and every quality case scores at least 8.

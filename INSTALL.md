@@ -4,22 +4,23 @@ This file is for AI agents or users who want to install or update skills from th
 
 Install only these skill package directories:
 
-- `skills/code-context`
+- `skills/repo-context`
 - `skills/code-planner`
 - `skills/diagnose`
 - `skills/code-review`
-- `skills/chatgpt-review-bridge`
+- `skills/repo-review`
 - `skills/code-delivery`
+- `skills/audit-security`
+- `skills/chatgpt-review-bridge`
 - `skills/implement-frontend`
 - `skills/implement-rust`
 - `skills/audit-frontend`
 - `skills/audit-rust`
-- `skills/code-security`
 - `skills/ops-browser`
 - `skills/ops-client`
 - `skills/writing-editor`
 
-Do not install the repository root, `prompts/`, `docs/`, or legacy skill names such as `repo-context`, `commit-reviewer`, `planner`, `frontend-implementation`, `frontend-governance`, or `rust-engineering-governance`.
+Do not install the repository root, `prompts/`, `docs/`, or legacy skill names such as `code-context`, `code-security`, `commit-reviewer`, `planner`, `frontend-implementation`, `frontend-governance`, or `rust-engineering-governance`.
 
 ## Recommended Install
 
@@ -39,10 +40,17 @@ Install selected skills:
 
 ```bash
 npx skills add https://github.com/idaibin/aicraft \
-  --skill code-context code-planner diagnose code-review chatgpt-review-bridge code-delivery implement-frontend implement-rust audit-frontend audit-rust code-security ops-browser ops-client writing-editor
+  --skill repo-context code-planner diagnose code-review repo-review code-delivery audit-security chatgpt-review-bridge implement-frontend implement-rust audit-frontend audit-rust ops-browser ops-client writing-editor
 ```
 
 For multiple selected skills, pass the names after `--skill` as shown above.
+
+Install only the review workflow skills:
+
+```bash
+npx skills add https://github.com/idaibin/aicraft \
+  --skill repo-context diagnose code-review repo-review audit-frontend audit-rust audit-security
+```
 
 Install only the operations skills:
 
@@ -61,7 +69,7 @@ npx skills update
 Update only selected skills:
 
 ```bash
-npx skills update ops-browser ops-client
+npx skills update repo-context repo-review audit-security
 ```
 
 For updates, selected skill names are positional arguments.
@@ -79,6 +87,16 @@ Use this only when developing this repository:
 ```bash
 python3 scripts/validate-skills.py
 python3 scripts/test_validate_skills.py
+```
+
+Useful targeted checks:
+
+```bash
+python3 scripts/validate-skills.py --skill repo-context
+python3 scripts/validate-skills.py --skill repo-review
+python3 scripts/validate-skills.py --skill diagnose
+python3 scripts/validate-skills.py --skill audit-frontend
+python3 scripts/validate-skills.py --skill audit-security
 ```
 
 This validates source packages without installing them. End-user installation and updates should use `npx skills add` and `npx skills update`.

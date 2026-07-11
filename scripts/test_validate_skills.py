@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import importlib.util
+import re
 import sys
 import tempfile
 import unittest
@@ -23,6 +24,7 @@ validate_local_links = VALIDATOR.validate_local_links
 validate_repository_indexes = VALIDATOR.validate_repository_indexes
 validate_skill_invocations = VALIDATOR.validate_skill_invocations
 validate_specialized_eval_contracts = VALIDATOR.validate_specialized_eval_contracts
+validate_cross_artifact_contracts = VALIDATOR.validate_cross_artifact_contracts
 
 BEHAVIOR_EVAL_PATH = Path(__file__).with_name("eval-writing-editor.py")
 BEHAVIOR_SPEC = importlib.util.spec_from_file_location("eval_writing_editor", BEHAVIOR_EVAL_PATH)
@@ -81,6 +83,42 @@ class ValidateSkillsTests(unittest.TestCase):
         changed = original.replace(mutation[0], mutation[1], 1)
         self.assertNotEqual(original, changed)
         return validate_specialized_eval_contracts(skill_name, changed, label="test")
+
+    def cross_artifact_contract_errors(
+        self, skill_name: str, surface: str, marker: str, section: str | None = None
+    ) -> list[str]:
+        package = VALIDATOR_PATH.parents[1] / "skills" / skill_name
+        surfaces = {
+            "SKILL.md": (package / "SKILL.md").read_text(encoding="utf-8"),
+            "agents/openai.yaml": (package / "agents" / "openai.yaml").read_text(encoding="utf-8"),
+            "agents/openai.default_prompt": VALIDATOR.yaml_scalar(
+                (package / "agents" / "openai.yaml").read_text(encoding="utf-8"),
+                "default_prompt",
+            ),
+            "references/usage.md": (package / "references" / "usage.md").read_text(encoding="utf-8"),
+            "references/eval-cases.md": (package / "references" / "eval-cases.md").read_text(encoding="utf-8"),
+        }
+        original = surfaces[surface]
+        if section is None:
+            changed = re.sub(
+                re.escape(marker), "removed-contract-marker", original, flags=re.IGNORECASE
+            )
+        else:
+            start = original.find(section)
+            self.assertGreaterEqual(start, 0)
+            body_start = start + len(section)
+            next_section = original.find("\n## ", body_start)
+            end = len(original) if next_section < 0 else next_section
+            scoped = re.sub(
+                re.escape(marker),
+                "removed-contract-marker",
+                original[body_start:end],
+                flags=re.IGNORECASE,
+            )
+            changed = original[:body_start] + scoped + original[end:]
+        self.assertNotEqual(surfaces[surface], changed)
+        surfaces[surface] = changed
+        return validate_cross_artifact_contracts(skill_name, surfaces, label="test")
 
     def test_repository_indexes_must_match_source_packages(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -261,6 +299,121 @@ class ValidateSkillsTests(unittest.TestCase):
             "audit-frontend", ("Pure Options API", "Removed API style")
         )
         self.assertTrue(any("Pure Options API" in error for error in errors))
+
+    def test_repo_review_requires_immutable_basis_contract(self) -> None:
+        errors = self.specialized_contract_errors(
+            "repo-review", ("| Immutable basis |", "| Removed basis |")
+        )
+        self.assertTrue(any("Immutable basis" in error for error in errors))
+
+    def test_repo_context_requires_review_boundary_contract(self) -> None:
+        errors = self.specialized_contract_errors(
+            "repo-context", ("| Context-versus-review boundary |", "| Removed review boundary |")
+        )
+        self.assertTrue(any("Context-versus-review boundary" in error for error in errors))
+
+    def test_audit_security_requires_coordinator_handoff_contract(self) -> None:
+        errors = self.specialized_contract_errors(
+            "audit-security", ("| Scoped specialist boundary |", "| Removed handoff |")
+        )
+        self.assertTrue(any("Scoped specialist boundary" in error for error in errors))
+
+    def test_ops_browser_requires_debug_handoff_contract(self) -> None:
+        errors = self.specialized_contract_errors(
+            "ops-browser", ("| Browser debug handoff |", "| Removed debug handoff |")
+        )
+        self.assertTrue(any("Browser debug handoff" in error for error in errors))
+
+    def test_ops_client_requires_debug_handoff_contract(self) -> None:
+        errors = self.specialized_contract_errors(
+            "ops-client", ("| Client debug handoff |", "| Removed debug handoff |")
+        )
+        self.assertTrue(any("Client debug handoff" in error for error in errors))
+
+    def test_every_declared_cross_artifact_term_is_mutation_protected(self) -> None:
+        tested = 0
+        declared = sum(
+            len(terms)
+            for _, _, _, terms in VALIDATOR.CROSS_ARTIFACT_TERM_REQUIREMENTS
+        )
+        for skill_name, surface, section, terms in VALIDATOR.CROSS_ARTIFACT_TERM_REQUIREMENTS:
+            for term in terms:
+                with self.subTest(skill=skill_name, surface=surface, term=term):
+                    errors = self.cross_artifact_contract_errors(
+                        skill_name, surface, term, section
+                    )
+                    self.assertTrue(any("missing contract terms" in error for error in errors))
+                    tested += 1
+        self.assertEqual(declared, tested)
+
+    def test_browser_eval_route_reversal_is_rejected(self) -> None:
+        package = VALIDATOR_PATH.parents[1] / "skills" / "ops-browser"
+        surfaces = {
+            "SKILL.md": (package / "SKILL.md").read_text(encoding="utf-8"),
+            "agents/openai.yaml": (package / "agents" / "openai.yaml").read_text(encoding="utf-8"),
+            "agents/openai.default_prompt": VALIDATOR.yaml_scalar(
+                (package / "agents" / "openai.yaml").read_text(encoding="utf-8"), "default_prompt"
+            ),
+            "references/usage.md": (package / "references" / "usage.md").read_text(encoding="utf-8"),
+            "references/eval-cases.md": (package / "references" / "eval-cases.md").read_text(encoding="utf-8"),
+        }
+        surfaces["references/eval-cases.md"] = surfaces["references/eval-cases.md"].replace(
+            "Should prefer `diagnose`, which may delegate Browser Debug Evidence to `ops-browser`.",
+            "Should trigger `ops-browser` directly.",
+            1,
+        )
+        errors = validate_cross_artifact_contracts("ops-browser", surfaces, label="test")
+        self.assertTrue(any("missing semantic terms" in error for error in errors))
+
+    def test_client_eval_evidence_weakening_is_rejected(self) -> None:
+        package = VALIDATOR_PATH.parents[1] / "skills" / "ops-client"
+        surfaces = {
+            "SKILL.md": (package / "SKILL.md").read_text(encoding="utf-8"),
+            "agents/openai.yaml": (package / "agents" / "openai.yaml").read_text(encoding="utf-8"),
+            "agents/openai.default_prompt": VALIDATOR.yaml_scalar(
+                (package / "agents" / "openai.yaml").read_text(encoding="utf-8"), "default_prompt"
+            ),
+            "references/usage.md": (package / "references" / "usage.md").read_text(encoding="utf-8"),
+            "references/eval-cases.md": (package / "references" / "eval-cases.md").read_text(encoding="utf-8"),
+        }
+        surfaces["references/eval-cases.md"] = surfaces["references/eval-cases.md"].replace(
+            "deletes evidence before transfer",
+            "deletes disposable state",
+            1,
+        )
+        errors = validate_cross_artifact_contracts("ops-client", surfaces, label="test")
+        self.assertTrue(any("missing semantic terms" in error for error in errors))
+
+    def test_semantic_contradiction_is_rejected_with_required_terms_present(self) -> None:
+        package = VALIDATOR_PATH.parents[1] / "skills" / "ops-browser"
+        yaml_text = (package / "agents" / "openai.yaml").read_text(encoding="utf-8")
+        surfaces = {
+            "SKILL.md": (package / "SKILL.md").read_text(encoding="utf-8"),
+            "agents/openai.yaml": yaml_text,
+            "agents/openai.default_prompt": VALIDATOR.yaml_scalar(yaml_text, "default_prompt"),
+            "references/usage.md": (package / "references" / "usage.md").read_text(encoding="utf-8"),
+            "references/eval-cases.md": (package / "references" / "eval-cases.md").read_text(encoding="utf-8"),
+        }
+        surfaces["references/eval-cases.md"] += (
+            "\nContradiction: direct operation takes precedence over `diagnose`.\n"
+        )
+        errors = validate_cross_artifact_contracts("ops-browser", surfaces, label="test")
+        self.assertTrue(any("contradictory contract phrase" in error for error in errors))
+
+    def test_metadata_terms_must_remain_in_default_prompt(self) -> None:
+        package = VALIDATOR_PATH.parents[1] / "skills" / "ops-browser"
+        yaml_text = (package / "agents" / "openai.yaml").read_text(encoding="utf-8")
+        default_prompt = VALIDATOR.yaml_scalar(yaml_text, "default_prompt")
+        moved_term = "before browser operation"
+        surfaces = {
+            "SKILL.md": (package / "SKILL.md").read_text(encoding="utf-8"),
+            "agents/openai.yaml": yaml_text + f"\n# {moved_term}\n",
+            "agents/openai.default_prompt": default_prompt.replace(moved_term, "after routing"),
+            "references/usage.md": (package / "references" / "usage.md").read_text(encoding="utf-8"),
+            "references/eval-cases.md": (package / "references" / "eval-cases.md").read_text(encoding="utf-8"),
+        }
+        errors = validate_cross_artifact_contracts("ops-browser", surfaces, label="test")
+        self.assertTrue(any("missing contract terms" in error for error in errors))
 
 
 if __name__ == "__main__":

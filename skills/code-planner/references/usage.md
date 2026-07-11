@@ -28,7 +28,7 @@ Use for prompts like:
 - `Mark contract-impact and route the final review to code-review.`
 - `Plan this crate move and include Cargo membership, exports, CI, docs, and stale-reference checks.`
 
-Do not use for first-pass repo onboarding, existing dirty-tree review, or commit grouping; prefer `code-context` or `code-review` for those.
+Do not use for first-pass repository onboarding, existing dirty-tree review, or commit grouping; prefer `repo-context` or `code-review` for those.
 
 ## Output
 

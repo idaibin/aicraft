@@ -1,98 +1,114 @@
 # Frontend Audit Checklist
 
-## Grounding
+## 1. Grounding and Delegation
 
 - Read all applicable guidance and status.
-- Declare direct audit or scoped specialist subreview. For a changed tree,
-  record the delegated frontend paths and keep `code-review` as the read-only
-  Git-change review owner.
+- Declare direct audit or bounded specialist review.
+- When delegated, record exact paths/diff, questions, exclusions, and coordinating owner:
+  - `code-review` for local dirty-tree and commit-readiness review;
+  - `repo-review` for repository snapshot, range, PR, release, or review-package review.
 - Identify Web, Console, or Tauri Desktop.
-- Trace route/page, layout, feature owner, analogous implementation, UI
-  primitives, tokens, request/cache, forms/schema, state, tests, docs, and
-  desktop adapter.
-- Record direct-reuse, composition/variant, reference-only, unrelated, and
-  `Not found` candidates.
-- Check whether new files and abstractions have evidence-backed justification.
+- Identify React, Vue Composition, Vue Options, or repository-native framework profile.
+- Trace route/page, layout, feature owner, analogous implementation, UI primitives, tokens, request/cache, forms/schema, state, tests, docs, and desktop adapter only as required by selected profiles.
+- Record direct-reuse, composition/variant, reference-only, unrelated, and `Not found` candidates.
 
-## Ownership
+## 2. Profile Selection
 
-- Page/route composes rather than owning unrelated workflow and transports.
+Select at least one profile and mark every other profile `Out of scope`:
+
+- Architecture/Reuse
+- State/Data/Contracts
+- Component/Layout/Design System
+- Accessibility
+- Performance
+- Desktop Boundary
+
+Do not perform token checks, memoization advice, generic accessibility scanning, or Tauri review merely to make a focused audit look comprehensive.
+
+## 3. Architecture/Reuse Profile
+
+- Route/page files primarily compose rather than own unrelated workflows and transports.
 - Business components stay in the feature; UI primitives stay business-neutral.
 - Hooks/composables, services, stores, schemas, and types each own a real responsibility.
-- Local UI state remains local; URL and server state keep their source of truth.
-- Tauri pages use an adapter; commands delegate to Rust domain/API owners.
+- Existing routes, components, variants, helpers, services, stores, schemas, tests, and docs were searched before recommending new layers.
+- Dependency direction, public contracts, generated files, aliases, exports, tests, CI/build/deploy, architecture docs, project maps, and indexes remain synchronized.
+- Add/reuse/move/rename/delete work has a complete structural lifecycle and stale-reference search.
 
-## Vue 3 Profile
+## 4. State/Data/Contracts Profile
 
-- Confirm SFC structure and the local `<script setup>`, Composition API, or
-  Options API convention before applying framework-specific rules.
-- For Composition API or `<script setup>`, trace `ref`, `reactive`, `computed`,
-  destructuring/spread, `toRef`/`toRefs`, Pinia extraction/`storeToRefs`,
-  shallow/raw values, and third-party objects at actual reactivity boundaries.
-- For Composition API or `<script setup>`, require explicit `watch` sources. For
-  `watchEffect`, enumerate intentional synchronous dependencies and do not
-  assume reads after `await` retrigger it. Check invalidation, request
-  abort/stale-response handling, feedback loops, flush timing, and duplicated
-  derived state.
-- For Options API, audit native `data`, `computed`, watch keys/getters/handlers
-  and `deep`/`immediate`/timing behavior, owned dynamic `this.$watch` unwatch
-  handles, `methods`, `provide`/`inject`, component Router guards, and
-  `mounted`/`unmounted`/`activated`/`deactivated` cleanup. Do not require
-  Composition imports or convert the component to satisfy this checklist.
-- Check composable instance/shared/effect-scope lifetime and Pinia store/action,
-  persistence/reset, consumer, and disposal ownership.
-- Preserve props/emits, event payloads, `v-model` arguments/modifiers, named and
-  scoped slots, fallthrough attributes, and component naming contracts.
-- Check provide/inject key/default behavior, reactive and mutation owner, and
-  provider/consumer cleanup. Prefer typed symbol keys when that is the local
-  convention.
-- Check Router params/query/meta, global versus component guard ownership,
-  temporary guard teardown, navigation failure, and duplicate registration.
-- Check unmount/scope disposal plus keep-alive activation/deactivation,
-  listener/timer/subscription cleanup, request cancellation, and refresh/reset
-  behavior.
+- Server/cache, URL, form, shared business, local UI, and native IPC state have distinct owners.
+- One source of truth is not mirrored into another without an explicit synchronization contract.
+- Requests, cache, schemas, errors, retry, cancellation, stale response, optimistic behavior, and feedback states follow existing project mechanisms.
+- Public component, route, schema, request, response, and IPC contracts remain compatible or have an explicit migration.
 
-## UI And Data
+### React
 
-- Existing primitives, variants, tokens, page layouts, tables, dialogs, empty
-  states, forms, requests, cache, toasts, and errors are reused.
-- Loading, empty, error, partial, retry, optimistic, stale, and cancellation
-  paths are explicit where applicable.
-- Page-edge spacing, scrolling, breakpoints, and CSS declarations have one owner.
-- No meaningless wrappers, copied components, or competing systems exist in the
-  audited scope.
+- Hooks/effects have bounded dependencies and cleanup.
+- Context/store subscriptions match consumer scope and do not force unrelated renders.
+- Router/Next/TanStack route, loader, search, cache, and ownership contracts are preserved.
 
-## Accessibility And Performance
+### Vue Composition
 
-- Keyboard, focus, dialogs/popovers/menus, form associations, icon names,
-  non-color status, and async announcements are covered.
-- Lists are bounded; requests deduplicate; React contexts or framework-native
-  shared stores are scoped according to the detected framework.
-- Memoization and bundle/IPC conclusions have measurement or path evidence.
-- Vue computed/cache, watcher, reactive fan-out, Pinia subscription, and
-  keep-alive request conclusions have profiling, request counts, or explicit
-  path/complexity evidence.
-- Desktop long tasks expose progress, cancellation, error, cleanup, and listener
-  lifecycle.
+- Confirm local SFC and `<script setup>`/Composition conventions.
+- Trace `ref`, `reactive`, `computed`, destructuring/spread, `toRef`/`toRefs`, Pinia extraction/`storeToRefs`, shallow/raw values, and third-party objects at actual reactivity boundaries.
+- Require explicit `watch` sources. For `watchEffect`, inspect intentional synchronous dependencies, invalidation, stale-response handling, feedback loops, and flush timing.
+- Check composable instance/shared/effect-scope lifetime, Pinia ownership, Router guards, provide/inject mutation ownership, keep-alive, and cancellation.
 
-## Structural And Documentation Lifecycle
+### Vue Options
 
-- Identify required updates across routes, exports, manifests, aliases,
-  generated files, tests, stories, fixtures, CI/build/deploy, architecture
-  docs, project maps, and indexes that describe the boundary.
-- Search for stale names, copies, imports, styles, docs, and command identifiers.
+- Audit native `data`, `computed`, watch keys/getters/handlers, `deep`/`immediate`/timing behavior, dynamic `this.$watch` cleanup, methods, provide/inject, component Router guards, and lifecycle.
+- Do not require Composition imports or recommend incidental conversion.
 
-## Validation
+## 5. Component/Layout/Design-System Profile
 
-- Run repository-defined formatting check, lint, typecheck, focused tests, and
-  build/route generation that match the change.
-- Validate browser behavior when layout, interaction, responsiveness, network,
-  accessibility, or performance claims require it.
-- Validate the real desktop client for native commands, menus, shortcuts,
-  windows, progress, cancellation, and platform behavior.
-- Report exact failures and `Not verified` gaps; never convert an unchecked
-  assumption into a pass.
-- Leave the worktree unchanged. A specialist subreview returns findings to
-  `code-review` and never stages, commits, or claims Git readiness. `code-review`
-  may produce the staging plan and readiness decision; `code-delivery` alone
-  performs authorized staging, commit, rebase/squash, push, or delivery.
+- Existing primitives, variants, tokens, layouts, tables, dialogs, forms, toasts, and feedback components are reused.
+- Page-edge spacing, scrolling, breakpoints, panel bounds, and CSS declarations have one owner.
+- Flexbox handles one-dimensional layout and Grid handles real two-dimensional layout.
+- Wrappers own semantics, layout, state, accessibility, animation, or reuse; otherwise flatten them.
+- No copied component system, duplicated token scale, repeated margin patch, or competing CSS mechanism exists in scope.
+- Runtime visual/responsive evidence is requested through `ops-browser` or `ops-client` when static evidence is insufficient.
+
+## 6. Accessibility Profile
+
+- Semantic elements, accessible names, labels, descriptions, and error associations are correct.
+- Keyboard operation and visible focus cover interactive controls.
+- Dialog, popover, menu, and focus-return behavior is verified.
+- Status and validation do not rely on color alone.
+- Loading, progress, errors, and async completion are communicated appropriately.
+- Claims requiring rendered behavior are backed by browser/client evidence or marked `Not verified`.
+
+## 7. Performance Profile
+
+- Define the render/reactivity/data/request/bundle/IPC path being evaluated.
+- Require measurement, request counts, profile evidence, or explicit complexity before memoization, computed/cache, virtualization, batching, or bundle changes.
+- Check list bounds, request deduplication, cancellation, subscription fan-out, stale work, and long tasks.
+- For Vue, inspect watcher/reactive fan-out, Pinia subscriptions, keep-alive refresh behavior, and request loops.
+- For React, inspect render boundaries, context/store subscriptions, effects, and cache/request ownership.
+- Do not treat component/file size as performance evidence.
+
+## 8. Desktop-Boundary Profile
+
+- Tauri pages use a typed frontend adapter or service.
+- Commands expose stable transport DTOs and errors and delegate business logic to Rust owners.
+- Long tasks expose real progress, cancellation, terminal states, cleanup, and listener lifecycle.
+- Menus, shortcuts, windows, and platform behavior use real-client evidence when claimed.
+- Frontend typing, command registration, and capability config do not substitute for native authorization or validation.
+
+## 9. Validation and Read-Only Boundary
+
+- Run only repository-defined non-mutating format checks, lint, typecheck, focused tests, builds, and generated-route checks relevant to selected profiles.
+- Use `ops-browser` for browser/runtime evidence and `ops-client` for real desktop-window evidence.
+- Report exact failures and `Not verified` gaps.
+- Leave source files, generated files, docs, index, checkout, refs, branches, PRs, and remote state unchanged.
+- Route accepted fixes to `implement-frontend`.
+- Return specialist findings to the coordinating review owner.
+- `code-delivery` alone performs authorized staging, commit, rebase/squash, push, or cleanup.
+
+## 10. Final Report
+
+- State product/framework profile.
+- State selected and excluded audit profiles.
+- State delegated boundary and coordinating owner when applicable.
+- Lead with severity-ranked findings.
+- Include exact location, evidence, impact, remediation direction/owner, and validation gap.
+- Summarize inspected candidates, ownership, selected profile evidence, structural/documentation drift, runtime evidence, and residual risks.

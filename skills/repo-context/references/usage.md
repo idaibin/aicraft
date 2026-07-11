@@ -1,8 +1,8 @@
-# Code Context
+# Repository Context
 
 ## Summary
 
-Ground an agent in a repository before it guesses. Use it to map real commands, paths, docs, and project conventions, or to preview context docs safely.
+Ground an agent in a repository before it guesses. Use it to map real commands, paths, docs, project conventions, ownership, and reuse candidates, or to preview context docs safely.
 
 ## Best For
 
@@ -31,7 +31,7 @@ Use for prompts like:
 - `Find whether an existing trait or interface can be extended before creating another one.`
 - `Draft AGENTS.md first; preview before writing.`
 
-Do not use for generic feature initialization, dirty-tree commit review, or implementation planning; prefer `code-review` or `code-planner` for those.
+Do not use for generic feature initialization, dirty-tree commit review, immutable repository/range/PR review, scoped security audit, or implementation planning; prefer `code-review`, `repo-review`, `audit-security`, or `code-planner` for those.
 
 ## Output
 
@@ -39,4 +39,4 @@ Expect verified current truth, project class, targeted directory/file inventory,
 
 ## Maintenance
 
-Use `references/eval-cases.md` for trigger and quality checks. In AICraft, validate with `python3 scripts/validate-skills.py`; end-user installs use `npx skills add https://github.com/idaibin/aicraft`, and end-user updates use `npx skills update`.
+Use `references/eval-cases.md` for trigger and quality checks. In AICraft, validate with `python3 scripts/validate-skills.py --skill repo-context`; end-user installs use `npx skills add https://github.com/idaibin/aicraft`, and end-user updates use `npx skills update`.

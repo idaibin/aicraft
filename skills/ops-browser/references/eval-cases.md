@@ -14,7 +14,8 @@ Use these cases when changing `ops-browser` triggers, modes, capability prefligh
 | `Fill the web form and upload this file.` | Should trigger Form/Upload mode and state-change gate. | Form and upload workflow. |
 | `Check whether this browser session is logged into the right account.` | Should trigger account/session evidence checks or Degraded Evidence. | Login-sensitive verification. |
 | `Check this page's console and network errors.` | Should trigger only if console/network capability is available; otherwise report blocked claims. | Capability-bound debugging evidence. |
-| `Debug why this page fails after I click submit; use browser evidence.` | Should trigger Debug mode. | Browser-side red/green loop. |
+| `Reproduce this known browser-only CORS failure and collect console/network evidence.` | Should trigger Browser Debug Evidence directly. | Direct browser fact with a browser-side red/green loop. |
+| `Diagnose delegated this exact browser reproduction; collect DOM, console, and network evidence.` | Should trigger Browser Debug Evidence. | Explicit coordinator delegation. |
 | `Keep using this same ChatGPT conversation ID for follow-up verification.` | Should trigger persistent-session handling when stable identity is exposed. | Session continuity. |
 | `The review bridge authorized one send; operate the selected ChatGPT tab and return composer/response evidence.` | Should trigger only low-level browser operation within the bridge-provided scope. | Browser support for a caller-owned review workflow. |
 
@@ -26,8 +27,11 @@ Use these cases when changing `ops-browser` triggers, modes, capability prefligh
 | `Implement this admin dashboard using the existing component system.` | Should prefer `implement-frontend`. | Frontend code implementation. |
 | `Verify the real Tauri client window; do not use a browser preview.` | Should prefer `ops-client`. | Real desktop-client operation. |
 | `Confirm the Electron release app window with platform-specific evidence.` | Should prefer `ops-client`. | Desktop runtime/window proof. |
-| `Understand this repository's directories and commands first.` | Should prefer `code-context`. | Repository context task. |
+| `Understand this repository's directories and commands first.` | Should prefer `repo-context`. | Repository context task. |
+| `Audit only this browser-facing endpoint for token or authorization risk.` | Should prefer `audit-security`; `ops-browser` may supply runtime evidence only when delegated. | Security review is not browser-operation ownership. |
 | `Prepare and send this branch for three ChatGPT review rounds, then archive review.md.` | Should prefer `chatgpt-review-bridge`; `ops-browser` alone does not own authorization, rounds, package, or archive. | External review orchestration boundary. |
+| `Why does this form intermittently fail after submit? Find the root cause.` | Should prefer `diagnose`, which may delegate Browser Debug Evidence to `ops-browser`. | Cross-system root-cause coordination is not browser-operation ownership. |
+| `Why does refresh sometimes lose state or return 401?` | Should prefer `diagnose` and use `ops-browser` only for bounded browser evidence. | The final cause may cross frontend, API, session, or backend boundaries. |
 
 ## Quality Eval
 
@@ -48,7 +52,7 @@ Use these cases when changing `ops-browser` triggers, modes, capability prefligh
 | State safety | Avoids disruptive actions on user-owned state or obtains explicit authorization. | Refreshes, clears storage, logs out, submits, uploads, switches accounts, or navigates destructively without need/authorization. |
 | Form/upload | Maps controls by role/label/name/test id, confirms source file/path and final state, and stops before unauthorized submission. | Uses coordinate guessing or submits unchecked fields. |
 | Evidence fit | Matches screenshots, DOM/accessibility, console, network, storage, and file evidence to the exact claim. | Treats a screenshot as network, account, storage, or download proof. |
-| Debug feedback loop | Defines URL, steps, expected symptom, observed symptom, and red/green evidence before proposing fixes. | Guesses from one screenshot or log without reproduction. |
+| Browser debug handoff | Enters only after `diagnose` delegation or an already-isolated browser evidence request; returns exact browser-layer facts, removes disposable state, and retains referenced evidence until embedded, archived, transferred, or accepted. | Starts from an unexplained root-cause request, claims the final cause/fix, deletes evidence before transfer, or leaves temporary browser state unexplained. |
 | Visual checks | Uses relevant viewports and checks overflow, clipping, dialogs, tables, hover/focus, and reachable loading/empty/error states. | Claims responsiveness from one unchecked viewport. |
 | Interaction proof | Captures before/after state for tested controls, navigation, forms, uploads, downloads, routes, or payloads. | Says an interaction works without changed-state evidence. |
 | Cleanup | Closes task-only pages/windows and reports remaining temporary sessions/artifacts. | Leaves temporary state without reporting it. |

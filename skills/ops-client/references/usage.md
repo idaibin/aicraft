@@ -2,7 +2,7 @@
 
 ## Summary
 
-Use `ops-client` for real desktop client operation and verification. It is currently Tauri-focused, but it also applies to Electron and native shells when real app-window evidence matters. Use `implement-frontend` for desktop webview code changes.
+Use `ops-client` for real desktop client operation, verification, and bounded Client Debug Evidence. It is currently Tauri-focused, but it also applies to Electron and native shells when real app-window evidence matters. Use `diagnose` for cross-system root-cause coordination and `implement-frontend` for desktop webview code changes.
 
 ## Trigger Examples
 
@@ -21,8 +21,9 @@ Use `ops-client` for real desktop client operation and verification. It is curre
 
 - Browser-only page inspection, form filling, upload/download, or console/network debugging; use `ops-browser`.
 - Desktop webview code implementation, IPC layering, or component refactors; use `implement-frontend`.
-- Generic repository context discovery without client launch review or real-window verification; use `code-context`.
+- Generic repository context discovery without client launch review or real-window verification; use `repo-context`.
 - Dirty-tree review or commit planning; use `code-review`.
+- Root-cause coordination for unexplained client failures; use `diagnose`, which may delegate real-client reproduction and evidence collection here.
 
 ## Operation Notes
 
@@ -33,6 +34,7 @@ Use `ops-client` for real desktop client operation and verification. It is curre
 - For Tauri webviews, make controls semantic and discoverable through DOM and Accessibility surfaces.
 - For code edits that add semantic controls, labels, or stable selectors, use `implement-frontend`; then return here for real-window proof.
 - For Electron apps, first prove the real desktop runtime/window when the task asks for client evidence; use browser tooling only for plain web-preview behavior or after the real app identity is established.
+- Enter Client Debug Evidence only after `diagnose` delegates the reproduction or the caller supplies an already-isolated client-layer evidence request. Otherwise route unexplained failures to `diagnose` before client operation. Reproduce only on the verified target process/window/build, return direct evidence, remove disposable probes and launched test instances, and retain referenced screenshots/logs/traces until embedded, archived, or accepted by the handoff owner. Do not infer a final cause across frontend, IPC, Rust, database, packaging, or platform layers.
 
 ## macOS Adapter
 

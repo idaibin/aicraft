@@ -37,12 +37,13 @@ project class and repository standard instead of forcing one layout everywhere.
 
 ## Non-Triggers
 
-- Repository orientation before the Rust surface is known; use `code-context`.
+- Repository orientation before the Rust surface is known; use `repo-context`.
 - Planning a cross-repository migration before implementation; use `code-planner`.
 - Diagnosing an unknown failing test or performance regression; use `diagnose`.
 - Reviewing staged ownership or producing commit groups; use `code-review`. Use `code-delivery` for actual staging or commits after review.
 - Systematic read-only Rust architecture, performance, memory, concurrency,
-  SQLite, unsafe, or FFI review; use `audit-rust`.
+  SQLite, unsafe, or FFI audit; use `audit-rust`.
+- Security-only audit after the Rust surface is mapped; use `audit-security`.
 - Frontend UI work around a Tauri backend; use `implement-frontend`.
 
 ## Output

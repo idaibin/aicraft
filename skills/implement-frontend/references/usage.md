@@ -46,12 +46,11 @@ Use `implement-frontend` as the first frontend coding skill after repository con
 
 ## Non-Triggers
 
-- Repository onboarding or command discovery; use `code-context`.
+- Repository onboarding or command discovery; use `repo-context`.
 - Large future planning before implementation; use `code-planner`.
 - Root-cause diagnosis before a fix is known; use `diagnose`.
 - Git diff ownership, staging plans, or commit readiness; use `code-review`. Use `code-delivery` for actual staging, commit, push, or delivery.
-- Systematic read-only frontend architecture, reuse, state/data, layout,
-  accessibility, performance, or Tauri-boundary review; use `audit-frontend`.
+- Systematic read-only frontend architecture, reuse, state/data, layout, accessibility, performance, or Tauri-boundary review; use `audit-frontend`.
 - Browser screenshots, console, network, uploads, downloads, account state, or runtime checks; use `ops-browser`.
 - Real desktop-client launch, process, CGWindowID, or native runtime evidence; use `ops-client`.
 

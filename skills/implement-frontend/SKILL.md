@@ -14,7 +14,7 @@ Implement frontend changes with existing-stack alignment, minimal DOM/CSS, clear
 1. Read repo guidance first: root `AGENTS.md`, nearest subproject `AGENTS.md`, `AGENT.md`, or chat-supplied rules.
 2. Identify the frontend project class, app boundary, package manager, runtime pin, script contract, directory/naming standard, and documented exceptions.
 3. Identify the target page, route, screen, component, framework, UI type, visual source, and required states before editing.
-4. Consume a current `code-context` inventory or perform the same targeted search for existing routes, pages, layouts, components, hooks or composables, services, stores, shared UI, tests, and analogous implementations.
+4. Consume a current `repo-context` inventory or perform the same targeted search for existing routes, pages, layouts, components, hooks or composables, services, stores, shared UI, tests, and analogous implementations.
 5. Decide in order: directly reuse, adapt the nearest reference, or create new. Record why existing candidates are insufficient before adding a file or abstraction.
 6. Inspect only the selected target and reference files needed for the requested change.
 7. Classify the existing UI system and layout model: framework, component library, state/data stack, utility/CSS strategy, shell/content/page boundaries, panels, and scroll regions.
@@ -37,7 +37,7 @@ Implement frontend changes with existing-stack alignment, minimal DOM/CSS, clear
 
 ## Do Not Use For
 
-- First-pass repository discovery, real commands, or entry points; use `code-context`.
+- First-pass repository discovery, real commands, or entry points; use `repo-context`.
 - Future task decomposition or multi-agent implementation planning; use `code-planner`.
 - Dirty-tree ownership, mixed-hunk review, staging plans, or commit readiness; use `code-review`.
 - Actual staging, commit creation, rebase/squash, push, or delivery; use `code-delivery` after review.
@@ -52,7 +52,7 @@ Implement frontend changes with existing-stack alignment, minimal DOM/CSS, clear
 - Follow repository-pinned Node/package-manager versions, lockfile, dependency policy, script names, directory names, and file naming. Do not upgrade or normalize them during unrelated UI work.
 - Keep framework-native structure: use the repository's React Router `routes`, Next.js `app`, Astro `pages`, Vue Router/views or feature convention, or documented equivalent. Preserve existing naming until alignment is explicit.
 - Do not introduce a parallel UI kit, CSS system, routing pattern, state layer, API helper, icon library, or form library when an existing one covers the need.
-- Do not create a page, component, hook, composable, helper, service, store, wrapper, or shared abstraction before checking the `code-context` inventory and performing a targeted file/symbol search.
+- Do not create a page, component, hook, composable, helper, service, store, wrapper, or shared abstraction before checking the `repo-context` inventory and performing a targeted file/symbol search.
 - Create a new implementation only when reuse or adaptation would violate ownership or behavior. State the reason and place it in the existing directory and naming convention.
 - Keep layout ownership explicit: app/window shell owns chrome and global clipping; content containers own the page's outer inset; page roots own page layout; components own only their internal spacing; panels own panel bounds; inner regions own scrolling or overflow.
 - Keep the shortest valid layout path. Every wrapper must own semantics, layout, state, accessibility, animation, or reuse; flatten nested elements that do not.

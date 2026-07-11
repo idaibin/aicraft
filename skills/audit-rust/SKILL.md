@@ -7,7 +7,7 @@ description: "Use when auditing or profiling complex Rust CLIs, libraries, Tokio
 
 ## Overview
 
-Audit Rust engineering from repository evidence. Select only the audit profiles required by the task; do not load architecture, performance, memory, SQLite, concurrency, and FFI review into every audit. This workflow is read-only by default; use `implement-rust` for requested changes. For an existing diff, `code-review` remains the read-only Git-change review coordinator and may invoke this skill for a bounded specialist subreview of the changed Rust surface.
+Audit Rust engineering from repository evidence. Select only the audit profiles required by the task; do not load architecture, performance, memory, SQLite, concurrency, and FFI review into every audit. This workflow is read-only by default; use `implement-rust` for requested changes. For an existing local diff, `code-review` remains the read-only Git-change review coordinator; for an immutable repository, range, PR, release candidate, or review package, `repo-review` remains the review coordinator. Either may invoke this skill for a bounded Rust specialist subreview.
 
 ## Rule Priority
 
@@ -24,7 +24,7 @@ Do not rewrite a working local design merely to resemble an external project.
 
 ## Workflow
 
-1. Read repository guidance, run `git status --short`, and inspect only relevant manifests, entry points, modules, docs, tests, benches, migrations, CI, and runtime configuration. If a Git change set exists, keep `code-review` as the read-only coordinator for dirty-tree classification, full-diff completeness, staging plans, and commit readiness; accept only a scoped Rust subreview boundary from that workflow.
+1. Read repository guidance, run `git status --short`, and inspect only relevant manifests, entry points, modules, docs, tests, benches, migrations, CI, and runtime configuration. When delegated, record the exact Rust paths or diff and keep the caller as review coordinator.
 2. Determine workspace/crate boundaries, library and binary entries, feature flags, MSRV, edition, runtime/thread model, error/tracing style, database linkage, migration strategy, quality commands, and unsafe/FFI/native dependencies that apply to the task.
 3. Select one or more audit profiles:
    - **Architecture/baseline:** crate/module/API ownership, dependencies, toolchain policy, structural lifecycle, docs, and legacy exceptions.
@@ -34,12 +34,12 @@ Do not rewrite a working local design merely to resemble an external project.
    - **SQLite:** runtime/linkage, connections, transactions, WAL, migrations, schema, indexes, plans, maintenance, backup, and recovery.
    - **Unsafe/FFI:** invariants, ABI/layout, pointer ownership, callbacks, threads, panic containment, alloc/free symmetry, and native cleanup.
 4. Classify applicable standards as portable governance, organization baseline, new-project template, repository contract, or documented legacy exception. Never turn a version snapshot or example tree into a universal rule.
-5. Consume current `code-context` output or build a targeted inventory of analogous APIs, modules, database access, background tasks, tests, benchmarks, migrations, callers, and architecture docs.
+5. Consume current `repo-context` output or build a targeted inventory of analogous APIs, modules, database access, background tasks, tests, benchmarks, migrations, callers, and architecture docs.
 6. Map governing invariants, resource owners, shutdown/cancellation paths, error boundaries, workload, baseline, and validation gaps for the selected profiles only.
 7. When an in-scope selected-profile change adds, reuses, moves, renames, or deletes a structural surface, audit every affected manifest, registration, export, feature, test, migration, generated file, deployment path, architecture document, and index; search for stale references.
 8. Validate hypotheses with non-mutating repository-defined commands and representative data. Do not substitute `cargo check` for release, benchmark, concurrency, migration, or runtime evidence.
 9. Stop when the selected profiles are supported by evidence. Mark unselected profiles out of scope rather than partially reviewing them.
-10. Report severity-ranked findings with impact, exact location, evidence, remediation direction, `Not verified` gaps, and the selected/excluded profile boundary. When operating as a specialist subreview, return findings to `code-review`; do not stage, commit, or take over delivery.
+10. Report severity-ranked findings with impact, exact location, evidence, remediation direction, `Not verified` gaps, and the selected/excluded profile boundary. In specialist mode, return findings to the coordinating `code-review` or `repo-review`; do not stage, commit, post comments, or take over final review ownership.
 
 ## Modes
 
@@ -47,6 +47,7 @@ Do not rewrite a working local design merely to resemble an external project.
 - **Combined risk audit:** multiple interacting profiles, such as Tokio plus SQLite or unsafe plus performance, with explicit integration risks.
 - **Baseline audit:** compare toolchain, workspace, directory, naming, validation, documentation, and legacy-exception policy against real project evidence.
 - **Performance experiment review:** define workload, baseline, measurement, one-factor experiment, and comparable before/after evidence; route experiment edits to `implement-rust`.
+- **Scoped specialist subreview:** inspect only the Rust paths or diff delegated by `code-review` or `repo-review`; return domain findings without taking review coordination or Git/GitHub ownership.
 
 ## Hard Rules
 
@@ -64,17 +65,18 @@ Do not rewrite a working local design merely to resemble an external project.
 - Choose `rusqlite` or SQLx from actual runtime, connection, transaction, checking, and deployment needs; never migrate because one is newer or marketed as async.
 - Keep every unsafe block minimal and document its safety invariant. Verify FFI ownership, length, alignment, lifetime, ABI, callback/re-entry, panic, thread, allocator, and cleanup behavior.
 - Apply stricter templates to new projects only when adopted. Migrate established projects incrementally at real change boundaries; never rename mechanically for visual consistency.
-- Do not edit, stage, commit, or deliver code in audit mode. Route approved remediation to `implement-rust`. `code-review` coordinates read-only review of an existing Git change set and may orchestrate this skill as a Rust specialist; `code-delivery` is used only when the user explicitly requests commit, push, squash, or remote delivery.
+- Do not edit, stage, commit, post review comments, or deliver code in audit mode. Route approved remediation to `implement-rust`. `code-review` owns local dirty-tree review and commit readiness; `repo-review` owns immutable repository/range/PR review coordination; `code-delivery` alone owns Git mutation.
 - Do not claim profiles were reviewed when their workload, runtime, target, dataset, or tool support was unavailable. Mark the exact gap `Not verified`.
 
 ## Do Not Use For
 
-- Repository orientation without a Rust task; use `code-context`.
+- Repository orientation without a Rust task; use `repo-context`.
 - Rust implementation, modification, refactoring, or porting; use `implement-rust`.
 - Root-cause diagnosis before a fix is known; use `diagnose`.
 - Whole-diff review, dirty-tree classification, staging plans, commit grouping, or commit readiness; use `code-review`. Under its orchestration, this skill may inspect a bounded changed Rust surface as a read-only specialist without taking over coordination.
+- Coordinating an entire repository, branch range, PR, release candidate, or review package; use `repo-review`, which may delegate a bounded Rust surface here.
 - Commit, push, squash, branch cleanup, or remote proof; use `code-delivery` only when the user explicitly requests delivery.
-- Security-only review after the Rust surface is mapped; use `code-security`.
+- Security-only audit after the Rust surface is mapped; use `audit-security`.
 - A frontend-only change with no Rust or SQLite boundary.
 
 ## Output Contract
@@ -83,7 +85,7 @@ Start with selected profiles and severity-ranked findings. For each finding, rep
 
 ## Skill Maintenance
 
-Keep this entry procedural. When triggers, modes, or rules change, update references, `agents/openai.yaml`, eval cases, README/install indexes, and run `python3 scripts/validate-skills.py`.
+Keep this entry procedural. When triggers, modes, or rules change, update references, `agents/openai.yaml`, eval cases, README/install indexes, and run `python3 scripts/validate-skills.py --skill audit-rust`.
 
 ## References
 

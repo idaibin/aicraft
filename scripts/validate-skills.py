@@ -12,7 +12,8 @@ from pathlib import Path
 
 
 LEGACY_SKILL_NAMES = (
-    "repo-context",
+    "code-context",
+    "code-security",
     "commit-reviewer",
     "planner",
     "frontend-implementation",
@@ -21,9 +22,7 @@ LEGACY_SKILL_NAMES = (
 )
 SKILL_NAME_RE = re.compile(r"^[a-z0-9-]+$")
 LEGACY_RE = re.compile(
-    r"(?<![A-Za-z0-9_-])("
-    + "|".join(re.escape(name) for name in LEGACY_SKILL_NAMES)
-    + r")(?![A-Za-z0-9_-])"
+    r"(?<![A-Za-z0-9_-])(" + "|".join(re.escape(name) for name in LEGACY_SKILL_NAMES) + r")(?![A-Za-z0-9_-])"
 )
 MARKDOWN_LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 SKILL_INVOCATION_RE = re.compile(r"(?<![A-Za-z0-9_.])\$([a-z][a-z0-9-]*)")
@@ -364,6 +363,178 @@ def validate_specialized_eval_contracts(
                 f"{label}: audit-frontend Quality Eval missing required case {case!r}"
             )
 
+    elif skill_name == "repo-review":
+        for case in missing_table_cases(
+            eval_text,
+            "## Quality Eval",
+            ("Immutable basis", "Specialist composition", "Duplicate control", "Read-only boundary"),
+        ):
+            errors.append(
+                f"{label}: repo-review Quality Eval missing required case {case!r}"
+            )
+
+    elif skill_name == "repo-context":
+        for case in missing_table_cases(
+            eval_text,
+            "## Quality Eval",
+            ("Scope and stop condition", "Context-versus-review boundary", "Reuse inventory", "New-file gate"),
+        ):
+            errors.append(
+                f"{label}: repo-context Quality Eval missing required case {case!r}"
+            )
+
+    elif skill_name == "audit-security":
+        for case in missing_table_cases(
+            eval_text,
+            "## Quality Eval",
+            ("Scope mapping", "Scoped specialist boundary", "Release check"),
+        ):
+            errors.append(
+                f"{label}: audit-security Quality Eval missing required case {case!r}"
+            )
+
+    elif skill_name == "ops-browser":
+        for case in missing_table_cases(
+            eval_text,
+            "## Quality Eval",
+            ("Browser debug handoff", "State safety", "Cleanup"),
+        ):
+            errors.append(
+                f"{label}: ops-browser Quality Eval missing required case {case!r}"
+            )
+
+    elif skill_name == "ops-client":
+        for case in missing_table_cases(
+            eval_text,
+            "## Quality Eval",
+            ("Client debug handoff", "Runtime source", "Unsupported versus unverified"),
+        ):
+            errors.append(
+                f"{label}: ops-client Quality Eval missing required case {case!r}"
+            )
+
+    return errors
+
+
+def markdown_section(markdown_text: str, section: str) -> str:
+    start = markdown_text.find(section)
+    if start < 0:
+        return ""
+    body_start = start + len(section)
+    next_section = markdown_text.find("\n## ", body_start)
+    return markdown_text[body_start:] if next_section < 0 else markdown_text[body_start:next_section]
+
+
+CROSS_ARTIFACT_TERM_REQUIREMENTS: tuple[
+    tuple[str, str, str | None, tuple[str, ...]], ...
+] = (
+    ("repo-review", "SKILL.md", "## Hard Rules", ("review basis", "resolved SHAs", "read-only")),
+    ("repo-review", "references/usage.md", "## Examples", ("Resolve both endpoints", "SHAs")),
+    ("repo-context", "SKILL.md", "## Overview", ("does not judge", "defects")),
+    ("repo-context", "references/usage.md", "## Triggers", ("immutable repository/range/PR review", "repo-review")),
+    ("audit-security", "SKILL.md", "## Modes", ("Scoped specialist subreview", "coordinator retains", "severity")),
+    ("audit-security", "references/usage.md", "## Output", ("delegated path/diff boundary", "without editing", "coordinator")),
+    ("ops-browser", "SKILL.md", "## Modes", ("diagnose", "already-isolated", "browser-layer")),
+    ("ops-browser", "agents/openai.default_prompt", None, ("only after $diagnose delegation", "before browser operation", "final cause/fix")),
+    ("ops-browser", "references/usage.md", "## Browser Debug Evidence", ("diagnose", "before browser operation", "retain referenced")),
+    ("ops-client", "SKILL.md", "## Modes", ("diagnose", "already-isolated", "client-layer")),
+    ("ops-client", "SKILL.md", "## Hard Rules", ("Retain screenshots", "handoff owner", "removed disposable state")),
+    ("ops-client", "agents/openai.default_prompt", None, ("only after $diagnose delegation", "before client operation", "retain referenced evidence")),
+    ("ops-client", "references/usage.md", "## Operation Notes", ("diagnose", "already-isolated", "retain referenced")),
+)
+
+
+def eval_row(eval_text: str, section: str, key: str) -> list[str]:
+    wanted = normalized_eval_key(key)
+    for row in markdown_table_rows(eval_text, section):
+        if row and normalized_eval_key(row[0]) == wanted:
+            return row
+    return []
+
+
+def validate_eval_row_semantics(
+    eval_text: str,
+    section: str,
+    key: str,
+    column_terms: tuple[tuple[int, tuple[str, ...]], ...],
+    *,
+    label: str,
+) -> list[str]:
+    row = eval_row(eval_text, section, key)
+    if not row:
+        return [f"{label}: missing semantic eval row {key!r} in {section}"]
+    errors: list[str] = []
+    for column, terms in column_terms:
+        cell = row[column].casefold() if len(row) > column else ""
+        missing = [term for term in terms if term.casefold() not in cell]
+        if missing:
+            errors.append(
+                f"{label}: eval row {key!r} column {column + 1} missing semantic terms {missing}"
+            )
+    return errors
+
+
+def validate_cross_artifact_contracts(
+    skill_name: str, surfaces: dict[str, str], *, label: str
+) -> list[str]:
+    """Validate scoped authority text plus structured Eval row behavior."""
+
+    errors: list[str] = []
+    for required_skill, surface, section, terms in CROSS_ARTIFACT_TERM_REQUIREMENTS:
+        if required_skill != skill_name:
+            continue
+        source = surfaces.get(surface, "")
+        scoped = markdown_section(source, section) if section else source
+        missing = [term for term in terms if term.casefold() not in scoped.casefold()]
+        if missing:
+            errors.append(
+                f"{label}: {skill_name} {surface} {section or 'field'} missing contract terms {missing}"
+            )
+
+    eval_text = surfaces.get("references/eval-cases.md", "")
+    semantic_rows: dict[str, tuple[tuple[str, str, tuple[tuple[int, tuple[str, ...]], ...]], ...]] = {
+        "repo-review": (("## Quality Eval", "Immutable basis", ((1, ("sha", "before conclusions")), (2, ("moving", "ambiguous")))),),
+        "repo-context": (("## Quality Eval", "Context-versus-review boundary", ((1, ("without p0-p3", "code-review", "repo-review")), (2, ("universal review",)))),),
+        "audit-security": (("## Quality Eval", "Scoped specialist boundary", ((1, ("delegated paths/diff", "code-review", "repo-review")), (2, ("expands scope", "whole-review readiness")))),),
+        "ops-browser": (
+            ("## Trigger Eval", "Reproduce this known browser-only CORS failure and collect console/network evidence.", ((1, ("browser debug evidence", "directly")), (2, ("browser fact",)))),
+            ("## Trigger Eval", "Diagnose delegated this exact browser reproduction; collect DOM, console, and network evidence.", ((1, ("browser debug evidence",)), (2, ("delegation",)))),
+            ("## Non-Trigger Eval", "Why does this form intermittently fail after submit? Find the root cause.", ((1, ("diagnose", "browser debug evidence")), (2, ("cross-system",)))),
+            ("## Quality Eval", "Browser debug handoff", ((1, ("diagnose", "already-isolated", "retains referenced evidence")), (2, ("final cause/fix", "deletes evidence before transfer")))),
+        ),
+        "ops-client": (
+            ("## Trigger Eval", "Diagnose delegated this exact release-window reproduction; collect process and window evidence.", ((1, ("client debug evidence",)), (2, ("delegation",)))),
+            ("## Trigger Eval", "On the verified release app, reproduce this already-isolated Accessibility action failure and return client evidence only.", ((1, ("client debug evidence",)), (2, ("bounded", "without cross-system")))),
+            ("## Non-Trigger Eval", "Why does the release app button not respond? Find the root cause.", ((1, ("diagnose", "client debug evidence")), (2, ("cross", "boundaries")))),
+            ("## Quality Eval", "Client debug handoff", ((1, ("diagnose", "already-isolated", "retains referenced evidence")), (2, ("final cause/fix", "deletes evidence before transfer")))),
+        ),
+    }
+    for section, key, columns in semantic_rows.get(skill_name, ()):
+        errors.extend(
+            validate_eval_row_semantics(eval_text, section, key, columns, label=label)
+        )
+    forbidden_by_skill = {
+        "ops-browser": (
+            "not prefer `diagnose`",
+            "trigger `ops-browser` directly and may later",
+            "permits final cause/fix",
+            "deletes evidence before transfer after reporting",
+            "direct operation takes precedence over `diagnose`",
+        ),
+        "ops-client": (
+            "not prefer `diagnose`",
+            "trigger `ops-client` directly and may later",
+            "permits final cause/fix",
+            "deletes evidence before transfer after reporting",
+            "direct operation takes precedence over `diagnose`",
+        ),
+    }
+    combined_contract_text = "\n".join(surfaces.values()).casefold()
+    for forbidden in forbidden_by_skill.get(skill_name, ()):
+        if forbidden.casefold() in combined_contract_text:
+            errors.append(
+                f"{label}: {skill_name} contains contradictory contract phrase {forbidden!r}"
+            )
     return errors
 
 
@@ -556,6 +727,31 @@ def validate_package(package: SkillPackage, *, label: str) -> tuple[list[str], Q
                 non_trigger_cases=eval_metrics.non_trigger_cases,
                 quality_cases=eval_metrics.quality_cases,
             )
+
+    contract_surfaces = {
+        "SKILL.md": skill_md_text,
+        "agents/openai.yaml": (
+            openai_yaml.read_text(encoding="utf-8") if openai_yaml.is_file() else ""
+        ),
+        "agents/openai.default_prompt": (
+            yaml_scalar(openai_yaml.read_text(encoding="utf-8"), "default_prompt")
+            if openai_yaml.is_file()
+            else ""
+        ),
+        "references/usage.md": (
+            (package_path / "references" / "usage.md").read_text(encoding="utf-8")
+            if (package_path / "references" / "usage.md").is_file()
+            else ""
+        ),
+        "references/eval-cases.md": (
+            (package_path / "references" / EVAL_CASES_FILE).read_text(encoding="utf-8")
+            if (package_path / "references" / EVAL_CASES_FILE).is_file()
+            else ""
+        ),
+    }
+    errors.extend(
+        validate_cross_artifact_contracts(package.name, contract_surfaces, label=label)
+    )
 
     for forbidden in ("README.md", "CHANGELOG.md", "INSTALL.md"):
         if (package_path / forbidden).exists():

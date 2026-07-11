@@ -23,7 +23,7 @@ Operate browser pages as stateful user sessions and collect web evidence. Start 
    - file upload and local artifact access;
    - background-safe operation without stealing focus.
 3. Enumerate browser sessions and existing tabs only when the available tool exposes them; never invent missing tab/window identity.
-4. Choose the mode and evidence plan based on capability and ownership: Local Project, Managed Session, User Session, Inspect/Verify, Visual/Responsive, Form/Upload, or Debug.
+4. Choose the mode and evidence plan based on capability and ownership: Local Project, Managed Session, User Session, Inspect/Verify, Visual/Responsive, Form/Upload, or Browser Debug Evidence. Enter Browser Debug Evidence only after `diagnose` delegates a reproduction or the caller supplies an already-isolated browser-layer evidence request; route unexplained or cross-system root-cause requests to `diagnose` before browser operation.
 5. Reuse the evidence-bearing session and target tab when it can be identified safely. Otherwise open an isolated managed page only when the task does not depend on unavailable user-profile state.
 6. Prefer browser/tool APIs, DOM inspection, roles, labels, test ids, and deterministic actions over manual guessing.
 7. Gather only evidence the tool can actually expose: UI state, DOM/accessibility, console, network, storage/auth state, screenshots, viewport behavior, downloads, route changes, or submitted payloads.
@@ -38,14 +38,18 @@ Operate browser pages as stateful user sessions and collect web evidence. Start 
 - **Inspect/Verify:** confirm page, environment, rendered state, account/session evidence, and requested behavior.
 - **Visual/Responsive:** check relevant viewports, overflow, clipping, dialogs, tables, hover/focus, and reachable feedback states.
 - **Form/Upload:** map controls semantically, verify source file/path and final state, and stop before unauthorized submission.
-- **Debug:** define a repeatable browser red/green loop, reproduce and minimize the symptom, test one hypothesis at a time, and clean probes.
+- **Browser Debug Evidence:** only after `diagnose` delegation or an already-isolated browser-layer evidence request, execute the reproduction, define a repeatable browser red/green loop, collect DOM/console/network/storage/route/screenshot evidence, test one browser-layer hypothesis at a time, and return the evidence to `diagnose` or the caller.
 - **Degraded evidence:** when required browser capabilities are missing, perform only supported checks, state the blocked claims, and provide the exact artifact or manual action needed to continue.
 
 ## Do Not Use For
 
 - Real Tauri, Electron, or native desktop-client runtime/window proof; use `ops-client`.
 - Frontend code changes, component architecture, design-system decisions, or UI implementation; use `implement-frontend`.
-- Repository onboarding, planning, local diff review, or security-only review; use the relevant `code-*` skill.
+- Cross-system root-cause coordination for intermittent or unexplained failures; use `diagnose`, which may delegate browser reproduction and evidence collection here.
+- Repository onboarding or context discovery; use `repo-context`.
+- Future implementation planning; use `code-planner`.
+- Local dirty-tree review or commit readiness; use `code-review`.
+- Security-only review; use `audit-security`.
 - Browser-only evidence when the user explicitly requested a real desktop app window.
 - External ChatGPT review orchestration, package construction, send authorization, round counting, conversation attribution, or response archiving; use `chatgpt-review-bridge`. This skill may perform only the low-level browser actions that bridge explicitly routes.
 
@@ -60,11 +64,12 @@ Operate browser pages as stateful user sessions and collect web evidence. Start 
 - Do not treat page title, avatar, visible email fragment, or successful page load as sufficient account/workspace proof.
 - If a recorded session is closed, logged out, replaced, or cannot be identified, report the break. Do not silently create a new page and call it the same session.
 - Keep extra tabs/windows only for named isolation, comparison, destructive-test, or evidence needs.
-- For debugging, establish exact URL, steps, expected symptom, observed symptom, and red/green evidence before proposing fixes.
+- For browser debug evidence, establish exact URL, steps, expected symptom, observed symptom, and red/green evidence before testing a browser-layer hypothesis.
 - Test one browser hypothesis at a time. Do not bundle refresh, cache clearing, account switch, viewport changes, and code edits.
+- Confirm only direct browser facts such as the active URL, missing cookie, absent DOM control, console error, network response, or browser-enforced CORS failure. Return cross-system evidence to `diagnose` or the caller; do not claim a final frontend-to-API-to-backend-to-database root cause or decide a permanent code fix.
 - Prefer page-native field operations. Use the system clipboard only as a saved-and-restored fallback.
 - Use file upload only when attachment semantics are correct. Temporary files must use a task-specific path appropriate to the active environment; do not assume Desktop exists in remote/container runtimes.
-- Report exact temp paths and delete task-owned local artifacts when supported. Local deletion never removes a server-side attachment.
+- Remove disposable task state such as temporary probes, injected filters, and task-only tabs when safe. Retain referenced screenshots, downloads, traces, logs, and other handoff evidence until embedded, archived, transferred, or explicitly accepted by the handoff owner. Report retained paths/identifiers, embedded evidence, removed disposable state, and anything left open. Local deletion never removes a server-side attachment.
 - Stop before login credentials, MFA, consent, account switching, permission grants, purchases, destructive submits, or irreversible state changes unless explicitly authorized.
 - Do not refresh, clear cache/storage, log out, submit, upload, or navigate away from user-owned state unless required and authorized.
 - Match evidence to claims: screenshots prove visual state, DOM/accessibility proves rendered semantics, console proves client logs, network proves requests/responses, storage proves stored state, and file checks prove downloads.
@@ -72,7 +77,7 @@ Operate browser pages as stateful user sessions and collect web evidence. Start 
 
 ## Output Contract
 
-Report the capability preflight, selected mode, browser/session and tab identity evidence, account/workspace evidence or `Not verified`, whether visible focus was required, viewport(s), state-changing actions, debug loop when relevant, evidence produced, upload/download temp paths and cleanup, degraded or blocked claims, caller-owned orchestration fields left unchanged, and temporary page/window cleanup.
+Report the capability preflight, selected mode, browser/session and tab identity evidence, account/workspace evidence or `Not verified`, whether visible focus was required, viewport(s), state-changing actions, browser debug loop when relevant, direct browser facts, evidence returned to `diagnose` or the caller, upload/download temp paths and cleanup, degraded or blocked claims, caller-owned orchestration fields left unchanged, and temporary page/window cleanup.
 
 ## Skill Maintenance
 

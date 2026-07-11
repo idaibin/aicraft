@@ -12,20 +12,24 @@
 - `Compare rusqlite and SQLx for this existing runtime and deployment model.`
 - `Verify Rust architecture docs against crates, commands, migrations, and real code.`
 - `As the code-review Rust specialist, inspect only the changed Tokio and SQLite surface; return findings without staging or committing.`
+- `Under repo-review, inspect only the Rust paths in this immutable range and return bounded findings.`
 
 ## Routing Examples
 
-- Use `code-context` first when the task is only repository orientation or when
+- Use `repo-context` first when the task is only repository orientation or when
   no Rust target is known.
 - Use `implement-rust` for a change whose module,
   contracts, and validation are already established.
 - Use `diagnose` when the root cause of a failure or regression is unknown.
-- Use `code-security` for a security-only audit after the relevant Rust boundary
+- Use `audit-security` for a security-only audit after the relevant Rust boundary
   is mapped.
-- Use `code-review` for dirty-tree review, full-diff and contract-chain
+- Use `code-review` for local dirty-tree review, full-diff and contract-chain
   completeness, staging plans, and commit grouping. It may delegate a bounded changed
   Rust surface to `audit-rust` for a read-only specialist subreview; the audit
   returns findings and does not stage or commit.
+- Use `repo-review` for immutable repository snapshots, ranges, PRs, release
+  candidates, or review packages. It may delegate bounded Rust paths here while
+  retaining final integration and severity ownership.
 - Use `code-delivery` only when the user explicitly requests commit, push,
   squash, branch cleanup, or remote proof. An existing diff does not by itself
   authorize or require delivery.
