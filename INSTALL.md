@@ -19,6 +19,7 @@ Install only these skill package directories:
 - `skills/ops-browser`
 - `skills/ops-client`
 - `skills/human-writing`
+- `skills/esports-poster`
 
 Do not install the repository root, `prompts/`, `docs/`, or legacy skill names such as `code-context`, `code-security`, `commit-reviewer`, `planner`, `frontend-implementation`, `frontend-governance`, or `rust-engineering-governance`.
 
@@ -40,7 +41,7 @@ Install selected skills:
 
 ```bash
 npx skills add https://github.com/idaibin/aicraft \
-  --skill repo-context code-planner diagnose code-review repo-review code-delivery audit-security chatgpt-review-bridge implement-frontend implement-rust audit-frontend audit-rust ops-browser ops-client human-writing
+  --skill repo-context code-planner diagnose code-review repo-review code-delivery audit-security chatgpt-review-bridge implement-frontend implement-rust audit-frontend audit-rust ops-browser ops-client human-writing esports-poster
 ```
 
 For multiple selected skills, pass the names after `--skill` as shown above.
@@ -58,6 +59,12 @@ Install only the operations skills:
 npx skills add https://github.com/idaibin/aicraft --skill ops-browser ops-client
 ```
 
+Install only the esports poster skill:
+
+```bash
+npx skills add https://github.com/idaibin/aicraft --skill esports-poster
+```
+
 ## Update
 
 Update installed skills:
@@ -69,7 +76,7 @@ npx skills update
 Update only selected skills:
 
 ```bash
-npx skills update repo-context repo-review audit-security
+npx skills update repo-context repo-review audit-security esports-poster
 ```
 
 For updates, selected skill names are positional arguments.

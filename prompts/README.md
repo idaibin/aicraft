@@ -16,6 +16,7 @@ Reusable prompt assets are grouped by use case.
 
 - `design/`
   - reusable visual-design, image-generation, poster, and brand-system prompts
+  - `esports-poster.md`: standalone verified esports result and preview poster prompt with reusable mode contracts
   - `msi-2026-esports-poster.md`: generate verified MSI 2026 match-result and match-preview posters with a consistent official-inspired visual system
 
 - `rustzen/`
@@ -35,6 +36,7 @@ Reusable prompt assets are grouped by use case.
 - `prompts/` stores evolving source prompt assets.
 - `skills/` stores self-contained published workflows.
 - Skills may be inspired by prompts, but published skills must not require `prompts/` at runtime.
+- When a prompt and skill describe the same capability, validate the behavior in ChatGPT first, then synchronize the stable contracts into both surfaces.
 - If a prompt change is required by a skill, update the corresponding `skills/<skill-name>/references/` file in GitHub before upgrading that skill.
 - Skill upgrade workflows compare only the matching remote `skills/<skill-name>/` package, not repository-level `prompts/`.
 - Keep prompt files usable as standalone task instructions, even when a related skill exists.
