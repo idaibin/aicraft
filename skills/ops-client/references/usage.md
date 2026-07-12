@@ -14,7 +14,7 @@ Use `ops-client` for real desktop client operation, verification, and bounded Cl
 - `On Linux, verify this client through an available AT-SPI/window-manager adapter.`
 - `Confirm the visible Electron release app, not just the web preview.`
 - `On macOS, press this client button with AXPress without stealing the mouse.`
-- `Confirm whether the running app came from pnpm tauri dev or the release app.`
+- `Confirm whether the running app came from npm run tauri dev or the release app.`
 - `Verify whether this Tauri/client control is identifiable through DOM or Accessibility labels.`
 
 ## Non-Triggers

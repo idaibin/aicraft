@@ -18,7 +18,7 @@
 
 1. 识别项目基础信息
 - 技术栈（前端 / 后端 / 框架 / 构建工具）
-- 包管理器（pnpm / npm / yarn / bun / cargo 等）
+- 包管理器（npm / yarn / bun / cargo 等）
 - 运行时版本要求（node / rust 等）
 - 启动方式（dev / start / serve 实际命令）
 
