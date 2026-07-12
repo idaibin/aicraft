@@ -25,6 +25,7 @@ Use these cases when changing `code-delivery` triggers, modes, staging rules, pu
 | `Check this endpoint for authorization risk.` | Should prefer `audit-security` after scope is clear. | Security-only audit. |
 | `Verify this web page in the browser before release.` | Should prefer `ops-browser`. | Runtime browser evidence. |
 | `Commit this branch, push it, and open a draft PR.` | Should prefer the GitHub publishing workflow. | PR creation is outside Git-only delivery. |
+| `Send this branch to ChatGPT for five independent review rounds before delivery.` | Should prefer `chatgpt-review-bridge`; delivery begins only after the review loop is accepted. | External review orchestration is not Git mutation. |
 
 ## Quality Eval
 
@@ -46,4 +47,4 @@ Use these cases when changing `code-delivery` triggers, modes, staging rules, pu
 
 ## Scoring
 
-Score each quality case from 0 to 10. Minimum pass: all trigger/non-trigger expectations are correct and every quality case scores at least 7.
+Score each quality case from 0 to 10. Minimum pass: all trigger/non-trigger expectations are correct and every quality case scores at least 8.

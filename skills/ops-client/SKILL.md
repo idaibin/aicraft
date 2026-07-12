@@ -1,6 +1,6 @@
 ---
 name: ops-client
-description: Use when operating or verifying a specified real desktop client window, proving Tauri/Electron/native runtime source, reviewing launch commands, capturing platform-specific window evidence, or validating AI-operable desktop controls.
+description: Use when directly operating or verifying a specified real desktop client, or collecting evidence for an already-isolated client-layer failure. Do not use for unexplained or cross-system root-cause diagnosis.
 ---
 
 # Ops Client

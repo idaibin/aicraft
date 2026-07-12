@@ -24,6 +24,8 @@ Use these cases when changing `diagnose` triggers, investigation workflow, imple
 | `Review all dirty changes and split commits.` | Prefer `code-review`. | Dirty-tree review and staging plan. |
 | `Verify this page in the browser and collect console/network evidence.` | Prefer `ops-browser`. | Browser operation task. |
 | `The cause is already confirmed; implement the frontend fix now.` | Prefer `implement-frontend`. | No diagnosis remains. |
+| `The cause is already confirmed; implement the Rust fix now.` | Prefer `implement-rust`. | No diagnosis remains. |
+| `Reproduce this already-isolated release-client window failure and return process/window evidence only.` | Prefer `ops-client`. | Bounded client operation after isolation. |
 | `Stage and commit the verified fix.` | Prefer `code-delivery`. | Git mutation is not diagnosis. |
 
 ## Quality Eval

@@ -99,6 +99,25 @@ diagnose
 
 This preserves continuous execution without merging investigation and implementation permissions.
 
+## Cross-Skill Handoff Contracts
+
+Cross-skill workflows must transfer bounded state without transferring
+authority. The caller owns intent, authorization, scope, and the next-state
+decision; the executor owns only its direct action and evidence.
+
+For `chatgpt-review-bridge -> ops-browser -> chatgpt-review-bridge`, both
+published packages carry the identical `browser-operation/v1` protocol. The
+bridge owns the Capability requirements, Handoff Request, operation ledger,
+`operation_id`, retry decision, rounds, and attribution. `ops-browser` owns the
+measured Capability Snapshot and same-ID Handoff Result. An interruption with
+uncertain side effects is `ambiguous` and must stop for reconciliation rather
+than trigger a replacement operation.
+
+Repository validation rejects drift between the two published protocol copies.
+Behavior evals must cover at least normal completion, failure before submit,
+duplicate-submit prevention, ambiguous interruption, stale capability evidence,
+and unauthorized handoff.
+
 ## Public Skill Versus Internal Profile
 
 Create a new public skill only when all of the following are true:
@@ -143,6 +162,12 @@ Every public skill must keep these synchronized:
 - `skills.sh.json`
 
 Changes to triggers, authority, modes/profiles, output, or routing require pairwise evals against the closest neighboring skills.
+
+The machine-readable nearest-neighbor inventory lives in
+`docs/skills/routing-graph.json`. Every public package must appear in the graph,
+every edge must be symmetric, and both endpoint packages must name the other in
+their Trigger or Non-Trigger eval sections. An empty list is valid only when a
+skill has no plausible routing competitor in the published suite.
 
 ## Routing Review Checklist
 

@@ -299,7 +299,7 @@ reduce the score.
 
 Minimum pass: trigger/non-trigger routing and every profile-selection case are
 correct; every scenario includes all seven required fields; and every common,
-selected-profile, and applicable Combined row scores at least 7. Record
+selected-profile, and applicable Combined row scores at least 8. Record
 unselected profile rows `Out of scope` and do not score them. Unavailable
 required evidence may remain `Not verified` without failing scope discipline,
 but claiming or fabricating a command result, benchmark, runtime version, query

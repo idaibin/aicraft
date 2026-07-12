@@ -1,6 +1,6 @@
 ---
 name: ops-browser
-description: "Use when operating or verifying browser pages: screenshots, visual checks, responsive checks, data extraction, form/upload/download workflows, console/network/storage checks, or login/session-sensitive browser evidence."
+description: "Use when directly operating or verifying browser pages, or collecting evidence for an already-isolated browser-layer failure. Do not use for unexplained or cross-system root-cause diagnosis."
 ---
 
 # Ops Browser
@@ -12,7 +12,10 @@ Operate browser pages as stateful user sessions and collect web evidence. Start 
 ## Workflow
 
 1. Identify the target hostname, path, environment, account/session, and task goal.
-2. Run a capability preflight before navigation or claims. Record available/unavailable/unknown for:
+2. Run one capability preflight before navigation or claims and return the
+   Capability Snapshot defined by
+   [the shared browser-operation protocol](references/browser-operation-protocol.md).
+   Record available/unavailable/unknown for:
    - browser session and tab enumeration;
    - existing-tab control and stable tab/session identifiers;
    - managed browser creation;
@@ -23,12 +26,16 @@ Operate browser pages as stateful user sessions and collect web evidence. Start 
    - file upload and local artifact access;
    - background-safe operation without stealing focus.
 3. Enumerate browser sessions and existing tabs only when the available tool exposes them; never invent missing tab/window identity.
-4. Choose the mode and evidence plan based on capability and ownership: Local Project, Managed Session, User Session, Inspect/Verify, Visual/Responsive, Form/Upload, or Browser Debug Evidence. Enter Browser Debug Evidence only after `diagnose` delegates a reproduction or the caller supplies an already-isolated browser-layer evidence request; route unexplained or cross-system root-cause requests to `diagnose` before browser operation.
-5. Reuse the evidence-bearing session and target tab when it can be identified safely. Otherwise open an isolated managed page only when the task does not depend on unavailable user-profile state.
-6. Prefer browser/tool APIs, DOM inspection, roles, labels, test ids, and deterministic actions over manual guessing.
-7. Gather only evidence the tool can actually expose: UI state, DOM/accessibility, console, network, storage/auth state, screenshots, viewport behavior, downloads, route changes, or submitted payloads.
-8. Distinguish direct evidence from inference; mark unavailable or unchecked claims `Not verified`.
-9. Close task-only temporary pages/windows and clean temporary local artifacts when the tool supports it; report anything left open or undeleted.
+   Imported bookmarks, history, and saved credentials may accelerate target discovery or user login, but do not prove an active session, account/workspace identity, conversation ownership, authorization, or operation state.
+4. When called by `chatgpt-review-bridge`, validate the Handoff Request fields,
+   reuse or refresh the named Capability Snapshot, and return a Handoff Result
+   with the same `operation_id`; do not reconstruct bridge policy locally.
+5. Choose the mode and evidence plan based on capability and ownership: Local Project, Managed Session, User Session, Inspect/Verify, Visual/Responsive, Form/Upload, or Browser Debug Evidence. Enter Browser Debug Evidence only after `diagnose` delegates a reproduction or the caller supplies an already-isolated browser-layer evidence request; route unexplained or cross-system root-cause requests to `diagnose` before browser operation.
+6. Reuse the evidence-bearing session and target tab when it can be identified safely. Otherwise open an isolated managed page only when the task does not depend on unavailable user-profile state.
+7. Prefer browser/tool APIs, DOM inspection, roles, labels, test ids, and deterministic actions over manual guessing.
+8. Gather only evidence the tool can actually expose: UI state, DOM/accessibility, console, network, storage/auth state, screenshots, viewport behavior, downloads, route changes, or submitted payloads.
+9. Distinguish direct evidence from inference; mark unavailable or unchecked claims `Not verified`.
+10. Close task-only temporary pages/windows and clean temporary local artifacts when the tool supports it; report anything left open or undeleted.
 
 ## Modes
 
@@ -57,9 +64,12 @@ Operate browser pages as stateful user sessions and collect web evidence. Start 
 
 - Do not claim a capability from the skill text. Capability exists only when the active tool exposes and successfully performs it.
 - When called by `chatgpt-review-bridge`, require the bridge-provided surface, authorization state, package path, round scope, selected browser route/capability, and conversation mapping or explicit first-conversation policy. Follow that route exactly. If its capability or identity evidence fails, return the blocked state to the bridge; do not switch sessions or create a managed fallback independently.
+- For a bridge handoff, require `schema_version`, `operation_id`, authorization, route, target, capability snapshot, preconditions, expected postcondition, and retry policy. Return the same ID and a protocol state; never create or replace the ID.
+- Before a state-changing action, inspect the requested target and prior evidence. If the ID is already submitted/completed or prior side effects are uncertain, return `blocked` or `ambiguous` without acting.
 - Choose the session by evidence ownership: requested/recorded session first when identifiable; existing tab with required state second; managed session when external profile state is unnecessary; user session only when supported and required.
 - Enumerate sessions/tabs before opening anything only when enumeration is available. If unavailable, state that limitation and avoid claiming reuse or account identity.
 - Reuse the same tab/session whenever practical. Revalidate target identity before typing, uploading, downloading, submitting, or navigating away.
+- Inspect only task-relevant imported-data categories exposed by the active tool. Do not enumerate unrelated history, reveal saved credentials, or persist imported values; report unknown provenance or stale state and require fresh identity evidence.
 - Stable session/conversation IDs and exact URLs are stronger than visible titles; tool-specific handles may expire and must be revalidated.
 - Do not treat page title, avatar, visible email fragment, or successful page load as sufficient account/workspace proof.
 - If a recorded session is closed, logged out, replaced, or cannot be identified, report the break. Do not silently create a new page and call it the same session.
@@ -77,7 +87,7 @@ Operate browser pages as stateful user sessions and collect web evidence. Start 
 
 ## Output Contract
 
-Report the capability preflight, selected mode, browser/session and tab identity evidence, account/workspace evidence or `Not verified`, whether visible focus was required, viewport(s), state-changing actions, browser debug loop when relevant, direct browser facts, evidence returned to `diagnose` or the caller, upload/download temp paths and cleanup, degraded or blocked claims, caller-owned orchestration fields left unchanged, and temporary page/window cleanup.
+Report the Capability Snapshot and snapshot ID, selected mode, browser/session and tab identity evidence, account/workspace evidence or `Not verified`, Handoff Result with unchanged `operation_id` when delegated, before/action/side-effect/after evidence, whether visible focus was required, viewport(s), browser debug loop when relevant, evidence returned to `diagnose` or the caller, upload/download temp paths and cleanup, degraded, blocked, or ambiguous claims, caller-owned orchestration fields left unchanged, and temporary page/window cleanup.
 
 ## Skill Maintenance
 
@@ -87,3 +97,4 @@ When maintaining this package, keep `SKILL.md` concise, move detailed examples t
 
 - See [references/usage.md](references/usage.md) for trigger guidance and workflow details.
 - See [references/eval-cases.md](references/eval-cases.md) for trigger and quality evals.
+- See [references/browser-operation-protocol.md](references/browser-operation-protocol.md) for the shared Capability Snapshot, handoff schema, operation state machine, and degraded mode.

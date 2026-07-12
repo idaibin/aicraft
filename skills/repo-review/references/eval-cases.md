@@ -11,7 +11,7 @@ Use these cases when changing `repo-review` triggers, review-basis rules, specia
 | `Review PR 42 but do not post comments or modify anything.` | Trigger pull-request `repo-review`; keep GitHub state unchanged. |
 | `Review this release candidate for migrations, CI, packaging, rollback, and security configuration.` | Trigger release-candidate `repo-review`. |
 | `Validate this multipart review package, then review all covered files.` | Trigger review-package mode only after manifest/hash/final-marker validation. |
-| `Use frontend, Rust, and security specialists where relevant, then produce one consolidated report.` | Trigger `repo-review` as coordinator and retain final severity/report ownership. |
+| `Use frontend, Rust, and security specialists where relevant, then produce one consolidated report.` | Trigger `repo-review` as coordinator; delegate bounded work to `audit-frontend`, `audit-rust`, and `audit-security` while retaining final severity/report ownership. |
 
 ## Non-Trigger Eval
 

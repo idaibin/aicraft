@@ -76,6 +76,10 @@ The screenshot-style permission prompt is produced by the local execution permis
 - Use Codex to collect evidence, apply fixes, run tests, and challenge ChatGPT findings locally.
 - For mutual review, alternate `standard chat or Project review -> Codex verification/fix -> next external round`. Count only completed, attributed ChatGPT responses as external review rounds.
 - Let `chatgpt-review-bridge` own the package, send authorization, surface, round count, conversation mapping, and response archive. Use `ops-browser` only for low-level browser actions and evidence on the route the bridge selected.
+- Exchange browser capability and action state only through `browser-operation/v1`: `ops-browser` returns one Capability Snapshot, the bridge creates a Handoff Request and operation-ledger entry before each state-changing action, and the browser returns the same `operation_id` in its Handoff Result.
+- Treat imported bookmarks/history as target-discovery hints and saved credentials as user-login assistance only. They do not establish an authenticated session, correct account/workspace, conversation identity, send authorization, or operation completion. Require fresh direct evidence for each of those claims and avoid reading unrelated imported data.
+- Treat `operation_id` as idempotency scope, not a correlation label. Never create a replacement ID after an interruption or ambiguous submit; reconcile the original target and expected postcondition first.
+- Use one `round_id` for the external review round and a distinct `operation_id` for conversation creation, each attachment/send action, the final marker, and response capture. The round is complete only after all required operation IDs complete.
 
 For a verified Project with no mapped conversation, an explicit external send
 authorizes creation of one conversation. Open the Project, create one
@@ -130,6 +134,12 @@ prepare manifest and all parts
 -> send FINAL PART marker plus reviewer instructions
 -> begin response-completion detection
 ```
+
+Assign a distinct operation ID to each intended send action, including the
+manifest instruction, each part, the final marker, and any response capture
+that changes page state. A retry keeps the same ID and is allowed only when the
+Handoff Result is `failed-before-submit` with direct evidence of no side effect.
+`submitted`, `acknowledged`, `completed`, and `ambiguous` must never be resent.
 
 Request acknowledgements in the form `PART <order>/<count> RECEIVED: <filename>; sha256=<manifest hash>` and compare them with the manifest before continuing. The complete sequence is one review round even though it uses multiple messages. Do not accept or archive substantive reviewer output before the final marker. Missing, duplicate, reordered, hash-mismatched, or unacknowledged parts make the round incomplete. When ChatGPT turns pasted text into an attachment, verify exactly one intended attachment for that send action; do not paste or upload again unless the first attempt is removed or clearly failed.
 

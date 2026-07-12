@@ -27,6 +27,7 @@ LEGACY_RE = re.compile(
 MARKDOWN_LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 SKILL_INVOCATION_RE = re.compile(r"(?<![A-Za-z0-9_.])\$([a-z][a-z0-9-]*)")
 EVAL_CASES_FILE = "eval-cases.md"
+ROUTING_GRAPH_FILE = "docs/skills/routing-graph.json"
 EVAL_REQUIRED_SECTIONS = (
     "## Trigger Eval",
     "## Non-Trigger Eval",
@@ -148,6 +149,109 @@ def validate_repository_indexes(root: Path, packages: list[SkillPackage]) -> lis
         for name in sorted(listed - expected):
             errors.append(f"repository: {path.name} lists unknown skill {name}")
 
+    return errors
+
+
+def reject_duplicate_json_keys(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    result: dict[str, object] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate key {key!r}")
+        result[key] = value
+    return result
+
+
+def expected_routes_to_skill(expected: str, skill_name: str) -> bool:
+    """Recognize an affirmative routing decision, not a coincidental skill mention."""
+
+    token_re = re.compile(
+        rf"(?<![a-z0-9-]){re.escape(skill_name)}(?![a-z0-9-])",
+        re.IGNORECASE,
+    )
+    positive_re = re.compile(
+        r"(?:prefer|use|trigger|before|keep|delegate|route)[^.;]{0,100}$",
+        re.IGNORECASE,
+    )
+    negative_re = re.compile(
+        r"(?:(?:do|does|should|must)\s+not|don't|never)\s+"
+        r"(?:prefer|use|trigger|route|delegate)[^.;]{0,50}$"
+        r"|(?:\bnot\b|rather than|instead of)[^.;]{0,40}$",
+        re.IGNORECASE,
+    )
+    for match in token_re.finditer(expected):
+        prefix = expected[max(0, match.start() - 120) : match.start()]
+        if negative_re.search(prefix):
+            continue
+        if positive_re.search(prefix):
+            return True
+    return False
+
+
+def validate_routing_graph(root: Path, packages: list[SkillPackage]) -> list[str]:
+    """Require symmetric nearest-neighbor routing and documented pairwise eval coverage."""
+
+    errors: list[str] = []
+    path = root / ROUTING_GRAPH_FILE
+    known = {package.name for package in packages}
+    try:
+        payload = json.loads(
+            path.read_text(encoding="utf-8"),
+            object_pairs_hook=reject_duplicate_json_keys,
+        )
+    except (OSError, json.JSONDecodeError, ValueError) as error:
+        return [f"repository: cannot read {ROUTING_GRAPH_FILE}: {error}"]
+    if not isinstance(payload, dict):
+        return [f"repository: {ROUTING_GRAPH_FILE} must contain an object"]
+
+    listed = set(payload)
+    for name in sorted(known - listed):
+        errors.append(f"repository: routing graph missing skill {name}")
+    for name in sorted(listed - known):
+        errors.append(f"repository: routing graph lists unknown skill {name}")
+
+    package_by_name = {package.name: package for package in packages}
+    for name in sorted(known & listed):
+        neighbors = payload.get(name)
+        if not isinstance(neighbors, list) or any(
+            not isinstance(neighbor, str) for neighbor in neighbors
+        ):
+            errors.append(f"repository: routing graph entry {name} must be a string list")
+            continue
+        if len(neighbors) != len(set(neighbors)):
+            errors.append(f"repository: routing graph entry {name} contains duplicates")
+        if name in neighbors:
+            errors.append(f"repository: routing graph entry {name} cannot reference itself")
+
+        eval_path = package_by_name[name].path / "references" / EVAL_CASES_FILE
+        eval_text = (
+            eval_path.read_text(encoding="utf-8", errors="ignore")
+            if eval_path.is_file()
+            else ""
+        )
+        routing_expectations = [
+            cell
+            for section in ("## Trigger Eval", "## Non-Trigger Eval")
+            for row in markdown_table_rows(eval_text, section)
+            for cell in row[1:2]
+        ]
+        for neighbor in neighbors:
+            if neighbor not in known:
+                errors.append(
+                    f"repository: routing graph entry {name} references unknown skill {neighbor}"
+                )
+                continue
+            reverse = payload.get(neighbor, [])
+            if not isinstance(reverse, list) or name not in reverse:
+                errors.append(
+                    f"repository: routing graph edge {name} -> {neighbor} must be symmetric"
+                )
+            if not any(
+                expected_routes_to_skill(expected, neighbor)
+                for expected in routing_expectations
+            ):
+                errors.append(
+                    f"source {name}: routing eval expectations do not cover nearest neighbor {neighbor}"
+                )
     return errors
 
 
@@ -336,6 +440,16 @@ def validate_specialized_eval_contracts(
             "Response completion",
             "Review artifact visibility",
             "Local verification",
+            "Capability Snapshot contract",
+            "Browser handoff contract",
+            "Operation idempotency",
+            "Interruption reconciliation",
+            "Identity-bound snapshot",
+            "Conversation creation idempotency",
+            "Round and operation scope",
+            "Legal transitions",
+            "Retry attempt lifecycle",
+            "Identity privacy",
         )
         for case in missing_table_cases(eval_text, "## Quality Eval", required):
             errors.append(
@@ -397,7 +511,20 @@ def validate_specialized_eval_contracts(
         for case in missing_table_cases(
             eval_text,
             "## Quality Eval",
-            ("Browser debug handoff", "State safety", "Cleanup"),
+            (
+                "Browser debug handoff",
+                "State safety",
+                "Cleanup",
+                "Capability Snapshot contract",
+                "Bridge handoff contract",
+                "Duplicate-submit prevention",
+                "Failed-before-submit retry",
+                "Identity freshness",
+                "Conversation creation operation",
+                "Legal transition result",
+                "Retry attempt evidence",
+                "Snapshot privacy",
+            ),
         ):
             errors.append(
                 f"{label}: ops-browser Quality Eval missing required case {case!r}"
@@ -437,6 +564,9 @@ CROSS_ARTIFACT_TERM_REQUIREMENTS: tuple[
     ("ops-browser", "SKILL.md", "## Modes", ("diagnose", "already-isolated", "browser-layer")),
     ("ops-browser", "agents/openai.default_prompt", None, ("only after $diagnose delegation", "before browser operation", "final cause/fix")),
     ("ops-browser", "references/usage.md", "## Browser Debug Evidence", ("diagnose", "before browser operation", "retain referenced")),
+    ("ops-browser", "SKILL.md", "## Hard Rules", ("operation_id", "ambiguous", "prior evidence")),
+    ("chatgpt-review-bridge", "SKILL.md", "## Browser Handoff", ("operation_id", "operation ledger", "ambiguous")),
+    ("chatgpt-review-bridge", "agents/openai.default_prompt", None, ("browser-operation/v1", "operation-ledger", "operation_id", "ambiguous")),
     ("ops-client", "SKILL.md", "## Modes", ("diagnose", "already-isolated", "client-layer")),
     ("ops-client", "SKILL.md", "## Hard Rules", ("Retain screenshots", "handoff owner", "removed disposable state")),
     ("ops-client", "agents/openai.default_prompt", None, ("only after $diagnose delegation", "before client operation", "retain referenced evidence")),
@@ -588,11 +718,11 @@ def validate_eval_cases(
     scoring_start = eval_text.find("## Scoring")
     scoring = eval_text[scoring_start:] if scoring_start >= 0 else ""
     has_minimum = "Minimum pass:" in scoring
-    has_numeric_gate = re.search(r"scores? at least (?:[7-9]|10)", scoring)
+    has_numeric_gate = re.search(r"scores? at least (?:[89]|10)", scoring)
     has_defect_gate = "no P0 or P1 defect remains" in scoring
     if not has_minimum or not (has_numeric_gate or has_defect_gate):
         errors.append(
-            f"{label}: scoring must define either a minimum quality score of at least 7 "
+            f"{label}: scoring must define either a minimum quality score of at least 8 "
             "or a no-P0/P1 defect gate"
         )
 
@@ -796,6 +926,95 @@ def validate_source_packages(packages: list[SkillPackage]) -> tuple[list[str], d
     return errors, metrics
 
 
+def validate_shared_browser_operation_protocol(root: Path) -> list[str]:
+    relative_paths = (
+        Path("skills/chatgpt-review-bridge/references/browser-operation-protocol.md"),
+        Path("skills/ops-browser/references/browser-operation-protocol.md"),
+    )
+    contents: list[str] = []
+    errors: list[str] = []
+    for relative in relative_paths:
+        path = root / relative
+        try:
+            contents.append(path.read_text(encoding="utf-8"))
+        except OSError as error:
+            errors.append(f"repository: cannot read {relative}: {error}")
+    if errors:
+        return errors
+    if contents[0] != contents[1]:
+        errors.append("repository: shared browser-operation protocol copies must be identical")
+    required_by_section = {
+        "## Capability Snapshot": (
+            "schema_version: browser-operation/v1",
+            "snapshot_id:",
+            "identity:",
+            "account_category:",
+            "workspace_id:",
+            "state_fingerprint:",
+            "login_state:",
+            "target_origin:",
+            "capabilities:",
+            "evidence:",
+            "gaps:",
+            "opaque one-way fingerprint",
+            "Never store an email address",
+        ),
+        "## Handoff Request": (
+            "schema_version: browser-operation/v1",
+            "operation_id:",
+            "round_id:",
+            "attempt: <positive integer; starts at 1>",
+            "intent:",
+            "create-conversation",
+            "authorization:",
+            "capability_snapshot_id:",
+            "preconditions:",
+            "expected_postcondition:",
+            "retry_policy: <never|only-if-no-side-effect-proven>",
+            "prior_evidence:",
+        ),
+        "## Handoff Result": (
+            "schema_version: browser-operation/v1",
+            "operation_id:",
+            "round_id:",
+            "attempt: <same request attempt>",
+            "capability_snapshot_id:",
+            "state: <preflighted|ready|created|attached|submitted|acknowledged|captured|cleaned|completed|failed-before-submit|blocked|ambiguous>",
+            "before:",
+            "action:",
+            "side_effect:",
+            "after:",
+            "retained_evidence:",
+            "cleanup:",
+            "error:",
+        ),
+        "## Operation State Machine": (
+            "| `prepared` | `preflighted`, `blocked` |",
+            "| `ready` | `created`, `attached`, `submitted`",
+            "| `submitted` | `acknowledged`, `completed`, `ambiguous` |",
+            "| `failed-before-submit` | `ready` only for a new attempt",
+            "| `completed` | terminal |",
+            "failed-before-submit",
+            "round_id",
+            "retry with the same ID",
+        ),
+        "## Degraded Mode": ("blocked", "ambiguous", "do not retry"),
+    }
+    for section, terms in required_by_section.items():
+        scoped = markdown_section(contents[0], section)
+        if not scoped:
+            errors.append(f"repository: shared browser-operation protocol missing section {section!r}")
+            continue
+        normalized_scoped = re.sub(r"\s+", " ", scoped).casefold()
+        for term in terms:
+            normalized_term = re.sub(r"\s+", " ", term).casefold()
+            if normalized_term not in normalized_scoped:
+                errors.append(
+                    f"repository: shared browser-operation protocol {section} missing {term!r}"
+                )
+    return errors
+
+
 def validate_skill_invocations(
     packages: list[SkillPackage], *, known_skill_names: set[str] | None = None
 ) -> list[str]:
@@ -885,6 +1104,8 @@ def main() -> int:
     )
     if not args.skill:
         source_errors.extend(validate_repository_indexes(root, packages))
+        source_errors.extend(validate_routing_graph(root, packages))
+        source_errors.extend(validate_shared_browser_operation_protocol(root))
     if source_errors:
         for error in source_errors:
             print(f"error: {error}", file=sys.stderr)

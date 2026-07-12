@@ -22,9 +22,12 @@ markdown_table_rows = VALIDATOR.markdown_table_rows
 validate_eval_cases = VALIDATOR.validate_eval_cases
 validate_local_links = VALIDATOR.validate_local_links
 validate_repository_indexes = VALIDATOR.validate_repository_indexes
+validate_routing_graph = VALIDATOR.validate_routing_graph
 validate_skill_invocations = VALIDATOR.validate_skill_invocations
 validate_specialized_eval_contracts = VALIDATOR.validate_specialized_eval_contracts
 validate_cross_artifact_contracts = VALIDATOR.validate_cross_artifact_contracts
+expected_routes_to_skill = VALIDATOR.expected_routes_to_skill
+validate_shared_browser_operation_protocol = VALIDATOR.validate_shared_browser_operation_protocol
 
 BEHAVIOR_EVAL_PATH = Path(__file__).with_name("eval-human-writing.py")
 BEHAVIOR_SPEC = importlib.util.spec_from_file_location("eval_human_writing", BEHAVIOR_EVAL_PATH)
@@ -64,7 +67,7 @@ VALID_EVAL = """# Eval Cases
 
 ## Scoring
 
-Minimum pass: every quality case scores at least 7.
+Minimum pass: every quality case scores at least 8.
 """
 
 
@@ -147,6 +150,86 @@ class ValidateSkillsTests(unittest.TestCase):
         self.assertTrue(any("missing skill beta" in error for error in errors))
         self.assertTrue(any("unknown skill gamma" in error for error in errors))
 
+    def test_shared_browser_operation_protocol_must_not_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            relative_paths = (
+                Path("skills/chatgpt-review-bridge/references/browser-operation-protocol.md"),
+                Path("skills/ops-browser/references/browser-operation-protocol.md"),
+            )
+            source = (
+                VALIDATOR_PATH.parents[1]
+                / "skills"
+                / "chatgpt-review-bridge"
+                / "references"
+                / "browser-operation-protocol.md"
+            ).read_text(encoding="utf-8")
+            for relative in relative_paths:
+                path = root / relative
+                path.parent.mkdir(parents=True)
+                path.write_text(source, encoding="utf-8")
+
+            self.assertEqual([], validate_shared_browser_operation_protocol(root))
+
+            (root / relative_paths[1]).write_text(source + "drift\n", encoding="utf-8")
+            errors = validate_shared_browser_operation_protocol(root)
+
+        self.assertTrue(any("must be identical" in error for error in errors))
+
+    def test_shared_browser_operation_protocol_requires_structured_fields(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            source = (
+                VALIDATOR_PATH.parents[1]
+                / "skills"
+                / "chatgpt-review-bridge"
+                / "references"
+                / "browser-operation-protocol.md"
+            ).read_text(encoding="utf-8")
+            changed = source.replace("round_id: <same request round id>\n", "", 1)
+            for relative in (
+                Path("skills/chatgpt-review-bridge/references/browser-operation-protocol.md"),
+                Path("skills/ops-browser/references/browser-operation-protocol.md"),
+            ):
+                path = root / relative
+                path.parent.mkdir(parents=True)
+                path.write_text(changed, encoding="utf-8")
+
+            errors = validate_shared_browser_operation_protocol(root)
+
+        self.assertTrue(
+            any("Handoff Result" in error and "round_id:" in error for error in errors)
+        )
+
+    def test_shared_browser_operation_protocol_rejects_invalid_retry_enum(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            source = (
+                VALIDATOR_PATH.parents[1]
+                / "skills"
+                / "chatgpt-review-bridge"
+                / "references"
+                / "browser-operation-protocol.md"
+            ).read_text(encoding="utf-8")
+            changed = source.replace(
+                "retry_policy: <never|only-if-no-side-effect-proven>",
+                "retry_policy: <always>",
+                1,
+            )
+            for relative in (
+                Path("skills/chatgpt-review-bridge/references/browser-operation-protocol.md"),
+                Path("skills/ops-browser/references/browser-operation-protocol.md"),
+            ):
+                path = root / relative
+                path.parent.mkdir(parents=True)
+                path.write_text(changed, encoding="utf-8")
+
+            errors = validate_shared_browser_operation_protocol(root)
+
+        self.assertTrue(
+            any("Handoff Request" in error and "retry_policy" in error for error in errors)
+        )
+
     def test_legacy_regex_catches_retired_skill_names(self) -> None:
         for name in (
             "frontend-implementation",
@@ -172,7 +255,7 @@ class ValidateSkillsTests(unittest.TestCase):
         self.assertEqual(4, metrics.quality_cases)
 
     def test_eval_validation_rejects_duplicates_and_weak_scoring(self) -> None:
-        invalid_eval = VALID_EVAL.replace("`two`", "`one`").replace("at least 7", "at least 5")
+        invalid_eval = VALID_EVAL.replace("`two`", "`one`").replace("at least 8", "at least 5")
         with tempfile.TemporaryDirectory() as temp_dir:
             eval_file = Path(temp_dir) / "eval-cases.md"
             eval_file.write_text(invalid_eval, encoding="utf-8")
@@ -181,9 +264,18 @@ class ValidateSkillsTests(unittest.TestCase):
         self.assertTrue(any("duplicate" in error for error in errors))
         self.assertTrue(any("score" in error for error in errors))
 
+    def test_eval_validation_rejects_historical_score_of_seven(self) -> None:
+        historical_eval = VALID_EVAL.replace("at least 8", "at least 7")
+        with tempfile.TemporaryDirectory() as temp_dir:
+            eval_file = Path(temp_dir) / "eval-cases.md"
+            eval_file.write_text(historical_eval, encoding="utf-8")
+            errors, _ = validate_eval_cases(eval_file, label="test")
+
+        self.assertTrue(any("at least 8" in error for error in errors))
+
     def test_eval_validation_accepts_defect_gate(self) -> None:
         defect_gate_eval = VALID_EVAL.replace(
-            "every quality case scores at least 7",
+            "every quality case scores at least 8",
             "no P0 or P1 defect remains",
         )
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -192,6 +284,112 @@ class ValidateSkillsTests(unittest.TestCase):
             errors, _ = validate_eval_cases(eval_file, label="test")
 
         self.assertEqual([], errors)
+
+    def test_routing_graph_requires_symmetric_documented_neighbors(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            alpha = root / "skills" / "alpha"
+            beta = root / "skills" / "beta"
+            for package, neighbor in ((alpha, "beta"), (beta, "alpha")):
+                references = package / "references"
+                references.mkdir(parents=True)
+                (package / "SKILL.md").write_text("", encoding="utf-8")
+                (references / "eval-cases.md").write_text(
+                    f"## Trigger Eval\n\n| Prompt | Expected |\n| --- | --- |\n| route | Prefer `{neighbor}`. |\n"
+                    "\n## Non-Trigger Eval\n\n| Prompt | Expected |\n| --- | --- |\n",
+                    encoding="utf-8",
+                )
+            graph = root / "docs" / "skills"
+            graph.mkdir(parents=True)
+            (graph / "routing-graph.json").write_text(
+                '{"alpha":["beta"],"beta":["alpha"]}', encoding="utf-8"
+            )
+            packages = [
+                VALIDATOR.SkillPackage(name="alpha", path=alpha),
+                VALIDATOR.SkillPackage(name="beta", path=beta),
+            ]
+
+            self.assertEqual([], validate_routing_graph(root, packages))
+
+            (graph / "routing-graph.json").write_text(
+                '{"alpha":["beta"],"beta":[]}', encoding="utf-8"
+            )
+            errors = validate_routing_graph(root, packages)
+
+        self.assertTrue(any("must be symmetric" in error for error in errors))
+
+    def test_routing_graph_ignores_neighbor_mentions_outside_expected_column(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            alpha = root / "skills" / "alpha"
+            beta = root / "skills" / "beta"
+            for package, prompt, expected in (
+                (alpha, "Mention beta only in this prompt", "Stay with alpha."),
+                (beta, "Route this case", "Prefer alpha."),
+            ):
+                references = package / "references"
+                references.mkdir(parents=True)
+                (package / "SKILL.md").write_text("", encoding="utf-8")
+                (references / "eval-cases.md").write_text(
+                    "## Trigger Eval\n\n| Prompt | Expected |\n| --- | --- |\n"
+                    f"| {prompt} | {expected} |\n"
+                    "\n## Non-Trigger Eval\n\n| Prompt | Expected |\n| --- | --- |\n",
+                    encoding="utf-8",
+                )
+            graph = root / "docs" / "skills"
+            graph.mkdir(parents=True)
+            (graph / "routing-graph.json").write_text(
+                '{"alpha":["beta"],"beta":["alpha"]}', encoding="utf-8"
+            )
+            packages = [
+                VALIDATOR.SkillPackage(name="alpha", path=alpha),
+                VALIDATOR.SkillPackage(name="beta", path=beta),
+            ]
+
+            errors = validate_routing_graph(root, packages)
+
+        self.assertTrue(any("source alpha" in error and "beta" in error for error in errors))
+
+    def test_routing_expectation_requires_affirmative_semantics(self) -> None:
+        self.assertTrue(expected_routes_to_skill("Should prefer `repo-context`.", "repo-context"))
+        self.assertTrue(
+            expected_routes_to_skill(
+                "Trigger coordinator; delegate bounded work to `audit-rust`.",
+                "audit-rust",
+            )
+        )
+        self.assertFalse(expected_routes_to_skill("Do not use `repo-context`.", "repo-context"))
+        self.assertFalse(expected_routes_to_skill("Should not use `repo-context`.", "repo-context"))
+        self.assertFalse(
+            expected_routes_to_skill(
+                "Prefer `diagnose`, not `repo-context`.",
+                "repo-context",
+            )
+        )
+        self.assertFalse(expected_routes_to_skill("Mentions `repo-context` only.", "repo-context"))
+
+    def test_routing_graph_rejects_duplicate_json_keys(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            for name in ("alpha", "beta"):
+                references = root / "skills" / name / "references"
+                references.mkdir(parents=True)
+                (references.parent / "SKILL.md").write_text("", encoding="utf-8")
+                (references / "eval-cases.md").write_text("", encoding="utf-8")
+            graph = root / "docs" / "skills"
+            graph.mkdir(parents=True)
+            (graph / "routing-graph.json").write_text(
+                '{"alpha":["beta"],"alpha":[],"beta":["alpha"]}',
+                encoding="utf-8",
+            )
+            packages = [
+                VALIDATOR.SkillPackage(name="alpha", path=root / "skills" / "alpha"),
+                VALIDATOR.SkillPackage(name="beta", path=root / "skills" / "beta"),
+            ]
+
+            errors = validate_routing_graph(root, packages)
+
+        self.assertTrue(any("duplicate key 'alpha'" in error for error in errors))
 
     def test_human_writing_behavior_fixtures_pass(self) -> None:
         results = BEHAVIOR_EVAL.run_fixtures(BEHAVIOR_EVAL.DEFAULT_FIXTURES)

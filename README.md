@@ -126,6 +126,10 @@ python3 scripts/validate-skills.py
 python3 scripts/test_validate_skills.py
 ```
 
+The validator also checks the symmetric nearest-neighbor routing inventory in
+[`docs/skills/routing-graph.json`](docs/skills/routing-graph.json) and requires
+both endpoint skills to cover each other in routing evals.
+
 Useful targeted package checks:
 
 ```bash

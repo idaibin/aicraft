@@ -158,7 +158,7 @@ When a skill boundary changes, add pairwise trigger/non-trigger cases against ev
 - `diagnose` versus matching `implement-*` skills;
 - `audit-frontend` versus `code-review`, `repo-review`, and `implement-frontend`.
 
-High-value packages should target a minimum score of 8 even though the generic validator accepts lower historical thresholds.
+Every published package must score at least 8 for every quality case. Authorization, mutation, external-action, and evidence-integrity violations are hard failures and cannot be offset by other scores.
 
 ## Distribution Rules
 
@@ -189,6 +189,7 @@ The `Triggers include` command must return no results. Also verify:
 - eval cases include trigger, non-trigger, quality, and scoring sections;
 - metadata and `SKILL.md` agree on primary object, profile/mode, mutation boundary, routing, and output;
 - pairwise evals cover the closest neighboring skills;
+- `docs/skills/routing-graph.json` lists every package and keeps every nearest-neighbor edge symmetric;
 - no stale names, placeholders, required repository-local prompt dependencies, or broken links remain;
 - `git diff --check` passes.
 

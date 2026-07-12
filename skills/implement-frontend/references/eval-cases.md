@@ -75,4 +75,4 @@ Use these cases when changing `implement-frontend` triggers, stack guidance, lay
 
 ## Scoring
 
-Score each quality case from 0 to 10. Minimum pass: all trigger/non-trigger expectations are correct and every quality case scores at least 7.
+Score each quality case from 0 to 10. Minimum pass: all trigger/non-trigger expectations are correct and every quality case scores at least 8.

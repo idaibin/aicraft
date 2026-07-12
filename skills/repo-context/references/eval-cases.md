@@ -10,8 +10,8 @@ Use these cases when changing `repo-context` triggers, workflow, outputs, routin
 | `Do not guess the startup path; confirm the real commands and entry points first.` | Should trigger `repo-context`. | Command and entry-point grounding. |
 | `Check whether existing project docs match the code.` | Should trigger Alignment mode. | Doc/code alignment rather than defect review. |
 | `Classify these repositories and check whether same-class directory standards match the manifests.` | Should trigger Alignment mode. | Project-class and structure mapping. |
-| `Before building this page, list existing routes and components and find reusable or reference implementations.` | Should trigger Targeted Inventory. | Reuse-first frontend grounding. |
-| `Before adding this Rust API, map the existing docs, routes, handlers, services, repos, DTOs, errors, callers, and tests.` | Should trigger Targeted Inventory. | Reuse-first Rust interface grounding. |
+| `Before building this page, list existing routes and components and find reusable or reference implementations.` | Should trigger Targeted Inventory before `implement-frontend`. | Reuse-first frontend grounding. |
+| `Before adding this Rust API, map the existing docs, routes, handlers, services, repos, DTOs, errors, callers, and tests.` | Should trigger Targeted Inventory before `implement-rust`. | Reuse-first Rust interface grounding. |
 
 ## Non-Trigger Eval
 
@@ -25,6 +25,7 @@ Use these cases when changing `repo-context` triggers, workflow, outputs, routin
 | `Find why this build fails.` | Should prefer `diagnose`. | Concrete failure investigation. |
 | `Verify this local web app in the browser and take a screenshot.` | Should prefer `ops-browser`. | Browser operation task. |
 | `Review this API for authorization risk.` | Should prefer `audit-security`. | Security review task. |
+| `根据这些已核实的开发 notes 写一篇中文技术文章，不要再做仓库调查。` | Should prefer `human-writing`. | Source-grounded writing transformation, not repository grounding. |
 
 ## Quality Eval
 
