@@ -7,24 +7,61 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
+import uuid
+from collections import Counter
 from dataclasses import dataclass
-from pathlib import Path
+from datetime import datetime, timedelta, timezone
+from pathlib import Path, PurePosixPath
+
+
+def reject_duplicate_json_keys(
+    pairs: list[tuple[str, object]],
+) -> dict[str, object]:
+    result: dict[str, object] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate JSON key {key!r}")
+        result[key] = value
+    return result
 
 
 ROOT = Path(__file__).resolve().parents[1]
 ROUTING_DATA = ROOT / "evals" / "routing.jsonl"
 AUTHORITY_DATA = ROOT / "evals" / "authority.jsonl"
 WORKFLOW_DATA = ROOT / "evals" / "workflow-smoke.jsonl"
-ROUTING_KINDS = {"trigger", "neighbor_non_trigger", "ambiguous", "multi_intent"}
-CORE_SKILLS = {"repo-map", "code-planner", "diagnose", "repo-review", "repo-delivery"}
-REQUIRED_METADATA = {
-    "model",
-    "host",
-    "skill_revision",
-    "dataset_revision",
-    "captured_at",
-    "results",
-}
+CONTRACTS = json.loads(
+    (ROOT / "contracts" / "skill-validation.json").read_text(encoding="utf-8"),
+    object_pairs_hook=reject_duplicate_json_keys,
+)
+BEHAVIOR_CONTRACT = CONTRACTS["behavior_eval"]
+ROUTING_CONTRACT = BEHAVIOR_CONTRACT["routing"]
+AUTHORITY_CONTRACT = BEHAVIOR_CONTRACT["authority"]
+WORKFLOW_CONTRACT = BEHAVIOR_CONTRACT["workflow"]
+ROUTING_KINDS = set(ROUTING_CONTRACT["kinds"])
+CORE_SKILLS = set(ROUTING_CONTRACT["core_skills"])
+RESULT_SCHEMA_VERSION = int(BEHAVIOR_CONTRACT["result_schema_version"])
+RAW_EVIDENCE_SCHEMA_VERSION = int(
+    BEHAVIOR_CONTRACT["raw_evidence_schema_version"]
+)
+PROMPT_TEMPLATE_VERSION = int(BEHAVIOR_CONTRACT["prompt_template_version"])
+PROMPT_VALUE_PLACEHOLDER = "<NATURAL_REQUEST_JSON>"
+MAXIMUM_CLOCK_SKEW_SECONDS = int(
+    BEHAVIOR_CONTRACT["maximum_clock_skew_seconds"]
+)
+REQUIRED_METADATA = set(BEHAVIOR_CONTRACT["result_required_fields"])
+RUN_CONFIG_REQUIRED = set(BEHAVIOR_CONTRACT["run_config_required_fields"])
+HELD_OUT_PROVENANCE_REQUIRED = set(
+    BEHAVIOR_CONTRACT["held_out_provenance_required_fields"]
+)
+ADJUDICATION_REQUIRED = set(
+    BEHAVIOR_CONTRACT["adjudication_required_fields"]
+)
+RAW_EVIDENCE_REQUIRED = set(
+    BEHAVIOR_CONTRACT["raw_evidence_required_fields"]
+)
+RESULT_VARIANTS = set(BEHAVIOR_CONTRACT["result_variants"])
+ADJUDICATION_METHODS = set(BEHAVIOR_CONTRACT["adjudication_methods"])
 
 
 @dataclass(frozen=True)
@@ -39,8 +76,8 @@ def load_jsonl(path: Path) -> list[dict[str, object]]:
         if not raw.strip():
             continue
         try:
-            item = json.loads(raw)
-        except json.JSONDecodeError as error:
+            item = json.loads(raw, object_pairs_hook=reject_duplicate_json_keys)
+        except (json.JSONDecodeError, ValueError) as error:
             raise ValueError(f"{path}:{line_number}: invalid JSON: {error}") from error
         if not isinstance(item, dict):
             raise ValueError(f"{path}:{line_number}: each row must be an object")
@@ -50,6 +87,89 @@ def load_jsonl(path: Path) -> list[dict[str, object]]:
 
 def dataset_hash(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def text_hash(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def canonical_json_hash(value: object) -> str:
+    encoded = json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def case_set_hash(cases: list[dict[str, object]]) -> str:
+    return canonical_json_hash(
+        [
+            {
+                "id": str(case["id"]),
+                "prompt_sha256": text_hash(str(case["prompt"])),
+            }
+            for case in cases
+        ]
+    )
+
+
+def committed_skill_fixture_hash(revision: str) -> str:
+    """Hash the exact committed blobs exported by the routing runner."""
+
+    tree = subprocess.run(
+        ["git", "-C", str(ROOT), "ls-tree", "-r", "-z", revision, "--", "skills"],
+        check=False,
+        capture_output=True,
+    )
+    if tree.returncode != 0:
+        raise ValueError(f"cannot read committed skills fixture for {revision}")
+    digest = hashlib.sha256()
+    package_names = discover_skill_names()
+    for record in tree.stdout.split(b"\0"):
+        if not record:
+            continue
+        try:
+            metadata, raw_path = record.split(b"\t", 1)
+            mode, object_type, object_sha = metadata.decode("ascii").split(" ")
+            path_text = raw_path.decode("utf-8")
+        except (ValueError, UnicodeDecodeError) as error:
+            raise ValueError(
+                f"cannot parse committed skills fixture for {revision}"
+            ) from error
+        path = PurePosixPath(path_text)
+        if path.parts in {("skills", "AGENTS.md"), ("skills", "CLAUDE.md")}:
+            # Repository authoring policies are not installable Skill package data.
+            continue
+        if (
+            object_type != "blob"
+            or mode not in {"100644", "100755"}
+            or path.is_absolute()
+            or len(path.parts) < 3
+            or path.parts[0] != "skills"
+            or path.parts[1] not in package_names
+            or ".." in path.parts
+            or path.as_posix() != path_text
+        ):
+            raise ValueError(
+                f"unsupported committed Skill entry {path_text!r} in {revision}"
+            )
+        content = subprocess.run(
+            ["git", "-C", str(ROOT), "cat-file", "blob", object_sha],
+            check=False,
+            capture_output=True,
+        )
+        if content.returncode != 0:
+            raise ValueError(
+                f"cannot read committed Skill blob {object_sha} in {revision}"
+            )
+        digest.update(path_text.encode("utf-8") + b"\0")
+        digest.update(mode.encode("ascii") + b"\0")
+        digest.update(content.stdout)
+        digest.update(b"\0")
+    return digest.hexdigest()
 
 
 def discover_skill_names(root: Path = ROOT) -> set[str]:
@@ -64,6 +184,23 @@ def string_list(item: dict[str, object], key: str, *, case_id: str) -> list[str]
     value = item.get(key)
     if not isinstance(value, list) or any(not isinstance(entry, str) for entry in value):
         raise ValueError(f"{case_id}: {key} must be a string list")
+    return value
+
+
+def unique_string_list(
+    item: dict[str, object],
+    key: str,
+    *,
+    case_id: str,
+    default: object | None = None,
+) -> list[str]:
+    value = item.get(key, default)
+    if not isinstance(value, list) or any(
+        not isinstance(entry, str) or not entry.strip() for entry in value
+    ):
+        raise ValueError(f"{case_id}: {key} must be a non-empty-string list")
+    if len(value) != len(set(value)):
+        raise ValueError(f"{case_id}: {key} must not contain duplicates")
     return value
 
 
@@ -91,12 +228,30 @@ def validate_unique_cases(cases: list[dict[str, object]], *, label: str) -> list
 
 
 def validate_routing_cases(
-    cases: list[dict[str, object]], known_skills: set[str]
+    cases: list[dict[str, object]],
+    known_skills: set[str],
+    *,
+    routing_graph_path: Path | None = None,
+    minimum_cases: int | None = None,
+    minimum_cases_per_skill: int | None = None,
+    required_kinds: set[str] | None = None,
+    require_neighbor_graph: bool = True,
 ) -> list[str]:
     errors = validate_unique_cases(cases, label="routing")
-    if len(cases) < 60:
-        errors.append(f"routing: expected at least 60 cases, found {len(cases)}")
+    case_minimum = (
+        int(ROUTING_CONTRACT["minimum_cases"])
+        if minimum_cases is None
+        else minimum_cases
+    )
+    if len(cases) < case_minimum:
+        errors.append(
+            f"routing: expected at least {case_minimum} cases, found {len(cases)}"
+        )
     observed_kinds: set[str] = set()
+    owner_counts: Counter[str] = Counter()
+    covered_neighbors: dict[str, set[str]] = {
+        skill_name: set() for skill_name in known_skills
+    }
     for item in cases:
         case_id = str(item.get("id", "routing case"))
         kind = item.get("kind")
@@ -107,6 +262,8 @@ def validate_routing_cases(
             observed_kinds.add(str(kind))
         if owner not in known_skills:
             errors.append(f"{case_id}: unknown expected owner {owner!r}")
+        else:
+            owner_counts[str(owner)] += 1
         try:
             forbidden = string_list(item, "forbidden_owners", case_id=case_id)
         except ValueError as error:
@@ -117,15 +274,139 @@ def validate_routing_cases(
                 errors.append(f"{case_id}: unknown forbidden owner {name!r}")
         if owner in forbidden:
             errors.append(f"{case_id}: expected owner cannot also be forbidden")
+        if owner in known_skills:
+            covered_neighbors[str(owner)].update(forbidden)
+        allowed = item.get("allowed_owners", [owner])
+        if not isinstance(allowed, list) or any(
+            not isinstance(name, str) for name in allowed
+        ):
+            errors.append(f"{case_id}: allowed_owners must be a string list")
+            allowed = []
+        if owner not in allowed:
+            errors.append(f"{case_id}: allowed_owners must include expected_owner")
+        for name in allowed:
+            if name not in known_skills:
+                errors.append(f"{case_id}: unknown allowed owner {name!r}")
+            if name in forbidden:
+                errors.append(f"{case_id}: allowed owner {name!r} cannot be forbidden")
+        handoff_values: dict[str, list[str]] = {}
+        for key in (
+            "required_handoffs",
+            "allowed_handoffs",
+            "forbidden_handoffs",
+        ):
+            try:
+                values = unique_string_list(
+                    item, key, case_id=case_id, default=[]
+                )
+            except ValueError as error:
+                errors.append(str(error))
+                handoff_values[key] = []
+                continue
+            handoff_values[key] = values
+            for name in values:
+                if name not in known_skills:
+                    errors.append(f"{case_id}: unknown {key[:-1]} {name!r}")
+        required_handoffs = set(handoff_values["required_handoffs"])
+        allowed_handoffs = set(handoff_values["allowed_handoffs"])
+        forbidden_handoffs = set(handoff_values["forbidden_handoffs"])
+        if not required_handoffs <= allowed_handoffs:
+            errors.append(
+                f"{case_id}: required_handoffs must be included in allowed_handoffs"
+            )
+        overlap = allowed_handoffs & forbidden_handoffs
+        if overlap:
+            errors.append(
+                f"{case_id}: handoffs cannot be both allowed and forbidden: "
+                f"{sorted(overlap)}"
+            )
+
+        required_groups = item.get("required_handoff_groups", [])
+        if not isinstance(required_groups, list):
+            errors.append(
+                f"{case_id}: required_handoff_groups must be a list of non-empty string lists"
+            )
+            required_groups = []
+        normalized_groups: set[frozenset[str]] = set()
+        for index, group in enumerate(required_groups):
+            group_label = f"required_handoff_groups[{index}]"
+            if (
+                not isinstance(group, list)
+                or not group
+                or any(
+                    not isinstance(name, str) or not name.strip()
+                    for name in group
+                )
+            ):
+                errors.append(
+                    f"{case_id}: {group_label} must be a non-empty string list"
+                )
+                continue
+            if len(group) != len(set(group)):
+                errors.append(f"{case_id}: {group_label} must not contain duplicates")
+                continue
+            group_set = frozenset(group)
+            if group_set in normalized_groups:
+                errors.append(
+                    f"{case_id}: required_handoff_groups must not contain duplicate groups"
+                )
+            normalized_groups.add(group_set)
+            for name in group:
+                if name not in known_skills:
+                    errors.append(
+                        f"{case_id}: unknown required handoff group member {name!r}"
+                    )
+            if not group_set <= allowed_handoffs:
+                errors.append(
+                    f"{case_id}: {group_label} must be included in allowed_handoffs"
+                )
+            group_overlap = group_set & forbidden_handoffs
+            if group_overlap:
+                errors.append(
+                    f"{case_id}: {group_label} contains forbidden handoffs "
+                    f"{sorted(group_overlap)}"
+                )
         if not isinstance(item.get("high_risk"), bool):
             errors.append(f"{case_id}: high_risk must be boolean")
         prompt = str(item.get("prompt", "")).casefold()
         leaked = [name for name in known_skills if name.casefold() in prompt]
         if leaked:
             errors.append(f"{case_id}: prompt leaks Skill name(s) {sorted(leaked)}")
-    missing_kinds = ROUTING_KINDS - observed_kinds
+    missing_kinds = (required_kinds or ROUTING_KINDS) - observed_kinds
     if missing_kinds:
         errors.append(f"routing: missing kinds {sorted(missing_kinds)}")
+    minimum_per_skill = (
+        int(ROUTING_CONTRACT["minimum_cases_per_skill"])
+        if minimum_cases_per_skill is None
+        else minimum_cases_per_skill
+    )
+    for skill_name in sorted(known_skills):
+        if owner_counts[skill_name] < minimum_per_skill:
+            errors.append(
+                f"routing: {skill_name} requires at least {minimum_per_skill} owner cases, "
+                f"found {owner_counts[skill_name]}"
+            )
+
+    if not require_neighbor_graph:
+        return errors
+
+    graph_path = routing_graph_path or ROOT / "docs" / "skills" / "routing-graph.json"
+    try:
+        routing_graph = json.loads(
+            graph_path.read_text(encoding="utf-8"),
+            object_pairs_hook=reject_duplicate_json_keys,
+        )
+    except (OSError, json.JSONDecodeError, ValueError) as error:
+        errors.append(f"routing: cannot read routing graph: {error}")
+    else:
+        for skill_name, neighbors in routing_graph.items():
+            if skill_name not in known_skills or not isinstance(neighbors, list):
+                continue
+            for neighbor in neighbors:
+                if neighbor not in covered_neighbors[skill_name]:
+                    errors.append(
+                        f"routing: live corpus missing {skill_name} -> {neighbor} nearest-neighbor case"
+                    )
     return errors
 
 
@@ -133,12 +414,18 @@ def validate_authority_cases(
     cases: list[dict[str, object]], known_skills: set[str]
 ) -> list[str]:
     errors = validate_unique_cases(cases, label="authority")
-    if len(cases) < 12:
-        errors.append(f"authority: expected at least 12 cases, found {len(cases)}")
+    minimum_cases = int(AUTHORITY_CONTRACT["minimum_cases"])
+    if len(cases) < minimum_cases:
+        errors.append(
+            f"authority: expected at least {minimum_cases} cases, found {len(cases)}"
+        )
+    covered_owners: set[str] = set()
     for item in cases:
         case_id = str(item.get("id", "authority case"))
         if item.get("expected_owner") not in known_skills:
             errors.append(f"{case_id}: unknown expected owner {item.get('expected_owner')!r}")
+        else:
+            covered_owners.add(str(item["expected_owner"]))
         for key in ("forbidden_actions", "required_actions"):
             try:
                 values = string_list(item, key, case_id=case_id)
@@ -147,6 +434,9 @@ def validate_authority_cases(
                 continue
             if not values:
                 errors.append(f"{case_id}: {key} must not be empty")
+    if AUTHORITY_CONTRACT.get("require_all_skills"):
+        for skill_name in sorted(known_skills - covered_owners):
+            errors.append(f"authority: missing owner coverage for {skill_name}")
     return errors
 
 
@@ -154,8 +444,12 @@ def validate_workflow_cases(
     cases: list[dict[str, object]], known_skills: set[str]
 ) -> list[str]:
     errors = validate_unique_cases(cases, label="workflow")
-    if len(cases) != 12:
-        errors.append(f"workflow: expected exactly 12 cases, found {len(cases)}")
+    minimum_cases = int(WORKFLOW_CONTRACT["minimum_cases"])
+    if len(cases) < minimum_cases:
+        errors.append(
+            f"workflow: expected at least {minimum_cases} cases, found {len(cases)}"
+        )
+    covered_owners: set[str] = set()
     for item in cases:
         case_id = str(item.get("id", "workflow case"))
         for key in ("expected_route", "required_evidence", "forbidden_actions"):
@@ -170,43 +464,894 @@ def validate_workflow_cases(
                 for owner in values:
                     if owner not in known_skills:
                         errors.append(f"{case_id}: unknown route owner {owner!r}")
+                    else:
+                        covered_owners.add(owner)
+        allowed_routes = item.get("allowed_routes", [])
+        if not isinstance(allowed_routes, list) or any(
+            not isinstance(route, list)
+            or not route
+            or any(not isinstance(owner, str) for owner in route)
+            for route in allowed_routes
+        ):
+            errors.append(f"{case_id}: allowed_routes must be a list of non-empty string lists")
+        else:
+            for route in allowed_routes:
+                for owner in route:
+                    if owner not in known_skills:
+                        errors.append(f"{case_id}: unknown allowed route owner {owner!r}")
         if not isinstance(item.get("title"), str) or not str(item["title"]).strip():
             errors.append(f"{case_id}: title must be non-empty")
+    if WORKFLOW_CONTRACT.get("require_all_skills"):
+        for skill_name in sorted(known_skills - covered_owners):
+            errors.append(f"workflow: missing route coverage for {skill_name}")
     return errors
 
 
 def validate_datasets(root: Path = ROOT) -> list[str]:
     known_skills = discover_skill_names(root)
+    return validate_dataset_paths(
+        root / "evals" / "routing.jsonl",
+        root / "evals" / "authority.jsonl",
+        root / "evals" / "workflow-smoke.jsonl",
+        known_skills=known_skills,
+        routing_graph_path=root / "docs" / "skills" / "routing-graph.json",
+        routing_is_held_out=False,
+    )
+
+
+def validate_dataset_paths(
+    routing_path: Path,
+    authority_path: Path,
+    workflow_path: Path,
+    *,
+    known_skills: set[str] | None = None,
+    routing_graph_path: Path | None = None,
+    routing_is_held_out: bool,
+) -> list[str]:
+    skills = known_skills or discover_skill_names()
+    routing_cases = load_jsonl(routing_path)
+    routing_errors = (
+        validate_held_out_routing_cases(routing_cases, skills)
+        if routing_is_held_out
+        else validate_routing_cases(
+            routing_cases,
+            skills,
+            routing_graph_path=routing_graph_path,
+        )
+    )
     return [
-        *validate_routing_cases(load_jsonl(root / "evals" / "routing.jsonl"), known_skills),
-        *validate_authority_cases(load_jsonl(root / "evals" / "authority.jsonl"), known_skills),
-        *validate_workflow_cases(load_jsonl(root / "evals" / "workflow-smoke.jsonl"), known_skills),
+        *routing_errors,
+        *validate_authority_cases(load_jsonl(authority_path), skills),
+        *validate_workflow_cases(load_jsonl(workflow_path), skills),
     ]
 
 
-def load_result_bundle(
-    path: Path, expected_ids: set[str], dataset_path: Path
+def validate_held_out_routing_cases(
+    cases: list[dict[str, object]], known_skills: set[str]
+) -> list[str]:
+    comparative = BEHAVIOR_CONTRACT["comparative"]
+    required_kinds = set(comparative["required_held_out_kinds"])
+    errors = validate_routing_cases(
+        cases,
+        known_skills,
+        minimum_cases=int(comparative["minimum_held_out_cases"]),
+        minimum_cases_per_skill=int(
+            comparative["minimum_held_out_cases_per_skill"]
+        ),
+        required_kinds=required_kinds,
+        require_neighbor_graph=False,
+    )
+    observed_by_owner: dict[str, set[str]] = {
+        skill_name: set() for skill_name in known_skills
+    }
+    for case in cases:
+        owner = case.get("expected_owner")
+        kind = case.get("kind")
+        if owner in known_skills and kind in required_kinds:
+            observed_by_owner[str(owner)].add(str(kind))
+    for skill_name in sorted(known_skills):
+        missing = required_kinds - observed_by_owner[skill_name]
+        if missing:
+            errors.append(
+                f"routing: held-out owner {skill_name} missing kinds {sorted(missing)}"
+            )
+    return errors
+
+
+def _infer_evidence_kind(dataset_path: Path) -> str:
+    rows = load_jsonl(dataset_path)
+    if rows and all("kind" in row and "forbidden_owners" in row for row in rows):
+        return "routing"
+    if rows and all("expected_route" in row for row in rows):
+        return "workflow"
+    if rows and all(
+        "expected_owner" in row
+        and "required_actions" in row
+        and "forbidden_actions" in row
+        for row in rows
+    ):
+        return "authority"
+    raise ValueError(
+        f"{dataset_path}: cannot infer evidence kind from dataset fields"
+    )
+
+
+def _validate_sha256(value: object, *, label: str) -> str:
+    if not isinstance(value, str) or re.fullmatch(r"[0-9a-f]{64}", value) is None:
+        raise ValueError(f"{label} must be a lowercase sha256")
+    return value
+
+
+def _validate_metrics(value: object, *, label: str) -> dict[str, object]:
+    if not isinstance(value, dict):
+        raise ValueError(f"{label} must be an object")
+    duration_ms = value.get("duration_ms")
+    if (
+        isinstance(duration_ms, bool)
+        or not isinstance(duration_ms, int)
+        or duration_ms < 1
+    ):
+        raise ValueError(f"{label}.duration_ms must be a positive integer")
+    for metric in ("input_tokens", "output_tokens"):
+        metric_value = value.get(metric)
+        if metric_value is not None and (
+            isinstance(metric_value, bool)
+            or not isinstance(metric_value, int)
+            or metric_value < 0
+        ):
+            raise ValueError(
+                f"{label}.{metric} must be null or a non-negative integer"
+            )
+    return value
+
+
+def _validate_observations(
+    observations: object, *, evidence_kind: str, result_id: str
 ) -> dict[str, object]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(observations, dict):
+        raise ValueError(f"{result_id}: raw observations must be an object")
+
+    if evidence_kind == "routing":
+        actual_owner = observations.get("actual_owner")
+        if not isinstance(actual_owner, str) or not actual_owner.strip():
+            raise ValueError(
+                f"{result_id}: raw observations.actual_owner must be a non-empty string"
+            )
+        unique_string_list(
+            observations, "handoffs", case_id=f"{result_id}: raw observations"
+        )
+    elif evidence_kind == "authority":
+        actual_owner = observations.get("actual_owner")
+        if not isinstance(actual_owner, str) or not actual_owner.strip():
+            raise ValueError(
+                f"{result_id}: raw observations.actual_owner must be a non-empty string"
+            )
+        unique_string_list(
+            observations,
+            "observed_actions",
+            case_id=f"{result_id}: raw observations",
+        )
+    elif evidence_kind == "workflow":
+        for key in ("route", "observed_evidence", "observed_actions"):
+            unique_string_list(
+                observations, key, case_id=f"{result_id}: raw observations"
+            )
+    else:
+        raise ValueError(f"{result_id}: unknown evidence kind {evidence_kind!r}")
+    return observations
+
+
+def _validate_execution_trace(raw: dict[str, object], *, result_id: str) -> None:
+    trace = raw.get("trace")
+    if not isinstance(trace, list) or not trace:
+        raise ValueError(f"{result_id}: raw trace must be a non-empty object list")
+    traced_actions: list[str] = []
+    for index, entry in enumerate(trace):
+        if not isinstance(entry, dict):
+            raise ValueError(f"{result_id}: raw trace[{index}] must be an object")
+        for key in ("source", "type", "action", "detail"):
+            value = entry.get(key)
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(
+                    f"{result_id}: raw trace[{index}].{key} must be a non-empty string"
+                )
+        _validate_sha256(
+            entry.get("detail_sha256"),
+            label=f"{result_id}: raw trace[{index}].detail_sha256",
+        )
+        if entry["detail_sha256"] != text_hash(str(entry["detail"])):
+            raise ValueError(
+                f"{result_id}: raw trace[{index}].detail_sha256 must match detail"
+            )
+        traced_actions.append(str(entry["action"]))
+    if len(traced_actions) != len(set(traced_actions)):
+        raise ValueError(f"{result_id}: raw trace actions must not contain duplicates")
+
+    workspace = raw.get("workspace")
+    if not isinstance(workspace, dict):
+        raise ValueError(f"{result_id}: raw workspace must be an object")
+    before_manifest = workspace.get("before_manifest")
+    after_manifest = workspace.get("after_manifest")
+    for key, manifest in (
+        ("before_manifest", before_manifest),
+        ("after_manifest", after_manifest),
+    ):
+        if not isinstance(manifest, dict) or any(
+            not isinstance(path, str)
+            or not path
+            or not isinstance(file_hash, str)
+            or re.fullmatch(r"[0-9a-f]{64}", file_hash) is None
+            for path, file_hash in manifest.items()
+        ):
+            raise ValueError(
+                f"{result_id}: raw workspace.{key} must map relative paths to sha256"
+            )
+        for path in manifest:
+            parsed_path = PurePosixPath(path)
+            if (
+                parsed_path.is_absolute()
+                or ".." in parsed_path.parts
+                or parsed_path.as_posix() != path
+            ):
+                raise ValueError(
+                    f"{result_id}: raw workspace.{key} has invalid path {path!r}"
+                )
+    for key, manifest in (
+        ("before_sha256", before_manifest),
+        ("after_sha256", after_manifest),
+    ):
+        _validate_sha256(workspace.get(key), label=f"{result_id}: raw workspace.{key}")
+        if workspace[key] != canonical_json_hash(manifest):
+            raise ValueError(
+                f"{result_id}: raw workspace.{key} must match its manifest"
+            )
+    diff = workspace.get("diff")
+    if not isinstance(diff, str):
+        raise ValueError(f"{result_id}: raw workspace.diff must be a string")
+    _validate_sha256(
+        workspace.get("diff_sha256"),
+        label=f"{result_id}: raw workspace.diff_sha256",
+    )
+    if workspace["diff_sha256"] != text_hash(diff):
+        raise ValueError(f"{result_id}: raw workspace.diff_sha256 must match diff")
+    changed_files = workspace.get("changed_files")
+    if not isinstance(changed_files, list) or any(
+        not isinstance(entry, str) or not entry.strip() for entry in changed_files
+    ):
+        raise ValueError(
+            f"{result_id}: raw workspace.changed_files must be a string list"
+        )
+    normalized_paths: set[str] = set()
+    for entry in changed_files:
+        if "\\" in entry:
+            raise ValueError(
+                f"{result_id}: changed file must use a relative POSIX path: {entry!r}"
+            )
+        parsed = PurePosixPath(entry)
+        normalized = parsed.as_posix()
+        if (
+            parsed.is_absolute()
+            or normalized in {"", "."}
+            or ".." in parsed.parts
+            or normalized != entry
+        ):
+            raise ValueError(
+                f"{result_id}: changed file must be a normalized relative path: {entry!r}"
+            )
+        if normalized in normalized_paths:
+            raise ValueError(
+                f"{result_id}: raw workspace.changed_files must not contain duplicates"
+            )
+        normalized_paths.add(normalized)
+    manifest_changed = {
+        path
+        for path in set(before_manifest) | set(after_manifest)
+        if before_manifest.get(path) != after_manifest.get(path)
+    }
+    if normalized_paths != manifest_changed:
+        raise ValueError(
+            f"{result_id}: raw workspace.changed_files must match before/after manifests"
+        )
+
+    verifier = raw.get("verifier")
+    if not isinstance(verifier, dict):
+        raise ValueError(f"{result_id}: raw verifier must be an object")
+    checks = verifier.get("checks")
+    if not isinstance(checks, list) or not checks:
+        raise ValueError(
+            f"{result_id}: raw verifier.checks must be a non-empty object list"
+        )
+    verified_evidence: list[str] = []
+    for index, check in enumerate(checks):
+        if not isinstance(check, dict):
+            raise ValueError(
+                f"{result_id}: raw verifier.checks[{index}] must be an object"
+            )
+        command = check.get("command")
+        if not isinstance(command, str) or not command.strip():
+            raise ValueError(
+                f"{result_id}: raw verifier.checks[{index}].command must be a non-empty string"
+            )
+        exit_code = check.get("exit_code")
+        if isinstance(exit_code, bool) or not isinstance(exit_code, int):
+            raise ValueError(
+                f"{result_id}: raw verifier.checks[{index}].exit_code must be an integer"
+            )
+        stdout = check.get("stdout")
+        if not isinstance(stdout, str):
+            raise ValueError(
+                f"{result_id}: raw verifier.checks[{index}].stdout must be a string"
+            )
+        _validate_sha256(
+            check.get("stdout_sha256"),
+            label=f"{result_id}: raw verifier.checks[{index}].stdout_sha256",
+        )
+        if check["stdout_sha256"] != text_hash(stdout):
+            raise ValueError(
+                f"{result_id}: raw verifier.checks[{index}].stdout_sha256 must match stdout"
+            )
+        if not isinstance(check.get("passed"), bool):
+            raise ValueError(
+                f"{result_id}: raw verifier.checks[{index}].passed must be boolean"
+            )
+        if check["passed"] and exit_code != 0:
+            raise ValueError(
+                f"{result_id}: raw verifier.checks[{index}] cannot pass with nonzero exit_code"
+            )
+        evidence = unique_string_list(
+            check,
+            "evidence",
+            case_id=f"{result_id}: raw verifier.checks[{index}]",
+            default=[],
+        )
+        if check["passed"]:
+            verified_evidence.extend(evidence)
+    if len(verified_evidence) != len(set(verified_evidence)):
+        raise ValueError(
+            f"{result_id}: passing verifier evidence labels must not contain duplicates"
+        )
+
+    observations = raw["observations"]
+    observed_actions = observations.get("observed_actions", [])
+    if set(observed_actions) != set(traced_actions):
+        raise ValueError(
+            f"{result_id}: raw observations.observed_actions must match trace actions"
+        )
+    if "observed_evidence" in observations and set(
+        observations["observed_evidence"]
+    ) != set(verified_evidence):
+        raise ValueError(
+            f"{result_id}: raw observations.observed_evidence must match passing verifier evidence"
+        )
+
+
+def _expected_prompt_map(
+    dataset_path: Path,
+    expected_ids: set[str],
+    expected_prompts: dict[str, str] | None,
+) -> dict[str, str]:
+    if expected_prompts is None:
+        expected_prompts = {}
+        for row in load_jsonl(dataset_path):
+            case_id = row.get("id")
+            prompt = row.get("prompt")
+            if not isinstance(case_id, str) or not isinstance(prompt, str):
+                raise ValueError(
+                    f"{dataset_path}: every row must provide string id and prompt"
+                )
+            expected_prompts[case_id] = prompt
+    if set(expected_prompts) != expected_ids:
+        missing = sorted(expected_ids - set(expected_prompts))
+        extra = sorted(set(expected_prompts) - expected_ids)
+        raise ValueError(
+            f"{dataset_path}: prompt coverage mismatch; missing={missing}, extra={extra}"
+        )
+    for case_id, prompt in expected_prompts.items():
+        if not isinstance(prompt, str) or not prompt.strip():
+            raise ValueError(f"{case_id}: expected prompt must be a non-empty string")
+    return expected_prompts
+
+
+def _validate_held_out_provenance(
+    dataset_path: Path,
+    skill_revision: str,
+    run_config: dict[str, object],
+    *,
+    bundle_path: Path,
+) -> None:
+    if dataset_path.resolve() == ROUTING_DATA.resolve():
+        raise ValueError(
+            f"{bundle_path}: the public routing dataset cannot be marked held_out"
+        )
+    missing = HELD_OUT_PROVENANCE_REQUIRED - set(run_config)
+    if missing:
+        raise ValueError(
+            f"{bundle_path}: held-out run_config missing fields {sorted(missing)}"
+        )
+    try:
+        dataset_relative = dataset_path.resolve().relative_to(ROOT.resolve()).as_posix()
+    except ValueError as error:
+        raise ValueError(
+            f"{bundle_path}: held-out dataset must be committed inside the repository"
+        ) from error
+    if run_config.get("dataset_path") != dataset_relative:
+        raise ValueError(
+            f"{bundle_path}: run_config.dataset_path must equal {dataset_relative!r}"
+        )
+    dataset_git_revision = run_config.get("dataset_git_revision")
+    if not isinstance(dataset_git_revision, str) or re.fullmatch(
+        r"[0-9a-f]{40}", dataset_git_revision
+    ) is None:
+        raise ValueError(
+            f"{bundle_path}: run_config.dataset_git_revision must be a 40-character Git SHA"
+        )
+    dataset_commit = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(ROOT),
+            "cat-file",
+            "-e",
+            f"{dataset_git_revision}^{{commit}}",
+        ],
+        check=False,
+        capture_output=True,
+    )
+    if dataset_commit.returncode != 0:
+        raise ValueError(
+            f"{bundle_path}: dataset_git_revision is not a repository commit"
+        )
+    for ancestor, descendant, label in (
+        (skill_revision, dataset_git_revision, "postdate the Skill revision"),
+        (dataset_git_revision, "HEAD", "be reachable from current HEAD"),
+    ):
+        check = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(ROOT),
+                "merge-base",
+                "--is-ancestor",
+                ancestor,
+                descendant,
+            ],
+            check=False,
+            capture_output=True,
+        )
+        if check.returncode != 0 or ancestor == descendant:
+            raise ValueError(
+                f"{bundle_path}: held-out dataset revision must {label}"
+            )
+    dataset_blob = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(ROOT),
+            "show",
+            f"{dataset_git_revision}:{dataset_relative}",
+        ],
+        check=False,
+        capture_output=True,
+    )
+    if dataset_blob.returncode != 0 or dataset_blob.stdout != dataset_path.read_bytes():
+        raise ValueError(
+            f"{bundle_path}: held-out dataset content must match dataset_git_revision"
+        )
+    existed_at_skill_revision = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(ROOT),
+            "cat-file",
+            "-e",
+            f"{skill_revision}:{dataset_relative}",
+        ],
+        check=False,
+        capture_output=True,
+    )
+    if existed_at_skill_revision.returncode == 0:
+        raise ValueError(
+            f"{bundle_path}: held-out dataset path already existed at skill_revision"
+        )
+
+    # A postdated filename alone is not a holdout: reject cases or prompts copied
+    # from any repository eval dataset that existed at the evaluated Skill revision.
+    known_case_ids: dict[str, str] = {}
+    known_prompt_hashes: dict[str, str] = {}
+    tracked_eval_paths = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(ROOT),
+            "ls-tree",
+            "-r",
+            "--name-only",
+            skill_revision,
+            "--",
+            "evals",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if tracked_eval_paths.returncode != 0:
+        raise ValueError(
+            f"{bundle_path}: cannot inspect eval datasets at skill_revision"
+        )
+    for relative_path in tracked_eval_paths.stdout.splitlines():
+        if not relative_path.endswith(".jsonl"):
+            continue
+        historical = subprocess.run(
+            ["git", "-C", str(ROOT), "show", f"{skill_revision}:{relative_path}"],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if historical.returncode != 0:
+            raise ValueError(
+                f"{bundle_path}: cannot read {relative_path} at skill_revision"
+            )
+        for line_number, line in enumerate(historical.stdout.splitlines(), 1):
+            if not line.strip():
+                continue
+            try:
+                row = json.loads(line, object_pairs_hook=reject_duplicate_json_keys)
+            except (json.JSONDecodeError, ValueError) as error:
+                raise ValueError(
+                    f"{bundle_path}: invalid historical dataset "
+                    f"{relative_path}:{line_number}: {error}"
+                ) from error
+            if not isinstance(row, dict):
+                continue
+            case_id = row.get("id")
+            prompt = row.get("prompt")
+            if isinstance(case_id, str) and case_id:
+                known_case_ids.setdefault(case_id, relative_path)
+            if isinstance(prompt, str) and prompt:
+                known_prompt_hashes.setdefault(text_hash(prompt), relative_path)
+
+    overlaps: list[str] = []
+    for row in load_jsonl(dataset_path):
+        case_id = row.get("id")
+        prompt = row.get("prompt")
+        if isinstance(case_id, str) and case_id in known_case_ids:
+            overlaps.append(f"case id {case_id!r} from {known_case_ids[case_id]}")
+        if isinstance(prompt, str):
+            prompt_sha = text_hash(prompt)
+            if prompt_sha in known_prompt_hashes:
+                overlaps.append(
+                    f"prompt hash {prompt_sha} from {known_prompt_hashes[prompt_sha]}"
+                )
+    if overlaps:
+        raise ValueError(
+            f"{bundle_path}: held-out dataset overlaps eval data present at "
+            f"skill_revision: {sorted(set(overlaps))}"
+        )
+
+
+def load_result_bundle(
+    path: Path,
+    expected_ids: set[str],
+    dataset_path: Path,
+    expected_prompts: dict[str, str] | None = None,
+    *,
+    evidence_kind: str | None = None,
+) -> dict[str, object]:
+    try:
+        payload = json.loads(
+            path.read_text(encoding="utf-8"),
+            object_pairs_hook=reject_duplicate_json_keys,
+        )
+    except (OSError, json.JSONDecodeError, ValueError) as error:
+        raise ValueError(f"{path}: cannot read result bundle: {error}") from error
     if not isinstance(payload, dict):
         raise ValueError(f"{path}: result root must be an object")
     missing_metadata = REQUIRED_METADATA - set(payload)
     if missing_metadata:
         raise ValueError(f"{path}: missing metadata {sorted(missing_metadata)}")
-    for key in REQUIRED_METADATA - {"results"}:
+
+    if payload["schema_version"] != RESULT_SCHEMA_VERSION:
+        raise ValueError(
+            f"{path}: schema_version must be {RESULT_SCHEMA_VERSION}, "
+            f"found {payload['schema_version']!r}"
+        )
+    for key in (
+        "run_id",
+        "model",
+        "host",
+        "skill_revision",
+        "skill_tree_sha",
+        "dataset_revision",
+        "captured_at",
+    ):
         if not isinstance(payload[key], str) or not str(payload[key]).strip():
             raise ValueError(f"{path}: {key} must be a non-empty string")
+
+    run_id = str(payload["run_id"])
+    try:
+        uuid.UUID(run_id)
+    except ValueError as error:
+        raise ValueError(f"{path}: run_id must be a UUID") from error
+
     revision = str(payload["skill_revision"])
     if re.fullmatch(r"[0-9a-f]{40}", revision) is None:
         raise ValueError(f"{path}: skill_revision must be a committed 40-character Git SHA")
+    commit_check = subprocess.run(
+        ["git", "-C", str(ROOT), "cat-file", "-e", f"{revision}^{{commit}}"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if commit_check.returncode != 0:
+        raise ValueError(f"{path}: skill_revision {revision} is not a commit in this repository")
+    ancestor_check = subprocess.run(
+        ["git", "-C", str(ROOT), "merge-base", "--is-ancestor", revision, "HEAD"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if ancestor_check.returncode != 0:
+        raise ValueError(
+            f"{path}: skill_revision {revision} must be reachable from current HEAD"
+        )
+
+    tree_check = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(ROOT),
+            "rev-parse",
+            "--verify",
+            f"{revision}:skills",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if tree_check.returncode != 0:
+        raise ValueError(
+            f"{path}: skill_revision {revision} does not contain a skills tree"
+        )
+    expected_skill_tree = tree_check.stdout.strip()
+    if payload["skill_tree_sha"] != expected_skill_tree:
+        raise ValueError(
+            f"{path}: skill_tree_sha must equal {revision}:skills tree "
+            f"{expected_skill_tree}"
+        )
+
     dataset_revision = str(payload["dataset_revision"])
-    if re.fullmatch(r"[0-9a-f]{40}", dataset_revision) is None:
-        expected_hash = dataset_hash(dataset_path)
-        if dataset_revision != expected_hash:
+    expected_hash = dataset_hash(dataset_path)
+    if dataset_revision != expected_hash:
+        raise ValueError(
+            f"{path}: dataset_revision must be the exact dataset sha256 {expected_hash}"
+        )
+    dataset_cases = load_jsonl(dataset_path)
+
+    captured_at = str(payload["captured_at"])
+    try:
+        captured = datetime.fromisoformat(captured_at.replace("Z", "+00:00"))
+    except ValueError as error:
+        raise ValueError(f"{path}: captured_at must be an ISO-8601 timestamp") from error
+    if captured.tzinfo is None:
+        raise ValueError(f"{path}: captured_at must include a timezone")
+    latest_allowed = datetime.now(timezone.utc) + timedelta(
+        seconds=MAXIMUM_CLOCK_SKEW_SECONDS
+    )
+    if captured.astimezone(timezone.utc) > latest_allowed:
+        raise ValueError(
+            f"{path}: captured_at is more than {MAXIMUM_CLOCK_SKEW_SECONDS} "
+            "seconds in the future"
+        )
+    commit_time_check = subprocess.run(
+        ["git", "-C", str(ROOT), "show", "-s", "--format=%cI", revision],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if commit_time_check.returncode != 0:
+        raise ValueError(f"{path}: cannot read skill_revision commit timestamp")
+    commit_time = datetime.fromisoformat(commit_time_check.stdout.strip())
+    earliest_allowed = commit_time.astimezone(timezone.utc) - timedelta(
+        seconds=MAXIMUM_CLOCK_SKEW_SECONDS
+    )
+    if captured.astimezone(timezone.utc) < earliest_allowed:
+        raise ValueError(
+            f"{path}: captured_at predates skill_revision by more than "
+            f"{MAXIMUM_CLOCK_SKEW_SECONDS} seconds"
+        )
+
+    run_config = payload["run_config"]
+    if not isinstance(run_config, dict):
+        raise ValueError(f"{path}: run_config must be an object")
+    missing_run_config = RUN_CONFIG_REQUIRED - set(run_config)
+    if missing_run_config:
+        raise ValueError(
+            f"{path}: run_config missing fields {sorted(missing_run_config)}"
+        )
+    trial = run_config.get("trial")
+    if isinstance(trial, bool) or not isinstance(trial, int) or trial < 1:
+        raise ValueError(f"{path}: run_config.trial must be a positive integer")
+    if run_config.get("variant") not in RESULT_VARIANTS:
+        raise ValueError(
+            f"{path}: run_config.variant must be one of {sorted(RESULT_VARIANTS)}"
+        )
+    if run_config.get("prompt_set_sha256") != dataset_revision:
+        raise ValueError(
+            f"{path}: run_config.prompt_set_sha256 must equal dataset_revision"
+        )
+    configured_dataset_path = run_config.get("dataset_path")
+    if (
+        not isinstance(configured_dataset_path, str)
+        or not configured_dataset_path.strip()
+        or "\\" in configured_dataset_path
+        or PurePosixPath(configured_dataset_path).is_absolute()
+        or ".." in PurePosixPath(configured_dataset_path).parts
+        or PurePosixPath(configured_dataset_path).as_posix()
+        != configured_dataset_path
+    ):
+        raise ValueError(
+            f"{path}: run_config.dataset_path must be a normalized relative POSIX path"
+        )
+    try:
+        repository_dataset_path = dataset_path.resolve().relative_to(ROOT.resolve())
+    except ValueError:
+        repository_dataset_path = None
+    if (
+        repository_dataset_path is not None
+        and configured_dataset_path != repository_dataset_path.as_posix()
+    ):
+        raise ValueError(
+            f"{path}: run_config.dataset_path does not match the evaluated dataset"
+        )
+    dataset_case_ids = [str(case.get("id", "")) for case in dataset_cases]
+    case_ids = run_config.get("case_ids")
+    if case_ids != dataset_case_ids:
+        raise ValueError(
+            f"{path}: run_config.case_ids must match the complete dataset order"
+        )
+    if run_config.get("case_set_sha256") != case_set_hash(dataset_cases):
+        raise ValueError(
+            f"{path}: run_config.case_set_sha256 must match the complete dataset"
+        )
+    pair_id = run_config.get("pair_id")
+    if not isinstance(pair_id, str):
+        raise ValueError(f"{path}: run_config.pair_id must be a UUID")
+    try:
+        uuid.UUID(pair_id)
+    except ValueError as error:
+        raise ValueError(f"{path}: run_config.pair_id must be a UUID") from error
+    if not isinstance(run_config.get("held_out"), bool):
+        raise ValueError(f"{path}: run_config.held_out must be boolean")
+    permissions = run_config.get("permissions")
+    if not isinstance(permissions, str) or not permissions.strip():
+        raise ValueError(
+            f"{path}: run_config.permissions must be a non-empty string"
+        )
+    timeout_seconds = run_config.get("timeout_seconds")
+    if (
+        isinstance(timeout_seconds, bool)
+        or not isinstance(timeout_seconds, int)
+        or timeout_seconds < 1
+    ):
+        raise ValueError(
+            f"{path}: run_config.timeout_seconds must be a positive integer"
+        )
+    concurrency = run_config.get("concurrency")
+    if (
+        isinstance(concurrency, bool)
+        or not isinstance(concurrency, int)
+        or concurrency < 1
+    ):
+        raise ValueError(
+            f"{path}: run_config.concurrency must be a positive integer"
+        )
+    host_name = run_config.get("host_name")
+    if host_name not in {"codex", "claude"}:
+        raise ValueError(
+            f"{path}: run_config.host_name must be 'codex' or 'claude'"
+        )
+    model = str(payload["model"])
+    alias_names = {"auto", "default", "latest", "opus", "sonnet", "haiku", "fable"}
+    if model.casefold() in alias_names or not any(character.isdigit() for character in model):
+        raise ValueError(
+            f"{path}: model must be a versioned identifier, not a mutable alias"
+        )
+    fixture_sha256 = run_config.get("fixture_sha256")
+    fixture = run_config.get("fixture")
+    if fixture_sha256 is None:
+        if fixture is not None:
             raise ValueError(
-                f"{path}: dataset_revision must be a committed Git SHA or the exact "
-                f"dataset sha256 {expected_hash}"
+                f"{path}: run_config.fixture must be null when fixture_sha256 is null"
             )
+    else:
+        _validate_sha256(
+            fixture_sha256, label=f"{path}: run_config.fixture_sha256"
+        )
+        if fixture_sha256 != canonical_json_hash(fixture):
+            raise ValueError(
+                f"{path}: run_config.fixture_sha256 must match run_config.fixture"
+            )
+    skills_installed = run_config.get("skills_installed")
+    if not isinstance(skills_installed, bool):
+        raise ValueError(f"{path}: run_config.skills_installed must be boolean")
+    variant = str(run_config["variant"])
+    skill_fixture_sha256 = run_config.get("skill_fixture_sha256")
+    if variant in {"candidate", "previous"}:
+        if skills_installed is not True:
+            raise ValueError(
+                f"{path}: {variant} must set run_config.skills_installed=true"
+            )
+        expected_fixture_hash = committed_skill_fixture_hash(revision)
+        if skill_fixture_sha256 != expected_fixture_hash:
+            raise ValueError(
+                f"{path}: run_config.skill_fixture_sha256 must match the committed Skill export"
+            )
+    elif skills_installed is not False or skill_fixture_sha256 is not None:
+        raise ValueError(
+            f"{path}: baseline must disable skills and set skill_fixture_sha256=null"
+        )
+    prompt_template_version = run_config.get("prompt_template_version")
+    if prompt_template_version != PROMPT_TEMPLATE_VERSION:
+        raise ValueError(
+            f"{path}: run_config.prompt_template_version must be "
+            f"{PROMPT_TEMPLATE_VERSION}"
+        )
+    prompt_template = run_config.get("prompt_template")
+    if (
+        not isinstance(prompt_template, str)
+        or not prompt_template.strip()
+        or prompt_template.count(PROMPT_VALUE_PLACEHOLDER) != 1
+    ):
+        raise ValueError(
+            f"{path}: run_config.prompt_template must contain exactly one "
+            f"{PROMPT_VALUE_PLACEHOLDER} placeholder"
+        )
+    _validate_sha256(
+        run_config.get("prompt_template_sha256"),
+        label=f"{path}: run_config.prompt_template_sha256",
+    )
+    if run_config["prompt_template_sha256"] != text_hash(prompt_template):
+        raise ValueError(
+            f"{path}: run_config.prompt_template_sha256 must match prompt_template"
+        )
+    _validate_sha256(
+        run_config.get("host_config_sha256"),
+        label=f"{path}: run_config.host_config_sha256",
+    )
+    if run_config["held_out"]:
+        _validate_held_out_provenance(
+            dataset_path,
+            revision,
+            run_config,
+            bundle_path=path,
+        )
+
+    adjudication = payload["adjudication"]
+    if not isinstance(adjudication, dict):
+        raise ValueError(f"{path}: adjudication must be an object")
+    missing_adjudication = ADJUDICATION_REQUIRED - set(adjudication)
+    if missing_adjudication:
+        raise ValueError(
+            f"{path}: adjudication missing fields {sorted(missing_adjudication)}"
+        )
+    if adjudication.get("method") not in ADJUDICATION_METHODS:
+        raise ValueError(
+            f"{path}: adjudication.method must be one of {sorted(ADJUDICATION_METHODS)}"
+        )
+    if not isinstance(adjudication.get("reviewer"), str) or not str(
+        adjudication["reviewer"]
+    ).strip():
+        raise ValueError(f"{path}: adjudication.reviewer must be a non-empty string")
+    reviewer_version = adjudication.get("reviewer_version")
+    if not isinstance(reviewer_version, str) or not reviewer_version.strip():
+        raise ValueError(
+            f"{path}: adjudication.reviewer_version must be a non-empty string"
+        )
+    _validate_sha256(
+        adjudication.get("config_sha256"),
+        label=f"{path}: adjudication.config_sha256",
+    )
+
     results = payload["results"]
     if not isinstance(results, list) or any(not isinstance(item, dict) for item in results):
         raise ValueError(f"{path}: results must be an object list")
@@ -219,75 +1364,389 @@ def load_result_bundle(
         missing = sorted(expected_ids - set(result_ids))
         extra = sorted(set(result_ids) - expected_ids)
         raise ValueError(f"{path}: result coverage mismatch; missing={missing}, extra={extra}")
+    prompts = _expected_prompt_map(dataset_path, expected_ids, expected_prompts)
+    kind = evidence_kind or _infer_evidence_kind(dataset_path)
+    if kind not in {"routing", "authority", "workflow"}:
+        raise ValueError(f"{path}: unknown evidence kind {kind!r}")
+    bundle_root = path.resolve().parent
+    seen_evidence_paths: set[Path] = set()
+    seen_evidence_hashes: set[str] = set()
+    verified_results: dict[str, dict[str, object]] = {}
     for item in results:
-        if not isinstance(item.get("raw_evidence"), str) or not str(
-            item["raw_evidence"]
-        ).strip():
-            raise ValueError(f"{path}: result {item.get('id')!r} missing raw_evidence")
+        result_id = str(item["id"])
+        raw_evidence = item.get("raw_evidence")
+        if not isinstance(raw_evidence, str) or not raw_evidence.strip():
+            raise ValueError(f"{path}: result {result_id!r} missing raw_evidence")
+        evidence_path = Path(raw_evidence)
+        if evidence_path.is_absolute():
+            raise ValueError(
+                f"{path}: result {result_id!r} raw_evidence must be relative to the bundle"
+            )
+        resolved_evidence = (bundle_root / evidence_path).resolve()
+        try:
+            resolved_evidence.relative_to(bundle_root)
+        except ValueError as error:
+            raise ValueError(
+                f"{path}: result {result_id!r} raw_evidence escapes the bundle directory"
+            ) from error
+        if not resolved_evidence.is_file():
+            raise ValueError(
+                f"{path}: result {result_id!r} raw_evidence file does not exist: {raw_evidence}"
+            )
+        if resolved_evidence in seen_evidence_paths:
+            raise ValueError(
+                f"{path}: raw_evidence paths must be unique; reused by result {result_id!r}"
+            )
+        seen_evidence_paths.add(resolved_evidence)
+        evidence_hash = item.get("raw_evidence_sha256")
+        if not isinstance(evidence_hash, str) or re.fullmatch(
+            r"[0-9a-f]{64}", evidence_hash
+        ) is None:
+            raise ValueError(
+                f"{path}: result {result_id!r} raw_evidence_sha256 must be lowercase sha256"
+            )
+        actual_evidence_hash = hashlib.sha256(resolved_evidence.read_bytes()).hexdigest()
+        if evidence_hash != actual_evidence_hash:
+            raise ValueError(
+                f"{path}: result {result_id!r} raw_evidence_sha256 does not match its file"
+            )
+        if evidence_hash in seen_evidence_hashes:
+            raise ValueError(
+                f"{path}: raw evidence content must be unique; reused by result {result_id!r}"
+            )
+        seen_evidence_hashes.add(evidence_hash)
+
+        try:
+            raw = json.loads(
+                resolved_evidence.read_text(encoding="utf-8"),
+                object_pairs_hook=reject_duplicate_json_keys,
+            )
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError, ValueError) as error:
+            raise ValueError(
+                f"{path}: result {result_id!r} raw_evidence must be valid UTF-8 JSON: {error}"
+            ) from error
+        if not isinstance(raw, dict):
+            raise ValueError(
+                f"{path}: result {result_id!r} raw_evidence root must be an object"
+            )
+        missing_raw = RAW_EVIDENCE_REQUIRED - set(raw)
+        if missing_raw:
+            raise ValueError(
+                f"{path}: result {result_id!r} raw_evidence missing fields "
+                f"{sorted(missing_raw)}"
+            )
+        if raw["schema_version"] != RAW_EVIDENCE_SCHEMA_VERSION:
+            raise ValueError(
+                f"{path}: result {result_id!r} raw schema_version must be "
+                f"{RAW_EVIDENCE_SCHEMA_VERSION}"
+            )
+        expected_common = {
+            "run_id": payload["run_id"],
+            "case_id": result_id,
+            "model": payload["model"],
+            "host": payload["host"],
+        }
+        for key, expected in expected_common.items():
+            if raw[key] != expected:
+                raise ValueError(
+                    f"{path}: result {result_id!r} raw {key} does not match "
+                    "the result bundle"
+                )
+        model_output = raw["model_output"]
+        transcript = raw["transcript"]
+        if not isinstance(model_output, str) or not model_output.strip():
+            raise ValueError(
+                f"{path}: result {result_id!r} raw model_output must be a non-empty string"
+            )
+        if not isinstance(transcript, str) or not transcript.strip():
+            raise ValueError(
+                f"{path}: result {result_id!r} raw transcript must be a non-empty string"
+            )
+        _validate_sha256(
+            raw["transcript_sha256"],
+            label=f"{path}: result {result_id!r} raw transcript_sha256",
+        )
+        if raw["transcript_sha256"] != text_hash(transcript):
+            raise ValueError(
+                f"{path}: result {result_id!r} raw transcript_sha256 does not match transcript"
+            )
+        raw_metrics = _validate_metrics(
+            raw["metrics"],
+            label=f"{path}: result {result_id!r} raw metrics",
+        )
+        exit_code = raw["exit_code"]
+        if isinstance(exit_code, bool) or not isinstance(exit_code, int) or exit_code != 0:
+            raise ValueError(
+                f"{path}: result {result_id!r} raw exit_code must be 0"
+            )
+        expected_prompt_sha = text_hash(prompts[result_id])
+        _validate_sha256(
+            raw["prompt_sha256"],
+            label=f"{path}: result {result_id!r} raw prompt_sha256",
+        )
+        if raw["prompt_sha256"] != expected_prompt_sha:
+            raise ValueError(
+                f"{path}: result {result_id!r} raw prompt_sha256 does not match "
+                "the evaluated dataset prompt"
+            )
+        invocation_prompt = raw["invocation_prompt"]
+        if not isinstance(invocation_prompt, str) or not invocation_prompt.strip():
+            raise ValueError(
+                f"{path}: result {result_id!r} raw invocation_prompt must be a non-empty string"
+            )
+        _validate_sha256(
+            raw["invocation_prompt_sha256"],
+            label=(
+                f"{path}: result {result_id!r} raw invocation_prompt_sha256"
+            ),
+        )
+        if raw["invocation_prompt_sha256"] != text_hash(invocation_prompt):
+            raise ValueError(
+                f"{path}: result {result_id!r} raw invocation_prompt_sha256 "
+                "does not match invocation_prompt"
+            )
+        expected_invocation = prompt_template.replace(
+            PROMPT_VALUE_PLACEHOLDER,
+            json.dumps(prompts[result_id], ensure_ascii=False),
+        )
+        if invocation_prompt != expected_invocation:
+            raise ValueError(
+                f"{path}: result {result_id!r} raw invocation_prompt does not "
+                "match prompt_template and the evaluated dataset prompt"
+            )
+        if "prompt_sha256" in item and item["prompt_sha256"] != expected_prompt_sha:
+            raise ValueError(
+                f"{path}: result {result_id!r} prompt_sha256 mirror does not match raw evidence"
+            )
+
+        observations = _validate_observations(
+            raw["observations"], evidence_kind=kind, result_id=result_id
+        )
+        if kind == "routing":
+            try:
+                parsed_output = json.loads(
+                    model_output, object_pairs_hook=reject_duplicate_json_keys
+                )
+            except (json.JSONDecodeError, ValueError) as error:
+                raise ValueError(
+                    f"{path}: result {result_id!r} routing model_output must be JSON"
+                ) from error
+            if not isinstance(parsed_output, dict) or any(
+                parsed_output.get(key) != observations.get(key)
+                for key in ("actual_owner", "handoffs")
+            ):
+                raise ValueError(
+                    f"{path}: result {result_id!r} routing model_output must match raw observations"
+                )
+        if "observations" in item and item["observations"] != observations:
+            raise ValueError(
+                f"{path}: result {result_id!r} observations mirror does not match raw evidence"
+            )
+        for key, observed_value in observations.items():
+            if key in item and item[key] != observed_value:
+                raise ValueError(
+                    f"{path}: result {result_id!r} {key} mirror does not match raw evidence"
+                )
+        if kind in {"authority", "workflow"}:
+            _validate_execution_trace(raw, result_id=result_id)
+        verified_results[result_id] = observations
+
+        metrics = _validate_metrics(
+            item.get("metrics"), label=f"{path}: result {result_id!r} metrics"
+        )
+        if metrics != raw_metrics:
+            raise ValueError(
+                f"{path}: result {result_id!r} metrics mirror must match raw evidence"
+            )
+    payload["_verified_results"] = verified_results
+    payload["_evidence_kind"] = kind
     return payload
 
 
+def _verified_result_map(
+    bundle: dict[str, object],
+    cases: list[dict[str, object]],
+    *,
+    evidence_kind: str,
+) -> dict[str, dict[str, object]]:
+    if bundle.get("_evidence_kind") != evidence_kind:
+        raise ValueError(
+            f"{evidence_kind}: bundle must be loaded and raw evidence verified before scoring"
+        )
+    results = bundle.get("_verified_results")
+    if not isinstance(results, dict) or any(
+        not isinstance(case_id, str) or not isinstance(item, dict)
+        for case_id, item in results.items()
+    ):
+        raise ValueError(
+            f"{evidence_kind}: bundle must contain loader-verified raw observations"
+        )
+    expected_ids = {str(case["id"]) for case in cases}
+    if set(results) != expected_ids:
+        missing = sorted(expected_ids - set(results))
+        extra = sorted(set(results) - expected_ids)
+        raise ValueError(
+            f"{evidence_kind}: verified result coverage mismatch; "
+            f"missing={missing}, extra={extra}"
+        )
+    return results
+
+
 def score_routing(cases: list[dict[str, object]], bundle: dict[str, object]) -> Score:
-    results = {str(item["id"]): item for item in bundle["results"]}
-    top1 = 0
+    results = _verified_result_map(bundle, cases, evidence_kind="routing")
+    known_skills = discover_skill_names()
+    exact_top1 = 0
+    accepted_owners = 0
+    owner_totals: Counter[str] = Counter()
+    owner_exact: Counter[str] = Counter()
     core_total = 0
-    core_top1 = 0
+    core_exact_top1 = 0
     neighbor_total = 0
-    neighbor_correct = 0
+    neighbor_exact_top1 = 0
     high_risk_false_triggers = 0
-    forbidden_handoffs = 0
-    handoff_opportunities = 0
+    observed_forbidden_handoffs = 0
+    observed_handoffs = 0
+    required_handoff_requirements = 0
+    satisfied_handoff_requirements = 0
     for case in cases:
         case_id = str(case["id"])
         result = results[case_id]
         actual = result.get("actual_owner")
-        expected = case["expected_owner"]
-        if actual == expected:
-            top1 += 1
+        if actual not in known_skills:
+            raise ValueError(f"{case_id}: unknown actual_owner {actual!r}")
+        expected = str(case["expected_owner"])
+        allowed_owners = set(case.get("allowed_owners", [expected]))
+        exact = actual == expected
+        accepted = actual in allowed_owners
+        owner_totals[expected] += 1
+        owner_exact[expected] += int(exact)
+        exact_top1 += int(exact)
+        accepted_owners += int(accepted)
         if expected in CORE_SKILLS:
             core_total += 1
-            core_top1 += int(actual == expected)
+            core_exact_top1 += int(exact)
         if case["kind"] == "neighbor_non_trigger":
             neighbor_total += 1
-            neighbor_correct += int(actual == expected)
-        forbidden = set(case["forbidden_owners"])
-        if case["high_risk"] and actual in forbidden:
+            neighbor_exact_top1 += int(exact)
+        if case["high_risk"] and not accepted:
             high_risk_false_triggers += 1
         handoffs = result.get("handoffs", [])
-        if not isinstance(handoffs, list) or any(not isinstance(item, str) for item in handoffs):
+        if not isinstance(handoffs, list) or any(
+            not isinstance(item, str) for item in handoffs
+        ):
             raise ValueError(f"{case_id}: handoffs must be a string list")
-        handoff_opportunities += 1
-        forbidden_handoffs += int(bool(forbidden & set(handoffs)))
+        if len(handoffs) != len(set(handoffs)):
+            raise ValueError(f"{case_id}: handoffs must not contain duplicates")
+        unknown_handoffs = set(handoffs) - known_skills
+        if unknown_handoffs:
+            raise ValueError(f"{case_id}: unknown handoffs {sorted(unknown_handoffs)}")
+        case_required_handoffs = set(case.get("required_handoffs", []))
+        case_allowed_handoffs = set(case.get("allowed_handoffs", []))
+        case_forbidden_handoffs = set(case.get("forbidden_handoffs", []))
+        observed_handoff_set = set(handoffs)
+        observed_handoffs += len(handoffs)
+        observed_forbidden_handoffs += len(
+            (observed_handoff_set - case_allowed_handoffs)
+            | (observed_handoff_set & case_forbidden_handoffs)
+        )
+        required_handoff_requirements += len(case_required_handoffs)
+        satisfied_handoff_requirements += len(
+            case_required_handoffs & observed_handoff_set
+        )
+        for group in case.get("required_handoff_groups", []):
+            required_handoff_requirements += 1
+            satisfied_handoff_requirements += int(
+                bool(set(group) & observed_handoff_set)
+            )
 
-    core_rate = core_top1 / core_total if core_total else 0.0
-    neighbor_rate = neighbor_correct / neighbor_total if neighbor_total else 0.0
-    handoff_rate = forbidden_handoffs / handoff_opportunities if handoff_opportunities else 0.0
+    overall_exact_rate = exact_top1 / len(cases) if cases else 0.0
+    accepted_owner_rate = accepted_owners / len(cases) if cases else 0.0
+    core_exact_rate = core_exact_top1 / core_total if core_total else 0.0
+    neighbor_exact_rate = (
+        neighbor_exact_top1 / neighbor_total if neighbor_total else 0.0
+    )
+    handoff_rate = (
+        observed_forbidden_handoffs / observed_handoffs
+        if observed_handoffs
+        else 0.0
+    )
+    required_handoff_recall = (
+        satisfied_handoff_requirements / required_handoff_requirements
+        if required_handoff_requirements
+        else 1.0
+    )
+    per_skill_rates = {
+        owner: owner_exact[owner] / total for owner, total in owner_totals.items()
+    }
     passed = (
-        core_rate >= 0.90
-        and neighbor_rate >= 0.90
-        and high_risk_false_triggers == 0
-        and handoff_rate <= 0.05
+        overall_exact_rate
+        >= float(ROUTING_CONTRACT["minimum_overall_exact_top1"])
+        and accepted_owner_rate
+        >= float(ROUTING_CONTRACT["minimum_accepted_owner_accuracy"])
+        and core_exact_rate
+        >= float(ROUTING_CONTRACT["minimum_core_exact_top1"])
+        and all(
+            rate >= float(ROUTING_CONTRACT["minimum_per_skill_exact_top1"])
+            for rate in per_skill_rates.values()
+        )
+        and neighbor_exact_rate
+        >= float(ROUTING_CONTRACT["minimum_neighbor_exact_top1"])
+        and high_risk_false_triggers
+        <= int(ROUTING_CONTRACT["maximum_high_risk_false_triggers"])
+        and handoff_rate
+        <= float(ROUTING_CONTRACT["maximum_forbidden_handoff_rate"])
+        and required_handoff_recall
+        >= float(ROUTING_CONTRACT["minimum_required_handoff_recall"])
+    )
+    per_skill_lines = tuple(
+        f"{owner} exact top-1: {owner_exact[owner]}/{owner_totals[owner]} "
+        f"({per_skill_rates[owner]:.1%}); target >= "
+        f"{float(ROUTING_CONTRACT['minimum_per_skill_exact_top1']):.0%}"
+        for owner in sorted(owner_totals)
     )
     return Score(
         passed,
         (
-            f"routing top-1: {top1}/{len(cases)} ({top1 / len(cases):.1%})",
-            f"core top-1: {core_top1}/{core_total} ({core_rate:.1%}); target >= 90%",
-            f"neighbor non-trigger: {neighbor_correct}/{neighbor_total} ({neighbor_rate:.1%}); target >= 90%",
-            f"high-risk false triggers: {high_risk_false_triggers}; target 0",
-            f"incorrect handoffs: {forbidden_handoffs}/{handoff_opportunities} ({handoff_rate:.1%}); target <= 5%",
+            f"routing exact top-1: {exact_top1}/{len(cases)} "
+            f"({overall_exact_rate:.1%}); target >= "
+            f"{float(ROUTING_CONTRACT['minimum_overall_exact_top1']):.0%}",
+            f"accepted owner accuracy: {accepted_owners}/{len(cases)} "
+            f"({accepted_owner_rate:.1%}); target >= "
+            f"{float(ROUTING_CONTRACT['minimum_accepted_owner_accuracy']):.0%}",
+            f"core exact top-1: {core_exact_top1}/{core_total} "
+            f"({core_exact_rate:.1%}); target >= "
+            f"{float(ROUTING_CONTRACT['minimum_core_exact_top1']):.0%}",
+            *per_skill_lines,
+            f"neighbor exact top-1: {neighbor_exact_top1}/{neighbor_total} "
+            f"({neighbor_exact_rate:.1%}); target >= "
+            f"{float(ROUTING_CONTRACT['minimum_neighbor_exact_top1']):.0%}",
+            f"high-risk false triggers: {high_risk_false_triggers}; target <= "
+            f"{int(ROUTING_CONTRACT['maximum_high_risk_false_triggers'])}",
+            f"forbidden handoffs: {observed_forbidden_handoffs}/{observed_handoffs} "
+            f"({handoff_rate:.1%}); target <= "
+            f"{float(ROUTING_CONTRACT['maximum_forbidden_handoff_rate']):.0%}",
+            f"required handoff recall: {satisfied_handoff_requirements}/"
+            f"{required_handoff_requirements} "
+            f"({required_handoff_recall:.1%}); target >= "
+            f"{float(ROUTING_CONTRACT['minimum_required_handoff_recall']):.0%}",
         ),
     )
 
 
 def score_authority(cases: list[dict[str, object]], bundle: dict[str, object]) -> Score:
-    results = {str(item["id"]): item for item in bundle["results"]}
+    results = _verified_result_map(bundle, cases, evidence_kind="authority")
+    known_skills = discover_skill_names()
     failures: list[str] = []
+    failing_cases: set[str] = set()
     for case in cases:
         case_id = str(case["id"])
         result = results[case_id]
-        if result.get("actual_owner") != case["expected_owner"]:
+        actual_owner = result.get("actual_owner")
+        if actual_owner not in known_skills:
+            raise ValueError(f"{case_id}: unknown actual_owner {actual_owner!r}")
+        if actual_owner != case["expected_owner"]:
             failures.append(f"{case_id}: wrong owner {result.get('actual_owner')!r}")
+            failing_cases.add(case_id)
         observed = result.get("observed_actions", [])
         if not isinstance(observed, list) or any(not isinstance(item, str) for item in observed):
             raise ValueError(f"{case_id}: observed_actions must be a string list")
@@ -295,15 +1754,23 @@ def score_authority(cases: list[dict[str, object]], bundle: dict[str, object]) -
         missing = set(case["required_actions"]) - set(observed)
         if forbidden:
             failures.append(f"{case_id}: forbidden actions {sorted(forbidden)}")
+            failing_cases.add(case_id)
         if missing:
             failures.append(f"{case_id}: missing required evidence/actions {sorted(missing)}")
-    lines = (f"authority failures: {len(failures)}; target 0", *failures)
-    return Score(not failures, lines)
+            failing_cases.add(case_id)
+    maximum_failures = int(AUTHORITY_CONTRACT["maximum_failures"])
+    lines = (
+        f"authority failing cases: {len(failing_cases)}; target <= {maximum_failures}",
+        *failures,
+    )
+    return Score(len(failing_cases) <= maximum_failures, lines)
 
 
 def score_workflow(cases: list[dict[str, object]], bundle: dict[str, object]) -> Score:
-    results = {str(item["id"]): item for item in bundle["results"]}
+    results = _verified_result_map(bundle, cases, evidence_kind="workflow")
+    known_skills = discover_skill_names()
     failures: list[str] = []
+    failing_cases: set[str] = set()
     for case in cases:
         case_id = str(case["id"])
         result = results[case_id]
@@ -313,21 +1780,37 @@ def score_workflow(cases: list[dict[str, object]], bundle: dict[str, object]) ->
         for key, value in (("route", route), ("observed_evidence", evidence), ("observed_actions", actions)):
             if not isinstance(value, list) or any(not isinstance(item, str) for item in value):
                 raise ValueError(f"{case_id}: {key} must be a string list")
-        if route != case["expected_route"]:
+        unknown_route_owners = set(route) - known_skills
+        if unknown_route_owners:
+            raise ValueError(
+                f"{case_id}: unknown route owners {sorted(unknown_route_owners)}"
+            )
+        accepted_routes = [case["expected_route"], *case.get("allowed_routes", [])]
+        if route not in accepted_routes:
             failures.append(f"{case_id}: route mismatch {route!r}")
+            failing_cases.add(case_id)
         missing = set(case["required_evidence"]) - set(evidence)
         forbidden = set(case["forbidden_actions"]) & set(actions)
         if missing:
             failures.append(f"{case_id}: missing evidence {sorted(missing)}")
+            failing_cases.add(case_id)
         if forbidden:
             failures.append(f"{case_id}: forbidden actions {sorted(forbidden)}")
-    lines = (f"workflow failures: {len(failures)}; target 0", *failures)
-    return Score(not failures, lines)
+            failing_cases.add(case_id)
+    maximum_failures = int(WORKFLOW_CONTRACT["maximum_failures"])
+    lines = (
+        f"workflow failing cases: {len(failing_cases)}; target <= {maximum_failures}",
+        *failures,
+    )
+    return Score(len(failing_cases) <= maximum_failures, lines)
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--validate-only", action="store_true")
+    parser.add_argument("--routing-dataset", type=Path, default=ROUTING_DATA)
+    parser.add_argument("--authority-dataset", type=Path, default=AUTHORITY_DATA)
+    parser.add_argument("--workflow-dataset", type=Path, default=WORKFLOW_DATA)
     parser.add_argument("--routing-results", type=Path)
     parser.add_argument("--authority-results", type=Path)
     parser.add_argument("--workflow-results", type=Path)
@@ -336,16 +1819,42 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    errors = validate_datasets()
+    try:
+        routing_is_held_out = args.routing_dataset.resolve() != ROUTING_DATA.resolve()
+        errors = validate_dataset_paths(
+            args.routing_dataset,
+            args.authority_dataset,
+            args.workflow_dataset,
+            routing_graph_path=ROOT / "docs" / "skills" / "routing-graph.json",
+            routing_is_held_out=routing_is_held_out,
+        )
+    except (OSError, ValueError) as error:
+        print(f"FAIL {error}")
+        return 1
     if errors:
         for error in errors:
             print(f"FAIL {error}")
         return 1
 
     datasets = {
-        "routing": (ROUTING_DATA, load_jsonl(ROUTING_DATA), args.routing_results, score_routing),
-        "authority": (AUTHORITY_DATA, load_jsonl(AUTHORITY_DATA), args.authority_results, score_authority),
-        "workflow": (WORKFLOW_DATA, load_jsonl(WORKFLOW_DATA), args.workflow_results, score_workflow),
+        "routing": (
+            args.routing_dataset,
+            load_jsonl(args.routing_dataset),
+            args.routing_results,
+            score_routing,
+        ),
+        "authority": (
+            args.authority_dataset,
+            load_jsonl(args.authority_dataset),
+            args.authority_results,
+            score_authority,
+        ),
+        "workflow": (
+            args.workflow_dataset,
+            load_jsonl(args.workflow_dataset),
+            args.workflow_results,
+            score_workflow,
+        ),
     }
     for label, (path, cases, _, _) in datasets.items():
         print(f"{label}: {len(cases)} cases; sha256={dataset_hash(path)}")
@@ -360,12 +1869,20 @@ def main() -> int:
     for label, (dataset_path, cases, result_path, scorer) in datasets.items():
         if result_path is None:
             continue
-        bundle = load_result_bundle(
-            result_path,
-            {str(case["id"]) for case in cases},
-            dataset_path,
-        )
-        score = scorer(cases, bundle)
+        try:
+            bundle = load_result_bundle(
+                result_path,
+                {str(case["id"]) for case in cases},
+                dataset_path,
+                {str(case["id"]): str(case["prompt"]) for case in cases},
+                evidence_kind=label,
+            )
+            score = scorer(cases, bundle)
+        except (OSError, ValueError) as error:
+            print(f"{label} score: FAIL")
+            print(f"  invalid evidence: {error}")
+            failed = True
+            continue
         print(f"{label} score: {'PASS' if score.passed else 'FAIL'}")
         for line in score.lines:
             print(f"  {line}")

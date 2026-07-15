@@ -1,6 +1,6 @@
 ---
 name: ops-client
-description: Use when directly operating or verifying a specified real desktop client, or collecting evidence for an already-isolated client-layer failure. Do not use for unexplained or cross-system root-cause diagnosis.
+description: "Use when directly operating or verifying a specified real desktop client, or gathering evidence for an isolated client-layer failure; require a verified target, window, and capability, not unexplained or cross-system diagnosis."
 ---
 
 # Ops Client
@@ -11,7 +11,7 @@ Operate and verify real desktop client windows. Treat platform automation as ada
 
 ## Workflow
 
-1. Identify the specified client target: app name, repository path, package/app directory, process, PID, visible window, platform, and requested evidence.
+1. Identify the specified client target and action scope: app name, repository path, package/app directory, process, PID, visible window, platform, requested evidence, and whether observation, capture, launch, restart, focus, or a named semantic interaction is explicitly authorized.
 2. Run a capability preflight and record available/unavailable/unknown for:
    - process enumeration and runtime-source inspection;
    - window enumeration with stable window identifiers;
@@ -27,7 +27,7 @@ Operate and verify real desktop client windows. Treat platform automation as ada
    - **Linux:** require an available AT-SPI/window-manager capture adapter and stable window/process evidence; otherwise use Degraded Evidence mode.
 6. Identify the exact real window by process owner, PID, title, bounds, and platform identifier. Do not substitute browser preview evidence.
 7. Capture and inspect the real window using the selected adapter before making visual claims.
-8. Prefer background-safe Accessibility/control-tree actions on named controls over coordinate clicks.
+8. Within the explicitly authorized action scope, prefer background-safe Accessibility/control-tree actions on named controls over coordinate clicks. Verification or capture alone never authorizes pressing a control.
 9. Rebuild/restart the intended client instance after relevant UI, bundle, native, or Accessibility changes before re-verifying.
 10. Report unsupported platform claims explicitly rather than emulating them with a browser page or cropped screenshot.
 11. Use Client Debug Evidence only when delegated by `diagnose` or when the caller supplies an already-isolated client-layer reproduction whose requested output is direct client evidence. Otherwise route unexplained or cross-system root-cause requests to `diagnose` before operating the client. For an accepted evidence task, verify the real process/window/build source, collect direct client evidence, clean disposable task state, and return the evidence to `diagnose` or the caller.
@@ -57,6 +57,8 @@ Operate and verify real desktop client windows. Treat platform automation as ada
 ## Hard Rules
 
 - Do not claim cross-platform support from a macOS-only procedure.
+- Treat observation, capture, launch, restart, focus, and control interaction as separate scopes. A verification request does not authorize launch, restart, focus change, or pressing controls; require an exact target and action before changing client state.
+- Stop before credentials, account switching, permission grants, destructive or irreversible actions, purchases, or external submission unless the user explicitly authorizes that exact action and target.
 - Do not treat browser previews, dev server pages, region screenshots, or app-like web tabs as desktop-client evidence unless the user explicitly asks for browser-only checking.
 - Do not start or restart a client before confirming the startup command source and whether it could disturb an existing app instance, active window, unsaved state, or user workflow.
 - Do not assume Accessibility or screen-capture permission. Verify the action succeeds or mark it unavailable.
@@ -73,11 +75,7 @@ Operate and verify real desktop client windows. Treat platform automation as ada
 
 ## Output Contract
 
-Report platform and selected adapter, capability preflight, specified client target, repository/client ownership evidence, startup command or `Not found`, target process/runtime, stable real-window identity, screenshot source/provenance, interaction method, Client Debug Evidence and handoff owner when relevant, permission or adapter gaps, restart/rebuild status, cleanup status, and all `Not supported` or `Not verified` claims.
-
-## Skill Maintenance
-
-When maintaining this package, keep `SKILL.md` concise, move platform-specific procedures to `references/` when they grow, update `agents/openai.yaml`, and run `python3 scripts/validate-skills.py`.
+Report platform and selected adapter, capability preflight, specified client target, authorized action scope, repository/client ownership evidence, startup command or `Not found`, target process/runtime, stable real-window identity, screenshot source/provenance, interaction method, Client Debug Evidence and handoff owner when relevant, permission or adapter gaps, restart/rebuild status, cleanup status, and all `Not supported` or `Not verified` claims.
 
 ## References
 

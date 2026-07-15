@@ -1,6 +1,6 @@
 ---
 name: audit-frontend
-description: "Use when auditing complex or cross-cutting frontend architecture across React, Vue, Tailwind, CSS Modules, Sass/Less, CSS-in-JS, component systems, high-density consoles, and Tauri desktops, or when repo-review delegates a bounded frontend specialist review, with explicit framework, styling, architecture, state/data, layout, accessibility, performance, and desktop profile selection."
+description: "Use when a known frontend surface needs a scoped, read-only audit of architecture, reuse, data/UI contracts, accessibility, performance, or desktop boundaries, including bounded specialist delegation from repo-review; choose only relevant profiles."
 ---
 
 # Frontend Audit
@@ -14,7 +14,7 @@ Audit frontend engineering from repository evidence rather than a universal fram
 Resolve conflicts in this order:
 
 1. The user's current explicit request.
-2. The nearest applicable `AGENTS.md` or repository guidance.
+2. Effective repository guidance, including `AGENTS.md`, `CLAUDE.md`, and host-provided instructions when present.
 3. Existing project code, components, and design system.
 4. Project documentation and interface contracts.
 5. This skill.
@@ -78,10 +78,6 @@ Never rewrite a working local structure merely to match this skill or an externa
 ## Output Contract
 
 Start with selected product, framework, styling, and audit profiles; explicitly excluded audit profiles; coordinating owner when delegated; and severity-ranked findings. For each finding, report impact, exact location, profile-specific evidence, recommended remediation owner/direction, and validation gap. Then summarize inspected rules/files, existing candidates, ownership map, selected state/data/layout/accessibility/performance/desktop evidence, component/injection/router/lifetime contracts, structural/documentation drift, commands/runtime evidence, and all `Not found` or `Not verified` residual risks.
-
-## Skill Maintenance
-
-Keep this entry profile-oriented and concise. When triggers, profiles, or rules change, update references, `agents/openai.yaml`, eval cases, README/install indexes, and run `python3 scripts/validate-skills.py --skill audit-frontend` plus the full validator.
 
 ## References
 

@@ -2,6 +2,18 @@
 
 Use this checklist when implementing or reviewing frontend changes.
 
+## Contents
+
+- [Required Context](#required-context)
+- [Reuse-First Gate](#reuse-first-gate)
+- [Stack And Structure](#stack-and-structure)
+- [Framework Profile](#framework-profile)
+- [DOM And Layout Ownership](#dom-and-layout-ownership)
+- [Styling](#styling)
+- [Behavior And Contracts](#behavior-and-contracts)
+- [Validation](#validation)
+- [Review](#review)
+
 ## Required Context
 
 - Read relevant repo guidance first.

@@ -2,16 +2,24 @@
 
 These templates are bundled with `repo-map` so the skill remains usable after publishing. Local `prompts/` files may supplement these templates, but they are never required.
 
+## Contents
+
+- [Template Selection](#template-selection)
+- [Repository Guidance Bootstrap](#repository-guidance-bootstrap-template)
+- [Repo Map Bootstrap](#repo-map-bootstrap-template)
+- [Doc/Code Alignment Review](#doccode-alignment-review-template)
+- [Task-Start Context](#task-start-context-template)
+
 ## Template Selection
 
-- Missing `AGENTS.md`: use the AGENTS.md bootstrap template.
+- Missing effective repository guidance: use the repository-guidance bootstrap template for the host-supported file.
 - Missing `docs/repo-map/README.md`: apply the creation gate, then use the repo-map bootstrap template when justified.
 - Existing docs present: use the doc/code alignment review template.
 - New task before edits: use the task-start context template.
 
 Templates provide structure only. Repository files, configs, commands, and code are the source of truth.
 
-## AGENTS.md Bootstrap Template
+## Repository Guidance Bootstrap Template
 
 Use after reading real project files. Preview the draft unless the user already explicitly requested creating or updating the file.
 
@@ -106,7 +114,7 @@ Use when the user is about to start implementation in a repo.
 
 Required first pass:
 
-- read relevant `AGENTS.md`
+- read relevant `AGENTS.md`, `CLAUDE.md`, and host-provided instructions when present
 - inspect related docs and code
 - resolve the containing Git root or classify the path as a multi-repo/non-Git workspace; run `git status --short` only in applicable Git roots
 - identify allowed and disallowed edit scope

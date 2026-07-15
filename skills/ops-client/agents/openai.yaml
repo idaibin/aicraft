@@ -1,4 +1,4 @@
 interface:
   display_name: "Ops Client"
   short_description: "Verify desktop apps through platform-specific adapters"
-  default_prompt: "Use $ops-client to identify and operate a specified real desktop client or collect bounded Client Debug Evidence only after $diagnose delegation or an already-isolated client-layer evidence request. Route unexplained or cross-system root-cause requests to $diagnose before client operation. Run capability preflight, use only the available platform adapter, return direct evidence without deciding the final cause/fix, remove disposable probes/test instances, and retain referenced evidence until transferred. Use $implement-frontend or the relevant native implementation skill for code changes."
+  default_prompt: "Use $ops-client to verify a specified real desktop client or perform only an explicitly authorized client action through an available platform adapter, returning bounded direct evidence without source-code changes."

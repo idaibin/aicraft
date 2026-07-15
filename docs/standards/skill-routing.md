@@ -2,6 +2,11 @@
 
 This standard defines when AICraft should keep capabilities together, split them into public skills, or model them as internal profiles.
 
+Portable and provider-specific package surfaces are defined separately in
+[`../quality/official-skill-alignment.md`](../quality/official-skill-alignment.md).
+Routing ownership must remain host-neutral even when OpenAI or Claude metadata
+adds provider-specific invocation behavior.
+
 ## Core Principle
 
 A public skill represents a stable user intent and execution owner, not merely a technology name or checklist category.
@@ -175,6 +180,8 @@ skill has no plausible routing competitor in the published suite.
 Before publishing a skill change:
 
 - confirm the description starts with `Use when` and names the real user intent;
+- confirm runtime guidance refers to effective repository/host instructions
+  rather than assuming one provider reads a particular filename;
 - confirm `Do Not Use For` names the closest competing skills;
 - confirm metadata routes to the same owner and mutation boundary as `SKILL.md`;
 - add pairwise trigger/non-trigger cases for every nearest neighbor;

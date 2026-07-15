@@ -6,6 +6,14 @@ synchronization script to copy it into each published package, so installed
 skills remain self-contained. Repository validation rejects stale or modified
 generated copies.
 
+## Contents
+
+- [Capability Snapshot](#capability-snapshot)
+- [Handoff Request](#handoff-request)
+- [Handoff Result](#handoff-result)
+- [Operation State Machine](#operation-state-machine)
+- [Degraded Mode](#degraded-mode)
+
 ## Capability Snapshot
 
 `ops-browser` measures browser capabilities once for the requested route and
@@ -17,7 +25,7 @@ schema_version: browser-operation/v1
 snapshot_id: cap-<stable-task-scope>
 captured_at: <ISO-8601 or Not verified>
 route:
-  browser_mode: <desktop-built-in-browser|current-chrome-explicit|standalone-playwright-explicit|manual>
+  browser_mode: <desktop-built-in-browser|chatgpt-cloud-browser|current-chrome-explicit|standalone-playwright-explicit|isolated-managed-session|manual>
   browser_id: <stable id or Not verified>
   session_id: <stable id or Not verified>
 identity:
@@ -41,6 +49,7 @@ capabilities:
   session_enumeration: <available|unavailable|unknown>
   tab_control: <available|unavailable|unknown>
   stable_tab_identity: <available|unavailable|unknown>
+  managed_session_creation: <available|unavailable|unknown>
   authenticated_session_reuse: <available|unavailable|unknown>
   dom_accessibility: <available|unavailable|unknown>
   console: <available|unavailable|unknown>
@@ -59,6 +68,10 @@ gaps:
   - capability: <name>
     reason: <why unavailable or unknown>
 ```
+
+Use `chatgpt-cloud-browser` for the ChatGPT cloud/agent browser surface and
+`isolated-managed-session` for an agent-owned managed session whose state does
+not come from a user browser profile.
 
 Reuse a snapshot only while its route, browser/session identity, account and
 workspace evidence, login-state fingerprint, target origin, and required

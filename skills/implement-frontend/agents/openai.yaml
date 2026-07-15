@@ -1,4 +1,4 @@
 interface:
   display_name: "Frontend Implementation"
   short_description: "Implement frontend framework and styling profiles safely"
-  default_prompt: "Use $implement-frontend for frontend UI changes. Detect the product surface, then select React, Vue Composition, Vue Options, or repository-native framework rules plus only the styling profiles actually present, such as Tailwind, CSS Modules, Sass/Less, CSS-in-JS, Ant Design, or shadcn/ui. Preserve native state, lifecycle, Router, component, API, layout, token, and styling ownership. Search existing routes, components, hooks/composables, services, stores, and shared UI first; reuse or adapt before creating. Route systematic read-only audits to $audit-frontend."
+  default_prompt: "Use $implement-frontend to make scoped frontend source changes with reuse-first discovery, repository-native conventions, and matching validation without Git delivery."

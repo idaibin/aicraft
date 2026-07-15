@@ -2,13 +2,21 @@
 
 Use this checklist when applying `code-planner` to split codebase requirements into executable and verifiable tasks. Trigger phrases include `code planning`, `plan first`, `split the approach first`, `do not edit yet`, `task breakdown`, `executable plan`, `verifiable steps`, `subagents`, `reject gates`, and `contract-impact planning`.
 
+## Contents
+
+- [Grounding](#grounding-checklist)
+- [Dirty Tree Ownership](#dirty-tree-ownership-checklist)
+- [Complexity Classification](#complexity-classification)
+- [Task Package Template](#task-package-template)
+- [Task Split](#task-split-checklist)
+- [Subagent Decision](#subagent-decision-checklist)
+- [Task Type](#task-type-checklist)
+- [Review And Reject](#review-and-reject-checklist)
+
 ## Grounding Checklist
 
-1. Read repo guidance:
-   - root `AGENTS.md`
-   - nearest subproject `AGENTS.md`
-   - `AGENT.md` fallback
-   - repo rules supplied in the chat
+1. Read effective repository guidance, including root or nearest `AGENTS.md`,
+   `CLAUDE.md`, and host-provided instructions when present.
 2. Run `git status --short`.
 3. Read directly related docs, specs, command files, configs, manifests, route definitions, schemas, API wrappers, tests, and source entry points.
 4. Identify project class, directory/toolchain standard, protected paths, and documented exceptions.

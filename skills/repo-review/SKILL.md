@@ -1,6 +1,6 @@
 ---
 name: repo-review
-description: "Use when reviewing repository changes read-only: current local worktree/index changes, a fixed commit or range, branch comparison, pull request, release candidate, or verified review package, with basis-specific evidence, bounded specialist coordination, findings, and commit-readiness guidance."
+description: "Use when repository changes need read-only review against a fixed worktree, immutable, pull-request, release, or package basis; coordinate bounded specialists, report evidence-ranked findings, and never edit source or mutate Git."
 ---
 
 # Repository Review
@@ -73,10 +73,6 @@ Do not mix evidence between bases. Current-worktree content is contamination whe
 ## Output Contract
 
 Lead with mode, basis, scope, exclusions, validation, and severity-ranked findings. Every finding includes exact location, evidence, impact, remediation, and verification. For Worktree mode, also report ownership labels, staged-state risks, semantic commit groups, exact staging approach, validation status, and concise commit messages. For immutable modes, include resolved SHAs, cross-domain integration, merge/release implications, and `No actionable findings` for empty requested groups. Finish with residual risk and all `Not found` or `Not verified` items.
-
-## Skill Maintenance
-
-When maintaining this package, update metadata, usage, both checklists, examples, evals, indexes, routing graph, and neighboring skill references. Run targeted and full repository validation before publishing.
 
 ## References
 

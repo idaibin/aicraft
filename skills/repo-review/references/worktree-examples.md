@@ -1,5 +1,17 @@
 # Worktree Commit-Grouping Examples
 
+## Contents
+
+- [Mixed Feature And Docs](#example-1-mixed-feature-and-docs)
+- [Build And Deploy Rename](#example-2-build-and-deploy-rename)
+- [Generated Or Local Files](#example-3-generated-or-local-files)
+- [Schema Change](#example-4-schema-change)
+- [Mixed Runtime And Docs Cleanup](#example-5-mixed-runtime-and-docs-cleanup)
+- [Unrelated User Edits](#example-6-dirty-worktree-with-unrelated-user-edits)
+- [Current-Context Commit Request](#example-7-current-context-commit-request)
+- [Direct Full Commit Request](#example-8-direct-full-commit-request)
+- [AI Sub-Workflow Invocation](#example-9-ai-sub-workflow-invocation)
+
 ## Example 1: Mixed Feature and Docs
 
 Input:

@@ -13,6 +13,7 @@
 | `Audit this React and Tailwind table for scale drift, class conflicts, responsive behavior, and duplicated spacing ownership.` | Trigger React plus Tailwind with Component/Layout/Design System; add Performance only when evidence warrants it. |
 | `Audit this Vue Composition and Pinia feature for reactive ownership, Router teardown, and stale requests.` | Trigger Vue Composition plus State/Data/Contracts. |
 | `Audit this Vue Options and Ant Design form without recommending Composition conversion or component replacement.` | Trigger Vue Options plus Ant Design with State/Data/Contracts and Component/Layout/Design System. |
+| `Audit this React page only for keyboard/focus accessibility and measured render/request performance.` | Trigger Accessibility and Performance profiles without implying architecture or styling coverage. |
 
 ## Non-Trigger Eval
 

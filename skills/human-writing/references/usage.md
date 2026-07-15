@@ -2,6 +2,16 @@
 
 Use `human-writing` when the main job is to turn supplied facts, notes, or a draft into publishable writing with a recognizably human voice.
 
+## Contents
+
+- [Trigger Examples](#trigger-examples)
+- [Non-Trigger Examples](#non-trigger-examples)
+- [Mode Selection](#mode-selection)
+- [Required Context](#required-context)
+- [Editing Priority](#editing-priority)
+- [Output Behavior](#output-behavior)
+- [Validation Boundary](#validation-boundary)
+
 ## Trigger Examples
 
 - `用 human-writing 把这篇技术博客重写得像我自己写的，保留所有命令和结论。`

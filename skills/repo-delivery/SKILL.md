@@ -1,6 +1,6 @@
 ---
 name: repo-delivery
-description: "Use when reviewed local repository changes need Git delivery that stops before pull-request creation: path-limited staging, verification, local commit, current-branch push or sync, squash-to-main, temporary branch cleanup, or proof that local and remote refs match."
+description: "Use when reviewed changes need authorized Git mutation: scoped staging, verification, commit, push/sync, squash to main, temporary-branch cleanup, or ref proof; owns Git delivery and stops before pull-request creation."
 ---
 
 # Repository Delivery
@@ -11,7 +11,7 @@ Deliver reviewed repository changes from a local worktree to the requested Git s
 
 ## Workflow
 
-1. Read repo guidance first: root `AGENTS.md`, nearest subproject `AGENTS.md`, `AGENT.md`, or chat-supplied rules.
+1. Read effective repository guidance first, including `AGENTS.md`, `CLAUDE.md`, and host-provided instructions when present.
 2. Run `git status --short --branch` and identify branch, upstream, staged files, dirty files, and unrelated local work.
 3. Fetch or inspect the relevant remote refs when network access is available; determine ahead/behind/diverged state before choosing push, rebase, merge, or squash behavior.
 4. Confirm the requested delivery target: local commit only, push current branch, sync current branch, squash to `main`, delete temporary branch, or a narrower path scope.
@@ -62,10 +62,6 @@ Deliver reviewed repository changes from a local worktree to the requested Git s
 ## Output Contract
 
 Start with delivery target, branch/upstream, branch policy, ahead/behind/diverged state, dirty-tree risks, and validation status. Then report staged scope, commit hash or skipped commit reason, push/merge/rebase/squash/cleanup actions, final local and remote ref evidence, rejected unsafe operations, and any `Not verified` items.
-
-## Skill Maintenance
-
-When maintaining this package, update `references/eval-cases.md`, `references/usage.md`, and `agents/openai.yaml` with trigger, mode, delivery, or output changes. In AICraft, run `python3 scripts/validate-skills.py` before publishing; end-user installs use `npx skills add https://github.com/idaibin/aicraft`, and end-user updates use `npx skills update`.
 
 ## References
 

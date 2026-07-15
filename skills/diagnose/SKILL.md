@@ -1,6 +1,6 @@
 ---
 name: diagnose
-description: "Use when diagnosing bugs, failing tests, build failures, unexpected behavior, regressions, flaky behavior, or performance problems to reproduce the exact symptom, isolate variables, test falsifiable hypotheses, and confirm the root cause before implementation."
+description: "Use when a bug, failed check, regression, flake, or performance problem needs root-cause isolation before any fix; reproduce it, test falsifiable hypotheses, then hand confirmed remediation to implementation."
 ---
 
 # Diagnose
@@ -11,7 +11,7 @@ Diagnose technical failures with a tight evidence loop. Reproduce the user's exa
 
 ## Workflow
 
-1. Read repo guidance first: root `AGENTS.md`, nearest subproject `AGENTS.md`, `AGENT.md`, or chat-supplied rules.
+1. Read effective repository guidance first, including `AGENTS.md`, `CLAUDE.md`, and host-provided instructions when present.
 2. Record `git status --short --branch`, current `HEAD`, and the checked-out branch or detached state before experiments.
 3. Identify the exact symptom, expected behavior, observed behavior, environment, input, command, URL, runtime state, or artifact.
 4. Classify the failure:
@@ -65,10 +65,6 @@ Diagnose technical failures with a tight evidence loop. Reproduce the user's exa
 ## Output Contract
 
 Report the failure class, exact red/green loop, reproduction evidence, minimized scenario when required, ranked hypotheses, probes run, confirmed root cause or `Not verified` gap, smallest remediation scope, regression seam, commands run, initial/final worktree/index/checkout/ref state, temporary-artifact cleanup, escalation decisions, and remaining risk. When a fix was requested, include the target implementation skill and a bounded implementation handoff; do not claim the fix was applied under `diagnose`.
-
-## Skill Maintenance
-
-When maintaining this package, keep `SKILL.md`, `references/usage.md`, `references/checklist.md`, `references/eval-cases.md`, and `agents/openai.yaml` synchronized. Run `python3 scripts/validate-skills.py --skill diagnose` before publishing.
 
 ## References
 

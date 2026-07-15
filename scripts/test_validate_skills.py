@@ -3,12 +3,19 @@
 
 from __future__ import annotations
 
+import copy
+import hashlib
 import importlib.util
+import json
 import re
+import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
+from datetime import date, datetime, timezone
 from pathlib import Path
+from unittest import mock
 
 VALIDATOR_PATH = Path(__file__).with_name("validate-skills.py")
 SPEC = importlib.util.spec_from_file_location("validate_skills", VALIDATOR_PATH)
@@ -83,6 +90,238 @@ Minimum pass: every quality case scores at least 8.
 
 
 class ValidateSkillsTests(unittest.TestCase):
+    @staticmethod
+    def verified_score_bundle(
+        evidence_kind: str,
+        results: list[dict[str, object]],
+    ) -> dict[str, object]:
+        return {
+            "results": results,
+            "_evidence_kind": evidence_kind,
+            "_verified_results": {str(item["id"]): item for item in results},
+        }
+
+    @staticmethod
+    def perfect_routing_bundle(
+        cases: list[dict[str, object]],
+    ) -> dict[str, object]:
+        return ValidateSkillsTests.verified_score_bundle(
+            "routing",
+            [
+                {
+                    "id": case["id"],
+                    "actual_owner": case["expected_owner"],
+                    "handoffs": [
+                        *case.get("required_handoffs", []),
+                        *[
+                            group[0]
+                            for group in case.get("required_handoff_groups", [])
+                        ],
+                    ],
+                }
+                for case in cases
+            ],
+        )
+
+    @staticmethod
+    def write_result_bundle_fixture(
+        root: Path,
+        dataset_path: Path,
+        *,
+        result_id: str = "case-001",
+    ) -> tuple[Path, dict[str, object]]:
+        dataset_rows = [
+            json.loads(line)
+            for line in dataset_path.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        prompt = next(
+            str(row["prompt"]) for row in dataset_rows if row.get("id") == result_id
+        )
+        run_id = "00000000-0000-4000-8000-000000000001"
+        model = "fixture-model-1"
+        host = "fixture-host/1"
+        prompt_template = f"Evaluate request: {CONTRACT_EVAL.PROMPT_VALUE_PLACEHOLDER}"
+        invocation_prompt = prompt_template.replace(
+            CONTRACT_EVAL.PROMPT_VALUE_PLACEHOLDER,
+            json.dumps(prompt, ensure_ascii=False),
+        )
+        metrics = {"duration_ms": 1, "input_tokens": 1, "output_tokens": 1}
+        raw_path = root / "raw" / f"{result_id}.json"
+        raw_path.parent.mkdir(parents=True)
+        model_output = json.dumps(
+            {"actual_owner": "diagnose", "handoffs": [], "reason": "fixture"}
+        )
+        transcript = "fixture host transcript"
+        raw_path.write_text(
+            json.dumps(
+                {
+                    "schema_version": CONTRACT_EVAL.RAW_EVIDENCE_SCHEMA_VERSION,
+                    "run_id": run_id,
+                    "case_id": result_id,
+                    "prompt_sha256": CONTRACT_EVAL.text_hash(prompt),
+                    "invocation_prompt": invocation_prompt,
+                    "invocation_prompt_sha256": CONTRACT_EVAL.text_hash(
+                        invocation_prompt
+                    ),
+                    "model": model,
+                    "host": host,
+                    "model_output": model_output,
+                    "transcript": transcript,
+                    "transcript_sha256": CONTRACT_EVAL.text_hash(transcript),
+                    "exit_code": 0,
+                    "observations": {
+                        "actual_owner": "diagnose",
+                        "handoffs": [],
+                    },
+                    "metrics": metrics,
+                }
+            ),
+            encoding="utf-8",
+        )
+        raw_hash = hashlib.sha256(raw_path.read_bytes()).hexdigest()
+        revision = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=VALIDATOR_PATH.parents[1],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+        skill_tree_sha = subprocess.run(
+            ["git", "rev-parse", f"{revision}:skills"],
+            cwd=VALIDATOR_PATH.parents[1],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+        payload: dict[str, object] = {
+            "schema_version": CONTRACT_EVAL.RESULT_SCHEMA_VERSION,
+            "run_id": run_id,
+            "model": model,
+            "host": host,
+            "skill_revision": revision,
+            "skill_tree_sha": skill_tree_sha,
+            "dataset_revision": CONTRACT_EVAL.dataset_hash(dataset_path),
+            "captured_at": datetime.now(timezone.utc).isoformat(),
+            "run_config": {
+                "trial": 1,
+                "variant": "candidate",
+                "dataset_path": dataset_path.name,
+                "prompt_set_sha256": CONTRACT_EVAL.dataset_hash(dataset_path),
+                "case_set_sha256": CONTRACT_EVAL.case_set_hash(dataset_rows),
+                "case_ids": [str(row["id"]) for row in dataset_rows],
+                "pair_id": "00000000-0000-4000-8000-000000000002",
+                "held_out": False,
+                "permissions": "read-only",
+                "timeout_seconds": 60,
+                "concurrency": 1,
+                "host_name": "codex",
+                "fixture": None,
+                "fixture_sha256": None,
+                "skills_installed": True,
+                "skill_fixture_sha256": CONTRACT_EVAL.committed_skill_fixture_hash(
+                    revision
+                ),
+                "prompt_template_version": CONTRACT_EVAL.PROMPT_TEMPLATE_VERSION,
+                "prompt_template": prompt_template,
+                "prompt_template_sha256": CONTRACT_EVAL.text_hash(prompt_template),
+                "host_config_sha256": "c" * 64,
+            },
+            "adjudication": {
+                "method": "deterministic",
+                "reviewer": "validator-regression",
+                "reviewer_version": "1",
+                "config_sha256": "d" * 64,
+            },
+            "results": [
+                {
+                    "id": result_id,
+                    "raw_evidence": str(raw_path.relative_to(root)),
+                    "raw_evidence_sha256": raw_hash,
+                    "metrics": metrics,
+                }
+            ],
+        }
+        bundle_path = root / "results.json"
+        bundle_path.write_text(json.dumps(payload), encoding="utf-8")
+        return bundle_path, payload
+
+    @staticmethod
+    def write_quality_evidence_manifest(
+        root: Path,
+        specs: list[dict[str, object]],
+    ) -> Path:
+        dataset_path = root / "evals" / "routing.jsonl"
+        dataset_path.parent.mkdir(parents=True, exist_ok=True)
+        dataset_path.write_text(
+            '{"id":"case-1","prompt":"fixture request"}\n',
+            encoding="utf-8",
+        )
+        dataset_hash = hashlib.sha256(dataset_path.read_bytes()).hexdigest()
+        records: list[dict[str, object]] = []
+        for index, spec in enumerate(specs, 1):
+            bundle_name = str(spec.get("bundle_name", f"bundle-{index}"))
+            bundle_dir = root / "evidence" / bundle_name
+            bundle_dir.mkdir(parents=True, exist_ok=True)
+            raw_path = bundle_dir / "raw.json"
+            raw_path.write_text(str(spec.get("raw", f'{{"run":{index}}}\n')), encoding="utf-8")
+            raw_hash = hashlib.sha256(raw_path.read_bytes()).hexdigest()
+            payload = {
+                "run_id": str(spec.get("run_id", f"run-{index}")),
+                "skill_revision": "a" * 40,
+                "skill_tree_sha": "b" * 40,
+                "run_config": {
+                    "variant": str(spec.get("variant", "candidate")),
+                    "trial": int(spec.get("trial", index)),
+                    "prompt_set_sha256": "c" * 64,
+                    "held_out": True,
+                    "permissions": "read-only",
+                    "timeout_seconds": 60,
+                    "concurrency": 1,
+                    "fixture_sha256": None,
+                    "host_config_sha256": "d" * 64,
+                },
+                "adjudication": {
+                    "method": "deterministic",
+                    "reviewer": "validator-regression",
+                    "reviewer_version": "1",
+                    "config_sha256": "e" * 64,
+                },
+                "results": [
+                    {
+                        "id": f"case-{index}",
+                        "raw_evidence": "raw.json",
+                        "raw_evidence_sha256": raw_hash,
+                    }
+                ],
+            }
+            bundle_path = bundle_dir / "results.json"
+            bundle_path.write_text(json.dumps(payload), encoding="utf-8")
+            records.append(
+                {
+                    "id": str(spec.get("id", f"evidence-{index}")),
+                    "kind": str(spec.get("kind", "routing")),
+                    "dataset": str(dataset_path.relative_to(root)),
+                    "dataset_sha256": dataset_hash,
+                    "bundle": str(bundle_path.relative_to(root)),
+                    "bundle_sha256": hashlib.sha256(bundle_path.read_bytes()).hexdigest(),
+                }
+            )
+        manifest = root / "docs" / "quality" / "evidence-manifest.json"
+        manifest.parent.mkdir(parents=True, exist_ok=True)
+        manifest.write_text(
+            json.dumps(
+                {
+                    "schema_version": VALIDATOR.QUALITY_EVIDENCE_SCHEMA_VERSION,
+                    "claims": [],
+                    "evidence": records,
+                    "comparisons": [],
+                }
+            ),
+            encoding="utf-8",
+        )
+        return manifest
+
     def specialized_contract_errors(
         self, skill_name: str, mutation: tuple[str, str]
     ) -> list[str]:
@@ -193,6 +432,455 @@ class ValidateSkillsTests(unittest.TestCase):
         self.assertTrue(any("unknown category" in error for error in errors))
         self.assertTrue(any("unknown release state" in error for error in errors))
         self.assertTrue(any("unknown structure state" in error for error in errors))
+
+    def test_quality_status_rejects_verified_axis_without_evidence_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            status = root / "docs" / "quality" / "status.md"
+            status.parent.mkdir(parents=True)
+            status.write_text(
+                "## Skill Status\n\n"
+                "| Skill | Functional category | Release | Structure | Behavior | Workflow |\n"
+                "| --- | --- | --- | --- | --- | --- |\n"
+                "| `alpha` | Core Engineering | available | verified | verified | not_verified |\n",
+                encoding="utf-8",
+            )
+            packages = [
+                VALIDATOR.SkillPackage(name="alpha", path=root / "skills" / "alpha")
+            ]
+
+            errors = validate_quality_status(root, packages)
+
+        self.assertTrue(
+            any(
+                "behavior=verified" in error
+                and "passing candidate routing trials" in error
+                for error in errors
+            )
+        )
+        self.assertTrue(
+            any("producer-attested only" in error for error in errors), errors
+        )
+
+    def test_official_baseline_requires_current_multilane_sources(self) -> None:
+        contracts = copy.deepcopy(VALIDATOR.VALIDATION_CONTRACTS)
+        validator = getattr(VALIDATOR, "validate_official_baseline")
+
+        self.assertEqual([], validator(contracts, today=date(2026, 7, 15)))
+
+        stale_errors = validator(contracts, today=date(2026, 10, 16))
+        self.assertTrue(any("review" in error.casefold() for error in stale_errors))
+
+        contracts["official_baseline"]["sources"] = [
+            source
+            for source in contracts["official_baseline"]["sources"]
+            if source["lane"] != "claude"
+        ]
+        lane_errors = validator(contracts, today=date(2026, 7, 15))
+        self.assertTrue(any("claude" in error.casefold() for error in lane_errors))
+
+    def test_official_baseline_rejects_future_review_date(self) -> None:
+        contracts = copy.deepcopy(VALIDATOR.VALIDATION_CONTRACTS)
+        contracts["official_baseline"]["reviewed_at"] = "2026-07-16"
+        contracts["official_baseline"]["review_due"] = "2026-10-16"
+
+        errors = VALIDATOR.validate_official_baseline(
+            contracts, today=date(2026, 7, 15)
+        )
+
+        self.assertTrue(any("cannot be in the future" in error for error in errors))
+
+    def test_strict_yaml_supports_single_and_double_quoted_strings(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            skill_path = Path(temp_dir) / "SKILL.md"
+            skill_path.write_text(
+                "---\n"
+                "name: 'sample-skill'\n"
+                'description: "Use when a quoted \\"value\\" is required."\n'
+                "---\n\n# Sample\n",
+                encoding="utf-8",
+            )
+
+            self.assertEqual([], VALIDATOR.frontmatter_contract_errors(skill_path))
+            self.assertEqual(
+                {
+                    "name": "sample-skill",
+                    "description": 'Use when a quoted "value" is required.',
+                },
+                VALIDATOR.read_frontmatter(skill_path),
+            )
+
+        interface, errors = VALIDATOR.openai_yaml_contract(
+            "interface:\n"
+            "  display_name: 'Reviewer''s Tool'\n"
+            '  short_description: "Review a selected source safely"\n'
+            "  default_prompt: 'Use $sample-skill to review it.'\n"
+        )
+        self.assertEqual([], errors)
+        self.assertEqual("Reviewer's Tool", interface["display_name"])
+
+    def test_strict_frontmatter_rejects_duplicate_keys_and_invalid_yaml(self) -> None:
+        cases = {
+            "duplicate": (
+                "---\nname: alpha\nname: beta\ndescription: Use when testing.\n---\n",
+                "duplicate key",
+            ),
+            "unterminated": (
+                '---\nname: alpha\ndescription: "Use when testing.\n---\n',
+                "unterminated",
+            ),
+            "nested": (
+                "---\nname: alpha\n  description: Use when testing.\n---\n",
+                "nested key has no parent",
+            ),
+        }
+        for name, (content, marker) in cases.items():
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as temp_dir:
+                path = Path(temp_dir) / "SKILL.md"
+                path.write_text(content, encoding="utf-8")
+                errors = VALIDATOR.frontmatter_contract_errors(path)
+                self.assertTrue(any(marker in error for error in errors), errors)
+
+    def test_openai_yaml_rejects_invalid_or_out_of_schema_mappings(self) -> None:
+        cases = {
+            "duplicate": (
+                "interface:\n"
+                "  display_name: One\n"
+                "  display_name: Two\n"
+                "  short_description: A useful description here\n"
+                "  default_prompt: Use $sample to act.\n",
+                "duplicate key",
+            ),
+            "illegal_yaml": (
+                "interface:\n"
+                '  display_name: "Unclosed\n'
+                "  short_description: A useful description here\n"
+                "  default_prompt: Use $sample to act.\n",
+                "unterminated",
+            ),
+            "extra_top_level": (
+                "interface:\n"
+                "  display_name: Sample\n"
+                "  short_description: A useful description here\n"
+                "  default_prompt: Use $sample to act.\n"
+                "policy: unsupported\n",
+                "unsupported keys",
+            ),
+            "extra_interface_key": (
+                "interface:\n"
+                "  display_name: Sample\n"
+                "  short_description: A useful description here\n"
+                "  default_prompt: Use $sample to act.\n"
+                "  hidden: value\n",
+                "unsupported keys",
+            ),
+            "empty_value": (
+                "interface:\n"
+                "  display_name: ''\n"
+                "  short_description: A useful description here\n"
+                "  default_prompt: Use $sample to act.\n",
+                "non-empty string",
+            ),
+        }
+        for name, (content, marker) in cases.items():
+            with self.subTest(name=name):
+                _, errors = VALIDATOR.openai_yaml_contract(content)
+                self.assertTrue(any(marker in error for error in errors), errors)
+
+    def test_quality_evidence_rejects_run_bundle_and_raw_replay(self) -> None:
+        cases = {
+            "run_id": (
+                [
+                    {
+                        "run_id": "00000000-0000-4000-8000-000000000101",
+                        "raw": "first",
+                        "trial": 1,
+                    },
+                    {
+                        "run_id": "00000000-0000-4000-8000-000000000101",
+                        "raw": "second",
+                        "trial": 2,
+                    },
+                ],
+                "duplicates run_id",
+            ),
+            "raw": (
+                [
+                    {
+                        "run_id": "00000000-0000-4000-8000-000000000201",
+                        "raw": "same raw",
+                        "trial": 1,
+                    },
+                    {
+                        "run_id": "00000000-0000-4000-8000-000000000202",
+                        "raw": "same raw",
+                        "trial": 2,
+                    },
+                ],
+                "replays raw evidence",
+            ),
+        }
+
+        def successful_run(command: list[str], **_: object) -> subprocess.CompletedProcess[str]:
+            stdout = "b" * 40 + "\n" if command[:2] == ["git", "rev-parse"] else ""
+            return subprocess.CompletedProcess(command, 0, stdout, "")
+
+        for name, (specs, marker) in cases.items():
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as temp_dir:
+                root = Path(temp_dir)
+                self.write_quality_evidence_manifest(root, specs)
+                with mock.patch.object(
+                    VALIDATOR.subprocess, "run", side_effect=successful_run
+                ):
+                    errors, _ = VALIDATOR.validate_quality_evidence(root)
+                self.assertTrue(any(marker in error for error in errors), errors)
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            manifest_path = self.write_quality_evidence_manifest(
+                root,
+                [
+                    {
+                        "run_id": "00000000-0000-4000-8000-000000000301",
+                        "raw": "first",
+                        "trial": 1,
+                    },
+                    {
+                        "run_id": "00000000-0000-4000-8000-000000000302",
+                        "raw": "second",
+                        "trial": 2,
+                    },
+                ],
+            )
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["evidence"][1]["bundle"] = manifest["evidence"][0]["bundle"]
+            manifest["evidence"][1]["bundle_sha256"] = manifest["evidence"][0][
+                "bundle_sha256"
+            ]
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with mock.patch.object(
+                VALIDATOR.subprocess, "run", side_effect=successful_run
+            ):
+                errors, _ = VALIDATOR.validate_quality_evidence(root)
+            self.assertTrue(any("reuses bundle path" in error for error in errors), errors)
+
+    def test_quality_evidence_binds_revision_to_current_skills_tree(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_quality_evidence_manifest(
+                root,
+                [
+                    {
+                        "run_id": "00000000-0000-4000-8000-000000000401",
+                        "raw": "tree evidence",
+                        "trial": 1,
+                    }
+                ],
+            )
+            calls: list[list[str]] = []
+
+            def changed_tree(
+                command: list[str], **_: object
+            ) -> subprocess.CompletedProcess[str]:
+                calls.append(command)
+                return subprocess.CompletedProcess(
+                    command,
+                    1 if command[:3] == ["git", "diff", "--quiet"] else 0,
+                    "",
+                    "",
+                )
+
+            with mock.patch.object(
+                VALIDATOR.subprocess, "run", side_effect=changed_tree
+            ):
+                errors, _ = VALIDATOR.validate_quality_evidence(root)
+
+        self.assertTrue(
+            any("does not match the current skills tree" in error for error in errors),
+            errors,
+        )
+        self.assertTrue(
+            any(
+                command[:3] == ["git", "diff", "--quiet"]
+                and command[-2:] == ["--", "skills"]
+                for command in calls
+            )
+        )
+
+    def test_improvement_claim_requires_replayed_passing_comparison(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            manifest = root / "docs" / "quality" / "evidence-manifest.json"
+            manifest.parent.mkdir(parents=True)
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "schema_version": VALIDATOR.QUALITY_EVIDENCE_SCHEMA_VERSION,
+                        "claims": [
+                            {
+                                "id": "routing-outcome-improvement",
+                                "status": "verified",
+                                "comparison_id": "missing-comparison",
+                                "dimension": "outcome",
+                                "kind": "routing",
+                                "host_name": "codex",
+                                "host_version": "codex-cli 1.0",
+                                "model": "gpt-5-test",
+                                "candidate_skill_revision": "a" * 40,
+                                "control_variant": "previous",
+                                "control_skill_revision": "b" * 40,
+                                "dataset_sha256": "c" * 64,
+                                "skills": [],
+                            }
+                        ],
+                        "evidence": [],
+                        "comparisons": [],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            errors, _ = VALIDATOR.validate_quality_evidence(root)
+
+        self.assertTrue(
+            any("requires its replayed passing comparison" in error for error in errors),
+            errors,
+        )
+
+    def test_quality_comparison_report_must_match_replay(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            dataset = root / "evals" / "held-out.jsonl"
+            dataset.parent.mkdir(parents=True)
+            dataset.write_text('{"id":"case-1"}\n', encoding="utf-8")
+            dataset_hash = hashlib.sha256(dataset.read_bytes()).hexdigest()
+            report = root / "evidence" / "comparison.json"
+            report.parent.mkdir(parents=True)
+            recorded = {
+                "schema_version": 1,
+                "status": "PASS",
+                "comparison": {
+                    "outcome_threshold_met": True,
+                    "outcome_non_regression": True,
+                    "token_threshold_met": False,
+                },
+                "errors": [],
+            }
+            report.write_text(json.dumps(recorded), encoding="utf-8")
+            evidence: dict[str, dict[str, object]] = {}
+            for variant in ("candidate", "previous"):
+                for trial in range(1, 4):
+                    evidence_id = f"{variant}-{trial}"
+                    evidence[evidence_id] = {
+                        "kind": "routing",
+                        "variant": variant,
+                        "trial": trial,
+                        "model": "gpt-5-test",
+                        "host": "codex-cli 1.0",
+                        "host_name": "codex",
+                        "skill_revision": ("a" if variant == "candidate" else "b") * 40,
+                        "bundle_path": root / "evidence" / f"{evidence_id}.json",
+                        "bundle_sha256": f"{trial}" * 64,
+                        "dataset_path": dataset,
+                        "dataset_sha256": dataset_hash,
+                    }
+            comparison = {
+                "id": "routing-improvement",
+                "kind": "routing",
+                "candidate_evidence": [f"candidate-{trial}" for trial in range(1, 4)],
+                "control_evidence": [f"previous-{trial}" for trial in range(1, 4)],
+                "report": str(report.relative_to(root)),
+                "report_sha256": hashlib.sha256(report.read_bytes()).hexdigest(),
+            }
+
+            successful_replay = subprocess.CompletedProcess(
+                ["compare"], 0, json.dumps(recorded), ""
+            )
+            with mock.patch.object(
+                VALIDATOR.subprocess, "run", return_value=successful_replay
+            ):
+                errors, passing = VALIDATOR.validate_quality_comparisons(
+                    root, [comparison], evidence
+                )
+            self.assertEqual([], errors)
+            self.assertEqual({"routing-improvement"}, set(passing))
+
+            mismatched_replay = subprocess.CompletedProcess(
+                ["compare"], 0, json.dumps({**recorded, "replayed": True}), ""
+            )
+            with mock.patch.object(
+                VALIDATOR.subprocess, "run", return_value=mismatched_replay
+            ):
+                errors, passing = VALIDATOR.validate_quality_comparisons(
+                    root, [comparison], evidence
+                )
+            self.assertEqual({}, passing)
+            self.assertTrue(any("does not match replay" in error for error in errors))
+
+    def test_package_policy_limits_are_enforced_by_validate_package(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            source = VALIDATOR_PATH.parents[1] / "skills" / "diagnose"
+            package_path = Path(temp_dir) / "diagnose"
+            shutil.copytree(source, package_path)
+
+            skill_path = package_path / "SKILL.md"
+            skill_text = skill_path.read_text(encoding="utf-8")
+            long_description = "Use when " + "x" * VALIDATOR.MAX_DESCRIPTION_CHARS
+            skill_text = re.sub(
+                r'^description:.*$',
+                f'description: "{long_description}"',
+                skill_text,
+                count=1,
+                flags=re.MULTILINE,
+            )
+            skill_text += "\n".join(
+                ["", "[Long guide](references/long-guide.md)"]
+                + [f"policy padding {index}" for index in range(60)]
+            )
+            skill_path.write_text(skill_text, encoding="utf-8")
+
+            metadata_path = package_path / "agents" / "openai.yaml"
+            metadata = metadata_path.read_text(encoding="utf-8")
+            metadata = re.sub(
+                r'^  short_description:.*$',
+                '  short_description: "short"',
+                metadata,
+                count=1,
+                flags=re.MULTILINE,
+            )
+            metadata = re.sub(
+                r'^  default_prompt:.*$',
+                f'  default_prompt: "Use $diagnose to {"x" * 230}"',
+                metadata,
+                count=1,
+                flags=re.MULTILINE,
+            )
+            metadata_path.write_text(metadata, encoding="utf-8")
+
+            long_reference = package_path / "references" / "long-guide.md"
+            long_reference.write_text(
+                "# Long Guide\n\n" + "\n".join(
+                    f"Policy detail {index}." for index in range(101)
+                ),
+                encoding="utf-8",
+            )
+
+            errors, _ = VALIDATOR.validate_package(
+                VALIDATOR.SkillPackage(name="diagnose", path=package_path),
+                label="test",
+            )
+
+        self.assertTrue(
+            any(
+                "description" in error
+                and str(VALIDATOR.MAX_DESCRIPTION_CHARS) in error
+                for error in errors
+            )
+        )
+        self.assertTrue(any("SKILL.md" in error and "120" in error for error in errors))
+        self.assertTrue(any("short_description" in error and "25" in error for error in errors))
+        self.assertTrue(any("default_prompt" in error and "220" in error for error in errors))
+        self.assertTrue(any("long-guide.md" in error and "Contents" in error for error in errors))
 
     def test_shared_browser_operation_protocol_must_not_drift(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -472,32 +1160,25 @@ class ValidateSkillsTests(unittest.TestCase):
         routing = CONTRACT_EVAL.load_jsonl(CONTRACT_EVAL.ROUTING_DATA)
         authority = CONTRACT_EVAL.load_jsonl(CONTRACT_EVAL.AUTHORITY_DATA)
         workflow = CONTRACT_EVAL.load_jsonl(CONTRACT_EVAL.WORKFLOW_DATA)
-        self.assertEqual(60, len(routing))
-        self.assertGreaterEqual(len(authority), 12)
-        self.assertEqual(12, len(workflow))
+        self.assertGreaterEqual(len(routing), 70)
+        self.assertGreaterEqual(len(authority), 14)
+        self.assertGreaterEqual(len(workflow), 14)
 
-        routing_bundle = {
-            "results": [
-                {
-                    "id": case["id"],
-                    "actual_owner": case["expected_owner"],
-                    "handoffs": [],
-                }
-                for case in routing
-            ]
-        }
-        authority_bundle = {
-            "results": [
+        routing_bundle = self.perfect_routing_bundle(routing)
+        authority_bundle = self.verified_score_bundle(
+            "authority",
+            [
                 {
                     "id": case["id"],
                     "actual_owner": case["expected_owner"],
                     "observed_actions": list(case["required_actions"]),
                 }
                 for case in authority
-            ]
-        }
-        workflow_bundle = {
-            "results": [
+            ],
+        )
+        workflow_bundle = self.verified_score_bundle(
+            "workflow",
+            [
                 {
                     "id": case["id"],
                     "route": list(case["expected_route"]),
@@ -505,8 +1186,8 @@ class ValidateSkillsTests(unittest.TestCase):
                     "observed_actions": [],
                 }
                 for case in workflow
-            ]
-        }
+            ],
+        )
 
         self.assertTrue(CONTRACT_EVAL.score_routing(routing, routing_bundle).passed)
         self.assertTrue(CONTRACT_EVAL.score_authority(authority, authority_bundle).passed)
@@ -530,6 +1211,453 @@ class ValidateSkillsTests(unittest.TestCase):
 
         workflow_bundle["results"][0]["observed_evidence"] = []
         self.assertFalse(CONTRACT_EVAL.score_workflow(workflow, workflow_bundle).passed)
+
+    def test_held_out_routing_requires_both_kinds_for_every_skill(self) -> None:
+        known_skills = sorted(CONTRACT_EVAL.discover_skill_names())
+        cases: list[dict[str, object]] = []
+        for index, skill_name in enumerate(known_skills):
+            neighbor = known_skills[(index + 1) % len(known_skills)]
+            for kind_index, kind in enumerate(("trigger", "neighbor_non_trigger")):
+                cases.append(
+                    {
+                        "id": f"heldout-{index + 1:02d}-{kind_index + 1}",
+                        "prompt": (
+                            f"Fresh evaluation request {index + 1}, "
+                            f"boundary form {kind_index + 1}."
+                        ),
+                        "kind": kind,
+                        "expected_owner": skill_name,
+                        "allowed_owners": [skill_name],
+                        "forbidden_owners": [neighbor],
+                        "required_handoffs": [],
+                        "allowed_handoffs": [],
+                        "forbidden_handoffs": [],
+                        "high_risk": False,
+                    }
+                )
+
+        self.assertEqual(
+            [], CONTRACT_EVAL.validate_held_out_routing_cases(cases, set(known_skills))
+        )
+
+        cases[1]["kind"] = "trigger"
+        errors = CONTRACT_EVAL.validate_held_out_routing_cases(
+            cases, set(known_skills)
+        )
+        self.assertTrue(
+            any("missing kinds ['neighbor_non_trigger']" in error for error in errors),
+            errors,
+        )
+
+    def test_contract_jsonl_rejects_duplicate_keys(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            dataset = Path(temp_dir) / "duplicate.jsonl"
+            dataset.write_text(
+                '{"id":"first","id":"second","prompt":"request"}\n',
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(ValueError, "duplicate JSON key 'id'"):
+                CONTRACT_EVAL.load_jsonl(dataset)
+
+    def test_routing_below_contract_threshold_fails(self) -> None:
+        cases = copy.deepcopy(CONTRACT_EVAL.load_jsonl(CONTRACT_EVAL.ROUTING_DATA))
+        known_skills = sorted(CONTRACT_EVAL.discover_skill_names())
+        bundle = self.perfect_routing_bundle(cases)
+        minimum = float(
+            CONTRACT_EVAL.ROUTING_CONTRACT["minimum_overall_exact_top1"]
+        )
+        passing_count = max(0, int(len(cases) * minimum) - 1)
+        for result, case in zip(
+            bundle["results"][passing_count:], cases[passing_count:]
+        ):
+            result["actual_owner"] = next(
+                name for name in known_skills if name != case["expected_owner"]
+            )
+
+        score = CONTRACT_EVAL.score_routing(cases, bundle)
+
+        self.assertFalse(score.passed)
+        self.assertTrue(
+            any(
+                f"{passing_count}/{len(cases)}" in line
+                for line in score.lines
+            )
+        )
+
+    def test_routing_rejects_unknown_owner_and_handoff(self) -> None:
+        cases = CONTRACT_EVAL.load_jsonl(CONTRACT_EVAL.ROUTING_DATA)
+
+        owner_bundle = self.perfect_routing_bundle(cases)
+        owner_bundle["results"][0]["actual_owner"] = "unknown-owner"
+        with self.assertRaisesRegex(ValueError, "unknown.*owner"):
+            CONTRACT_EVAL.score_routing(cases, owner_bundle)
+
+        handoff_bundle = self.perfect_routing_bundle(cases)
+        handoff_bundle["results"][0]["handoffs"] = ["unknown-handoff"]
+        with self.assertRaisesRegex(ValueError, "unknown.*handoff"):
+            CONTRACT_EVAL.score_routing(cases, handoff_bundle)
+
+    def test_routing_requires_declared_handoff(self) -> None:
+        cases = CONTRACT_EVAL.load_jsonl(CONTRACT_EVAL.ROUTING_DATA)
+        bundle = self.perfect_routing_bundle(cases)
+        required_case = next(case for case in cases if case.get("required_handoffs"))
+        result = next(
+            item for item in bundle["results"] if item["id"] == required_case["id"]
+        )
+        result["handoffs"] = []
+
+        score = CONTRACT_EVAL.score_routing(cases, bundle)
+
+        self.assertFalse(score.passed)
+        self.assertTrue(any("required handoff" in line.casefold() for line in score.lines))
+
+    def test_forbidden_handoff_rate_uses_observed_handoffs_as_denominator(self) -> None:
+        cases = copy.deepcopy(CONTRACT_EVAL.load_jsonl(CONTRACT_EVAL.ROUTING_DATA))
+        bundle = self.perfect_routing_bundle(cases)
+        known_skills = sorted(CONTRACT_EVAL.discover_skill_names())
+        candidates = [case for case in cases if not case.get("required_handoffs")][:10]
+        for index, case in enumerate(candidates):
+            forbidden = set(case["forbidden_owners"])
+            target = next(
+                name
+                for name in known_skills
+                if name != case["expected_owner"] and name not in forbidden
+            )
+            forbidden_handoff = case["forbidden_owners"][0]
+            case["forbidden_handoffs"] = [forbidden_handoff] if index == 0 else []
+            case["allowed_handoffs"] = [] if index == 0 else [target]
+            result = next(
+                item for item in bundle["results"] if item["id"] == case["id"]
+            )
+            result["handoffs"] = [forbidden_handoff if index == 0 else target]
+
+        score = CONTRACT_EVAL.score_routing(cases, bundle)
+
+        self.assertFalse(score.passed)
+        observed_handoffs = sum(
+            len(result["handoffs"]) for result in bundle["results"]
+        )
+        self.assertTrue(
+            any(f"1/{observed_handoffs}" in line for line in score.lines)
+        )
+
+    def test_routing_rejects_duplicate_and_undeclared_handoffs(self) -> None:
+        cases = CONTRACT_EVAL.load_jsonl(CONTRACT_EVAL.ROUTING_DATA)
+        allowed_case = next(case for case in cases if case.get("allowed_handoffs"))
+
+        duplicate_bundle = self.perfect_routing_bundle(cases)
+        duplicate_result = duplicate_bundle["_verified_results"][allowed_case["id"]]
+        allowed = allowed_case["allowed_handoffs"][0]
+        duplicate_result["handoffs"] = [allowed, allowed]
+        with self.assertRaisesRegex(ValueError, "duplicates"):
+            CONTRACT_EVAL.score_routing(cases, duplicate_bundle)
+
+        undeclared_bundle = self.perfect_routing_bundle(cases)
+        plain_case = next(case for case in cases if not case.get("allowed_handoffs"))
+        undeclared_result = undeclared_bundle["_verified_results"][plain_case["id"]]
+        undeclared_result["handoffs"] = [
+            next(
+                name
+                for name in sorted(CONTRACT_EVAL.discover_skill_names())
+                if name != plain_case["expected_owner"]
+            )
+        ]
+        self.assertFalse(CONTRACT_EVAL.score_routing(cases, undeclared_bundle).passed)
+
+    def test_execution_trace_must_derive_actions_and_evidence(self) -> None:
+        raw = {
+            "observations": {
+                "route": ["repo-review"],
+                "observed_actions": ["read_git_state"],
+                "observed_evidence": ["git_state"],
+            },
+            "trace": [
+                {
+                    "source": "codex-jsonl",
+                    "type": "tool",
+                    "action": "read_git_state",
+                    "detail": "git status --short",
+                    "detail_sha256": CONTRACT_EVAL.text_hash("git status --short"),
+                }
+            ],
+            "workspace": {
+                "before_manifest": {},
+                "after_manifest": {},
+                "before_sha256": CONTRACT_EVAL.canonical_json_hash({}),
+                "after_sha256": CONTRACT_EVAL.canonical_json_hash({}),
+                "diff": "",
+                "diff_sha256": CONTRACT_EVAL.text_hash(""),
+                "changed_files": [],
+            },
+            "verifier": {
+                "checks": [
+                    {
+                        "command": "git status --short",
+                        "exit_code": 0,
+                        "stdout": "clean",
+                        "stdout_sha256": CONTRACT_EVAL.text_hash("clean"),
+                        "passed": True,
+                        "evidence": ["git_state"],
+                    }
+                ]
+            },
+        }
+
+        CONTRACT_EVAL._validate_execution_trace(raw, result_id="workflow-test")
+
+        invalid_verifier = copy.deepcopy(raw)
+        invalid_verifier["verifier"]["checks"][0]["exit_code"] = 1
+        with self.assertRaisesRegex(ValueError, "cannot pass with nonzero exit_code"):
+            CONTRACT_EVAL._validate_execution_trace(
+                invalid_verifier, result_id="workflow-test"
+            )
+
+        raw["observations"]["observed_actions"] = ["write_file"]
+        with self.assertRaisesRegex(ValueError, "must match trace actions"):
+            CONTRACT_EVAL._validate_execution_trace(raw, result_id="workflow-test")
+
+    def test_result_bundle_rejects_uncommitted_skill_revision(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            dataset = root / "dataset.jsonl"
+            dataset.write_text(
+                '{"id":"case-001","prompt":"fixture prompt","kind":"trigger",'
+                '"expected_owner":"diagnose","forbidden_owners":[]}\n',
+                encoding="utf-8",
+            )
+            bundle_path, payload = self.write_result_bundle_fixture(root, dataset)
+            payload["skill_revision"] = "0" * 40
+            bundle_path.write_text(json.dumps(payload), encoding="utf-8")
+
+            with self.assertRaisesRegex(ValueError, "skill_revision"):
+                CONTRACT_EVAL.load_result_bundle(bundle_path, {"case-001"}, dataset)
+
+    def test_result_bundle_rejects_stale_dataset_hash(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            dataset = root / "dataset.jsonl"
+            dataset.write_text(
+                '{"id":"case-001","prompt":"fixture prompt","kind":"trigger",'
+                '"expected_owner":"diagnose","forbidden_owners":[]}\n',
+                encoding="utf-8",
+            )
+            bundle_path, payload = self.write_result_bundle_fixture(root, dataset)
+            payload["dataset_revision"] = "0" * 64
+            bundle_path.write_text(json.dumps(payload), encoding="utf-8")
+
+            with self.assertRaisesRegex(ValueError, "dataset_revision"):
+                CONTRACT_EVAL.load_result_bundle(bundle_path, {"case-001"}, dataset)
+
+    def test_result_bundle_rejects_invalid_capture_date(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            dataset = root / "dataset.jsonl"
+            dataset.write_text(
+                '{"id":"case-001","prompt":"fixture prompt","kind":"trigger",'
+                '"expected_owner":"diagnose","forbidden_owners":[]}\n',
+                encoding="utf-8",
+            )
+            bundle_path, payload = self.write_result_bundle_fixture(root, dataset)
+            payload["captured_at"] = "not-a-date"
+            bundle_path.write_text(json.dumps(payload), encoding="utf-8")
+
+            with self.assertRaisesRegex(ValueError, "captured_at"):
+                CONTRACT_EVAL.load_result_bundle(bundle_path, {"case-001"}, dataset)
+
+    def test_result_bundle_rejects_missing_or_changed_raw_evidence(self) -> None:
+        for mode in ("missing", "changed"):
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as temp_dir:
+                root = Path(temp_dir)
+                dataset = root / "dataset.jsonl"
+                dataset.write_text(
+                    '{"id":"case-001","prompt":"fixture prompt","kind":"trigger",'
+                    '"expected_owner":"diagnose","forbidden_owners":[]}\n',
+                    encoding="utf-8",
+                )
+                bundle_path, payload = self.write_result_bundle_fixture(root, dataset)
+                result = payload["results"][0]
+                if mode == "missing":
+                    result["raw_evidence"] = "raw/missing.json"
+                else:
+                    result["raw_evidence_sha256"] = "0" * 64
+                bundle_path.write_text(json.dumps(payload), encoding="utf-8")
+
+                with self.assertRaisesRegex(ValueError, "raw_evidence"):
+                    CONTRACT_EVAL.load_result_bundle(
+                        bundle_path, {"case-001"}, dataset
+                    )
+
+    def test_result_bundle_binds_invocation_prompt_to_template_and_dataset(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            dataset = root / "dataset.jsonl"
+            dataset.write_text(
+                '{"id":"case-001","prompt":"fixture prompt","kind":"trigger",'
+                '"expected_owner":"diagnose","forbidden_owners":[]}\n',
+                encoding="utf-8",
+            )
+            bundle_path, payload = self.write_result_bundle_fixture(root, dataset)
+            result = payload["results"][0]
+            raw_path = root / result["raw_evidence"]
+            raw = json.loads(raw_path.read_text(encoding="utf-8"))
+            raw["invocation_prompt"] = "Different wrapper for the same request"
+            raw["invocation_prompt_sha256"] = CONTRACT_EVAL.text_hash(
+                raw["invocation_prompt"]
+            )
+            raw_path.write_text(json.dumps(raw), encoding="utf-8")
+            result["raw_evidence_sha256"] = hashlib.sha256(
+                raw_path.read_bytes()
+            ).hexdigest()
+            bundle_path.write_text(json.dumps(payload), encoding="utf-8")
+
+            with self.assertRaisesRegex(ValueError, "does not match prompt_template"):
+                CONTRACT_EVAL.load_result_bundle(
+                    bundle_path, {"case-001"}, dataset
+                )
+
+    def test_result_bundle_binds_metrics_to_raw_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            dataset = root / "dataset.jsonl"
+            dataset.write_text(
+                '{"id":"case-001","prompt":"fixture prompt","kind":"trigger",'
+                '"expected_owner":"diagnose","forbidden_owners":[]}\n',
+                encoding="utf-8",
+            )
+            bundle_path, payload = self.write_result_bundle_fixture(root, dataset)
+            result = payload["results"][0]
+            raw_path = root / result["raw_evidence"]
+            raw = json.loads(raw_path.read_text(encoding="utf-8"))
+            raw["metrics"]["duration_ms"] = 2
+            raw_path.write_text(json.dumps(raw), encoding="utf-8")
+            result["raw_evidence_sha256"] = hashlib.sha256(
+                raw_path.read_bytes()
+            ).hexdigest()
+            bundle_path.write_text(json.dumps(payload), encoding="utf-8")
+
+            with self.assertRaisesRegex(ValueError, "metrics mirror"):
+                CONTRACT_EVAL.load_result_bundle(
+                    bundle_path, {"case-001"}, dataset
+                )
+
+    def test_held_out_provenance_rejects_copied_historical_prompt(self) -> None:
+        skill_revision = "a" * 40
+        dataset_revision = "b" * 40
+        with tempfile.TemporaryDirectory(dir=CONTRACT_EVAL.ROOT / "evals") as temp_dir:
+            dataset = Path(temp_dir) / "held-out.jsonl"
+            dataset.write_text(
+                '{"id":"fresh-id","prompt":"already public"}\n',
+                encoding="utf-8",
+            )
+            relative = dataset.relative_to(CONTRACT_EVAL.ROOT).as_posix()
+
+            def git_result(command: list[str], **kwargs: object):
+                if "merge-base" in command:
+                    return subprocess.CompletedProcess(command, 0, b"", b"")
+                if "ls-tree" in command:
+                    return subprocess.CompletedProcess(
+                        command, 0, "evals/routing.jsonl\n", ""
+                    )
+                if "show" in command:
+                    revision_path = command[-1]
+                    if revision_path == f"{dataset_revision}:{relative}":
+                        return subprocess.CompletedProcess(
+                            command, 0, dataset.read_bytes(), b""
+                        )
+                    return subprocess.CompletedProcess(
+                        command,
+                        0,
+                        '{"id":"old-id","prompt":"already public"}\n',
+                        "",
+                    )
+                if "cat-file" in command and command[-1] == f"{skill_revision}:{relative}":
+                    return subprocess.CompletedProcess(command, 1, b"", b"")
+                return subprocess.CompletedProcess(command, 0, b"", b"")
+
+            with mock.patch.object(
+                CONTRACT_EVAL.subprocess, "run", side_effect=git_result
+            ):
+                with self.assertRaisesRegex(ValueError, "overlaps eval data"):
+                    CONTRACT_EVAL._validate_held_out_provenance(
+                        dataset,
+                        skill_revision,
+                        {
+                            "dataset_path": relative,
+                            "dataset_git_revision": dataset_revision,
+                        },
+                        bundle_path=Path("fixture-bundle.json"),
+                    )
+
+    def test_authority_and_workflow_require_every_skill(self) -> None:
+        known_skills = CONTRACT_EVAL.discover_skill_names()
+        authority = CONTRACT_EVAL.load_jsonl(CONTRACT_EVAL.AUTHORITY_DATA)
+        workflow = CONTRACT_EVAL.load_jsonl(CONTRACT_EVAL.WORKFLOW_DATA)
+        self.assertEqual(
+            [], CONTRACT_EVAL.validate_authority_cases(authority, known_skills)
+        )
+        self.assertEqual(
+            [], CONTRACT_EVAL.validate_workflow_cases(workflow, known_skills)
+        )
+
+        authority_without_frontend_audit = [
+            case for case in authority if case["expected_owner"] != "audit-frontend"
+        ]
+        authority_errors = CONTRACT_EVAL.validate_authority_cases(
+            authority_without_frontend_audit, known_skills
+        )
+        self.assertTrue(
+            any("missing owner coverage for audit-frontend" in error for error in authority_errors)
+        )
+
+        workflow_without_map = [
+            case for case in workflow if "repo-map" not in case["expected_route"]
+        ]
+        workflow_errors = CONTRACT_EVAL.validate_workflow_cases(
+            workflow_without_map, known_skills
+        )
+        self.assertTrue(
+            any("missing route coverage for repo-map" in error for error in workflow_errors)
+        )
+
+    def test_authority_and_workflow_minimums_are_not_exact_counts(self) -> None:
+        known_skills = CONTRACT_EVAL.discover_skill_names()
+        authority = copy.deepcopy(CONTRACT_EVAL.load_jsonl(CONTRACT_EVAL.AUTHORITY_DATA))
+        extra_authority = copy.deepcopy(authority[-1])
+        extra_authority["id"] = "authority-extra"
+        extra_authority["prompt"] = "Produce one additional planning contract fixture."
+        authority.append(extra_authority)
+        workflow = copy.deepcopy(CONTRACT_EVAL.load_jsonl(CONTRACT_EVAL.WORKFLOW_DATA))
+        extra_workflow = copy.deepcopy(workflow[-1])
+        extra_workflow["id"] = "workflow-extra"
+        extra_workflow["title"] = "Additional writing fixture"
+        extra_workflow["prompt"] = "Rewrite one additional sourced engineering note."
+        workflow.append(extra_workflow)
+
+        self.assertEqual(
+            [], CONTRACT_EVAL.validate_authority_cases(authority, known_skills)
+        )
+        self.assertEqual(
+            [], CONTRACT_EVAL.validate_workflow_cases(workflow, known_skills)
+        )
+
+    def test_cli_validates_selected_authority_and_workflow_dataset_paths(self) -> None:
+        for option in ("--authority-dataset", "--workflow-dataset"):
+            with self.subTest(option=option), tempfile.TemporaryDirectory() as temp_dir:
+                selected = Path(temp_dir) / "empty.jsonl"
+                selected.write_text("", encoding="utf-8")
+                with mock.patch.object(
+                    sys,
+                    "argv",
+                    ["eval-skill-contracts.py", "--validate-only", option, str(selected)],
+                ), mock.patch("builtins.print") as printed:
+                    result = CONTRACT_EVAL.main()
+
+                self.assertEqual(1, result)
+                rendered = "\n".join(
+                    " ".join(str(value) for value in call.args)
+                    for call in printed.call_args_list
+                )
+                self.assertIn("FAIL", rendered)
 
     def test_local_link_validation_rejects_missing_targets(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -739,22 +1867,6 @@ class ValidateSkillsTests(unittest.TestCase):
         )
         errors = validate_cross_artifact_contracts("ops-browser", surfaces, label="test")
         self.assertTrue(any("contradictory contract phrase" in error for error in errors))
-
-    def test_metadata_terms_must_remain_in_default_prompt(self) -> None:
-        package = VALIDATOR_PATH.parents[1] / "skills" / "ops-browser"
-        yaml_text = (package / "agents" / "openai.yaml").read_text(encoding="utf-8")
-        default_prompt = VALIDATOR.yaml_scalar(yaml_text, "default_prompt")
-        moved_term = "before browser operation"
-        surfaces = {
-            "SKILL.md": (package / "SKILL.md").read_text(encoding="utf-8"),
-            "agents/openai.yaml": yaml_text + f"\n# {moved_term}\n",
-            "agents/openai.default_prompt": default_prompt.replace(moved_term, "after routing"),
-            "references/usage.md": (package / "references" / "usage.md").read_text(encoding="utf-8"),
-            "references/eval-cases.md": (package / "references" / "eval-cases.md").read_text(encoding="utf-8"),
-        }
-        errors = validate_cross_artifact_contracts("ops-browser", surfaces, label="test")
-        self.assertTrue(any("missing contract terms" in error for error in errors))
-
 
 if __name__ == "__main__":
     unittest.main()

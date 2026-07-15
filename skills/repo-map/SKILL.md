@@ -1,6 +1,6 @@
 ---
 name: repo-map
-description: "Use when the user asks to map current Git or non-Git workspace truth into a durable repo map: real roots and boundaries, architecture, commands, shortest task routes, and verified reusable components, functions, types, or APIs, or to repair stale navigation incrementally."
+description: "Use when current Git or non-Git workspace truth needs a durable map of roots, ownership, architecture, commands, task routes, and reusable contracts, or an existing map needs evidence-based repair."
 ---
 
 # Repository Map
@@ -16,7 +16,7 @@ Map stable workspace or repository semantics into a concise navigation layer roo
    - otherwise use the requested directory as the workspace/map root and search below it for child Git roots by `.git` directory or file markers, pruning dependency, generated, cache, and build-output directories;
    - if child Git roots exist, classify the container as a multi-repo workspace and record each in-scope Git root; for nested or overlapping Git roots, record containment, treat the deepest root as canonical owner of files inside its boundary, and treat an ancestor root as container owner unless current manifests or contracts prove otherwise; if none exist, classify it as an ordinary non-Git directory project and map its real structure and content normally;
    - record map persistence as `versioned` when the artifact belongs to a Git root, otherwise `local-unversioned`. Never reject mapping merely because no Git repository exists.
-2. Read effective `AGENTS.md` guidance from the map root and each child Git root actually opened. Run `git status --short` in every applicable Git root before editing a document there; do not run Git commands as if a non-Git container were a repository.
+2. Read effective repository guidance from the map root and each child Git root actually opened, including `AGENTS.md`, `CLAUDE.md`, and host-provided instructions when present. Run `git status --short` in every applicable Git root before editing a document there; do not run Git commands as if a non-Git container were a repository.
 3. Locate the existing repo-map artifact. Prefer a project-defined equivalent; otherwise consider `<map-root>/docs/repo-map/README.md`. If multiple current or legacy candidates exist, inspect their ownership and references, select one authoritative root index, record any migration, and stop for clarification when evidence cannot choose safely; never silently overwrite or create a competing map. If the target artifact is inside Git and already modified, inspect its staged and unstaged diff, preserve unrelated hunks, and stop on an unsafe overlap.
 4. Apply the creation gate: create or expand a map only when it will reduce wrong-root routing, repeated semantic discovery, duplicate implementation, or cross-boundary inference. If one directory listing or manifest answers the need, read it directly and keep the map absent or smaller.
 5. Classify the scope before reading broadly:
@@ -81,10 +81,6 @@ Map stable workspace or repository semantics into a concise navigation layer roo
 ## Output Contract
 
 Report the repo-map path, initial working scope, scope class, map root, discovered Git roots and containment, persistence state, relevant worktree state, sections created or updated, and validation performed. Summarize task routes, reuse decisions and canonical entries, duplicate-declaration risks avoided, semantic or path repairs, preserved sections, and remaining `Not found` or `Not verified` gaps. For stopped or partial execution, also report the stop reason, completed evidence chain, unresolved boundary, artifact state, and required follow-up. Do not duplicate the full map in chat.
-
-## Skill Maintenance
-
-When maintaining this package, update `references/eval-cases.md`, `references/usage.md`, `references/checklist.md`, `references/reuse-index.md`, `references/prompt-templates.md`, and `agents/openai.yaml` when their contract changes. In AICraft, run `python3 scripts/validate-skills.py --skill repo-map` before publishing.
 
 ## References
 

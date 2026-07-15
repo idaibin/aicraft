@@ -4,6 +4,12 @@ This reference records transferable lessons from Bun's Rust rewrite. It is
 evidence, not a template: repository guidance and the local risk model still
 decide which practices apply.
 
+## Contents
+
+- [Source Basis](#source-basis)
+- [What Transfers](#what-transfers)
+- [What Does Not Transfer Automatically](#what-does-not-transfer-automatically)
+
 ## Source Basis
 
 Reviewed on 2026-07-10:

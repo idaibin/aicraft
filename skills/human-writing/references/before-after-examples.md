@@ -2,6 +2,19 @@
 
 These examples are non-normative calibration fixtures for package maintenance. Never use them as a source of facts, author experience, or mandatory phrasing.
 
+## Contents
+
+- [Short Product Post](#short-product-post)
+- [Factual Soft Copy](#factual-soft-copy)
+- [Technical Retrospective](#technical-retrospective)
+- [Tutorial Opening](#tutorial-opening)
+- [Tested Versus Documented](#tested-versus-documented)
+- [Technical Claim Compression](#technical-claim-compression)
+- [Interested Source Versus Independent Evidence](#interested-source-versus-independent-evidence)
+- [AI Assistance Disclosure](#platform-required-ai-assistance-disclosure)
+- [Human Habit Preservation](#human-habit-preservation)
+- [Sparse Notes](#sparse-notes)
+
 ## Short Product Post
 
 Source facts:

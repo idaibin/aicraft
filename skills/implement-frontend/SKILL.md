@@ -1,6 +1,6 @@
 ---
 name: implement-frontend
-description: Use when implementing or modifying frontend UI, routes, components, forms, tables, dashboards, responsive behavior, DOM/CSS structure, layout ownership, or frontend architecture across React, Vue, Tailwind, CSS Modules, Sass/Less, CSS-in-JS, Ant Design, shadcn/ui, and repository-native stacks while preserving existing state, API, design-system, and verification contracts.
+description: "Use when a frontend change must be implemented or refactored across UI, state, data, styling, accessibility, performance, or desktop integration; owns source edits and validation, but no staging, commit, push, or other Git delivery."
 ---
 
 # Frontend Implementation
@@ -11,7 +11,7 @@ Implement frontend changes with existing-stack alignment, minimal DOM/CSS, clear
 
 ## Workflow
 
-1. Read repo guidance first: root `AGENTS.md`, nearest subproject `AGENTS.md`, `AGENT.md`, or chat-supplied rules.
+1. Read effective repository guidance first, including `AGENTS.md`, `CLAUDE.md`, and host-provided instructions when present.
 2. Identify the frontend project class, app boundary, package manager, runtime pin, script contract, directory/naming standard, and documented exceptions.
 3. Identify the target page, route, screen, component, framework, UI type, visual source, and required states before editing.
 4. Consume a current `repo-map` inventory or perform the same targeted search for existing routes, pages, layouts, components, hooks or composables, services, stores, shared UI, tests, and analogous implementations.
@@ -65,10 +65,6 @@ Implement frontend changes with existing-stack alignment, minimal DOM/CSS, clear
 ## Output Contract
 
 Report the branch, frontend project class, detected framework/profile and toolchain, existing implementations checked, direct reuse or reference candidate, new-file justification when applicable, touched UI surface, structural lifecycle updates, layout and outer-spacing owners, state/reactivity/store ownership, component/injection/router/lifetime contracts, cleanup and cancellation behavior, Flex/Grid decision, DOM/CSS simplification choices, preserved contracts, commands run, failed commands, browser/client evidence or `Not verified` gaps, and intentionally excluded stack changes.
-
-## Skill Maintenance
-
-When maintaining this package, keep `SKILL.md` concise, move detailed examples to `references/`, update `agents/openai.yaml`, and run `python3 scripts/validate-skills.py`.
 
 ## References
 

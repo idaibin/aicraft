@@ -4,9 +4,21 @@ Use this checklist before delivery from a dirty worktree or when reviewing inter
 
 This checklist is read-only. Do not edit, create, delete, rename, or format worktree files, and do not run write-mode checks. Route fixes to implementation and Git mutation to `repo-delivery`.
 
+## Contents
+
+- [Required Evidence](#required-evidence)
+- [Inventory](#inventory)
+- [Completeness](#completeness)
+- [Split Rules](#split-rules)
+- [Common Cases](#common-cases)
+- [Do Not Commit](#do-not-commit)
+- [Staging-Plan Rules](#staging-plan-rules)
+- [Delivery Boundary](#delivery-boundary)
+- [Commit Message Style](#commit-message-style)
+
 ## Required Evidence
 
-- Read `AGENTS.md` first when present; use nearest `AGENTS.md` for subprojects and `AGENT.md` only as a fallback.
+- Read effective repository guidance first, including nearest `AGENTS.md`, `CLAUDE.md`, and host-provided instructions when present.
 - Run `git status --short`.
 - Run `git diff --stat` and `git diff --name-status`.
 - If anything is staged, run `git diff --cached --stat` and `git diff --cached --name-status`.

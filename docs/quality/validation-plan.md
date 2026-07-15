@@ -1,84 +1,149 @@
 # AICraft Validation Plan
 
-Status: execution baseline
+Status: active evidence plan
 
 Date: 2026-07-15
 
 ## Objective
 
-AICraft is in a validation phase. The next milestone is evidence that existing
-Skill contracts route correctly, preserve authority boundaries, stop and hand
-off correctly, and complete representative repository workflows. Public Skill
-growth and a new orchestration layer are out of scope.
+AICraft validates existing Skill contracts before expanding the public suite.
+The plan must answer four different questions without collapsing them into one
+score:
 
-Validation evaluates AICraft's declared contracts directly. It does not require
-a comparison with an unskilled model because model, prompt, context, and task
-differences would make that comparison ambiguous.
+1. Does each package match the current portable and provider-specific format?
+2. Does a model route, stop, and hand off according to the declared contract?
+3. Does the Skill complete representative repository work without crossing its
+   authority boundary?
+4. Does the changed Skill improve outcomes or efficiency over the previous or
+   no-Skill condition?
+
+The machine-readable case minimums, coverage requirements, score gates, result
+schema, and official-source review dates live in
+[`contracts/skill-validation.json`](../../contracts/skill-validation.json).
+Documents and scripts must consume that contract rather than maintain a second
+set of numeric thresholds.
 
 ## Evidence Layers
 
 ### Structure Suite
 
-Proves package shape and repository consistency only:
+Run from the repository root:
 
 ```bash
 python3 scripts/sync-shared-protocols.py --check
 python3 scripts/validate-skills.py
-python3 scripts/test_validate_skills.py
+python3 -m unittest discover -s scripts -p 'test_*.py'
 python3 scripts/eval-skill-contracts.py --validate-only
+python3 scripts/measure-skill-footprint.py --baseline-ref <comparison-ref>
 git diff --check
 ```
 
-### Routing Corpus
+This layer proves package shape, metadata, references, routing inventory,
+dataset schemas, shared-protocol synchronization, and validator regressions.
+The footprint command measures deterministic context size only. This layer does
+not execute a model and cannot prove behavior, workflow quality, time savings,
+or token savings.
 
-Build 60-100 natural-language requests without Skill names or leaked answers.
-Cover positive routing, nearest-neighbor non-triggers, ambiguous requests, and
-multi-intent requests.
+### Routing And Handoff Suite
 
-Record prompt, expected owner, forbidden owners, dataset revision, model, host,
-Skill revision, raw result, and adjudication. Initial targets:
+Use natural-language requests that do not name a Skill or leak the expected
+owner. Cover positive routing, nearest-neighbor non-triggers, high-risk false
+triggers, ambiguous requests, and multi-intent requests with required and
+forbidden handoffs. Every published Skill and every live nearest-neighbor edge
+must meet the coverage rules in the contract.
 
-| Metric | Target |
-| --- | ---: |
-| Core Skill top-1 routing | >= 90% |
-| Nearest-neighbor non-trigger | >= 90% |
-| High-risk false trigger | 0 |
-| Incorrect handoff | <= 5% |
+Retain the prompt, dataset hash, exact model and host, committed Skill revision,
+selected owner, handoffs, adjudication, raw output, duration, token counts when
+the host exposes them, prompt template, fixture, pair identity, and isolated
+host-environment policy.
 
 ### Authority Suite
 
-Verify that review does not write, diagnosis does not apply an unconfirmed fix,
-implementation does not mutate Git, delivery touches only authorized paths, and
-operations require explicit external-action authorization. Authority failures
-must be zero.
+Use real tool-capable runs to verify that read-only skills do not write,
+diagnosis does not apply a permanent fix, implementation does not mutate Git,
+delivery touches only authorized paths, and browser, client, or external review
+actions require the declared authorization. Score observed behavior, not the
+model's stated intention.
 
-### Workflow Smoke Suite
+The current trace contract is producer-attested: it makes a retained trace and
+verifier output tamper-evident, but it does not authenticate the producer or
+derive action/evidence labels independently from raw host events. Record these
+runs for audit and contract development, but do not set behavior to `verified`
+until an independent semantic verifier is implemented.
 
-Run 12 representative repository tasks covering React, Rust, SQLite, diagnosis,
-worktree and commit review, frontend/Rust/security audits, browser/client
-evidence, and Git delivery. Retain request, routing, tool calls, changed files,
-diff, validation, failure, and recovery evidence.
+### Workflow Suite
+
+Run representative repository tasks for every published Skill. Retain the
+request, route, tool calls, changed files, raw trace, validation output,
+workspace diff, stop or recovery state, duration, and token counts when
+available. A successful narrative without the required evidence is a failed
+workflow result.
+
+Workflow traces have the same producer-attested boundary as authority traces.
+They cannot set workflow to `verified` until an independent event-to-action and
+verifier mapping is enforced.
+
+## Contract Verification And Improvement Comparison
+
+Contract verification and comparative improvement are separate experiments.
+
+- A candidate-only run can verify that the current Skill meets its routing,
+  authority, and workflow contracts. It does not prove improvement.
+- A claim that a Skill noticeably improves collaboration, quality, time, or
+  token use requires a controlled previous-Skill or no-Skill baseline.
+- Candidate and baseline use the same task prompts, repository fixture, host,
+  model, tool permissions, timeout, and adjudication rubric. Run matched
+  conditions with isolated HOME/config/Skill roots and a shared pair ID. Run
+  them in parallel. If the host cannot do that, use randomized interleaving and
+  record the limitation.
+- Run the contract-defined minimum number of trials per condition. Report pass
+  rate, duration, and token mean plus variation; retain every trial rather than
+  selecting the best run.
+- Changes to `name`, `description`, or discovery metadata require a held-out
+  routing set committed after the Skill revision, absent at that revision, and
+  disjoint by case ID and prompt hash from existing eval datasets. Also record
+  independent/blind-set provenance; Git chronology cannot prove human blindness.
+- Grade task outcomes and authority violations independently from style. Store
+  raw traces, verifier output, and workspace diffs so a score can be audited.
+- When a host does not expose token counts, record `null`; do not estimate them.
+- Report duration but do not use it as an improvement gate. Host-load noise is
+  not controlled tightly enough; only outcome or non-regressing token
+  efficiency can pass the current comparison gate.
 
 ## Verification Rules
 
-- `behavior = verified` requires routing and authority evidence bound to model,
-  host, committed Skill revision, dataset revision, and raw results.
-- `workflow = verified` requires completed representative tasks with scope,
-  validation, workspace-integrity, and interruption evidence.
+- `structure = verified` requires the full structure suite at the recorded
+  repository revision.
+- Routing results may support a narrowly scoped model/host/revision claim after
+  their raw evidence and comparison replay pass.
+- Authority and workflow bundles are currently producer-attested only, so
+  `behavior` and `workflow` remain `not_verified` even when their schema and
+  scorer pass. Enabling either state requires an independent semantic verifier
+  and a contract update.
+- An improvement claim additionally requires a passing comparison report built
+  from manifest-recorded candidate and control bundles. Repository validation
+  replays the comparator and rejects a report whose content, hash, conditions,
+  source revisions, or evidence selection no longer matches.
+- Every verified claim is scoped to one dimension, kind, host name/version,
+  exact model, candidate/control revisions, dataset hash, and Skill inventory.
+  A single comparison cannot establish a global quality or collaboration claim.
 - Unchecked hosts, models, stacks, or runtime claims remain `not_verified`.
-- Fix descriptions, boundaries, or validator checks only after a recorded
-  failure demonstrates the need.
-- Do not rewrite the suite broadly or add public Skills to improve a metric.
+- Update descriptions, contracts, fixtures, and regression tests when official
+  standards change or recorded evidence demonstrates drift. Do not preserve a
+  stale validator merely because its old fixtures still pass.
+- Do not add public Skills or weaken score gates to improve a metric.
 
-## Phases
+## Execution Phases
 
-1. Freeze inventory and structure evidence.
-2. Publish functional categories, release state, validation state, workflows,
-   and install bundles.
-3. Build and execute the routing and authority suites.
-4. Execute the workflow smoke suite.
-5. Make evidence-driven, minimal corrections.
-6. Verify Claude Code compatibility separately.
-7. Define AICraft v1 from verified reliability, not Skill count.
+1. Pin and periodically refresh the official alignment record.
+2. Keep package, metadata, routing, and dataset validation deterministic.
+3. Execute routing and authority trials with complete raw evidence.
+4. Execute per-Skill workflow trials in isolated repository fixtures.
+5. Run controlled previous/no-Skill comparisons for improvement claims.
+6. Make evidence-driven corrections and rerun held-out regressions.
+7. Verify OpenAI Codex and Claude Code behavior separately without turning
+   provider-specific features into portable requirements.
 
-Current evidence and gaps are tracked in [`status.md`](status.md).
+Current evidence and gaps are tracked in [`status.md`](status.md). The external
+baseline and provider lanes are recorded in
+[`official-skill-alignment.md`](official-skill-alignment.md).

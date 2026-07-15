@@ -1,5 +1,17 @@
 # Usage
 
+## Contents
+
+- [Trigger Examples](#trigger-examples)
+- [Non-Triggers](#non-triggers)
+- [Local Collection](#local-collection)
+- [External Action Gate](#external-action-gate)
+- [Local Codex Gate](#local-codex-gate)
+- [Standard Chat, Project, And Codex](#standard-chat-project-and-codex)
+- [Review Package](#review-package)
+- [Review Artifact](#review-artifact)
+- [Review Artifact Visibility](#review-artifact-visibility)
+
 ## Trigger Examples
 
 - `Prepare/build/draft a review package for ChatGPT, but do not send it.`
@@ -37,7 +49,7 @@ Do not attach to Chrome, claim tabs, open browser profiles, create ChatGPT sessi
 
 ## External Action Gate
 
-Use the gate in `SKILL.md` only when external sending or route selection is not already authorized. Package-only wording never opens the gate and never authorizes a send. An explicit request such as `send/submit/upload this to ChatGPT`, `use ChatGPT now to review`, `ask ChatGPT to review now`, or `外部互审 3 轮` authorizes sending on the safely resolved route for the stated scope and round count; do not ask the same route question again.
+Use this gate only when external sending or route selection is not already authorized. Package-only wording never opens the gate and never authorizes a send. An explicit request such as `send/submit/upload this to ChatGPT`, `use ChatGPT now to review`, `ask ChatGPT to review now`, or `外部互审 3 轮` authorizes sending on the safely resolved route for the stated scope and round count; do not ask the same route question again.
 
 Option handling:
 
@@ -49,7 +61,9 @@ Option handling:
 
 ## Local Codex Gate
 
-Use the exact Local Codex Gate in `SKILL.md` before `codex exec`.
+Use this gate before `codex exec`. `SKILL.md` loads it only when the user
+explicitly requests nested local Codex CLI execution; an ordinary request to
+apply verified fixes stays with the active implementation workflow.
 
 Mode mapping:
 

@@ -2,6 +2,18 @@
 
 Good prose cannot repair unsupported content. Build a source ledger before drafting or rewriting.
 
+## Contents
+
+- [Source Ledger](#source-ledger)
+- [Source Precedence](#source-precedence)
+- [Claim Trace](#claim-trace)
+- [Rewrite Rules](#rewrite-rules)
+- [Drafting From Sparse Notes](#drafting-from-sparse-notes)
+- [Soft-Copy Integrity](#soft-copy-integrity)
+- [Material Relationships](#material-relationships)
+- [Platform-Required Process Disclosures](#platform-required-process-disclosures)
+- [Current External Claims](#current-external-claims)
+
 ## Source Ledger
 
 Classify material into four buckets:

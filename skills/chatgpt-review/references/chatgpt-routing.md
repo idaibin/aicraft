@@ -1,5 +1,19 @@
 # ChatGPT Routing And IO
 
+## Contents
+
+- [Terminology Basis](#terminology-basis)
+- [Authorization Before Routing](#authorization-before-routing)
+- [Routing Order](#routing-order)
+- [Surface Resolution](#surface-resolution)
+- [Default Configuration](#default-configuration)
+- [Current Chrome Routing](#current-chrome-routing)
+- [Browser Capability Routing](#browser-capability-routing)
+- [Standalone Playwright Routing](#standalone-playwright-routing)
+- [Text And File Input](#text-and-file-input)
+- [Output Capture](#output-capture)
+- [Prompt Template](#prompt-template)
+
 ## Terminology Basis
 
 - [Projects in ChatGPT](https://help.openai.com/en/articles/10169521-using-projects-in-chatgpt)

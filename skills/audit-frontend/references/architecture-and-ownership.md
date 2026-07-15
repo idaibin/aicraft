@@ -8,7 +8,7 @@ GitButler's app/package/API boundaries. See `reference-corpus.md`.
 
 Before proposing files, record:
 
-- active `AGENTS.md` files and architecture docs;
+- effective repository guidance (`AGENTS.md`, `CLAUDE.md`, and host-provided instructions when present) and architecture docs;
 - frontend app boundary, package/workspace manifests, aliases, generated paths,
   route generation, and validation scripts;
 - target page and route entry, parent layouts, analogous features, and tests;

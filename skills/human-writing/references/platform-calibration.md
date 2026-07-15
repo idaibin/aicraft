@@ -4,6 +4,17 @@ These are optional editorial heuristics, not claims about platform algorithms or
 
 Keep compliance and editorial precedence separate.
 
+## Contents
+
+- [Personal Blog](#personal-blog)
+- [Zhihu-Style Answer](#zhihu-style-answer)
+- [Juejin / CSDN Technical Post](#juejin--csdn-style-technical-post)
+- [WeChat / Chinese Long-Form](#wechat-public-account--general-chinese-long-form)
+- [SSPAI Product Or Experience Article](#sspai-style-product-or-experience-article)
+- [X / Weibo / Short Social Post](#x--weibo--short-social-post)
+- [Reddit / Hacker News](#reddit--hacker-news)
+- [Medium / DEV Community](#medium--dev-community)
+
 Compliance order:
 
 1. fact integrity and safety

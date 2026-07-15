@@ -3,6 +3,9 @@
 `skills/` stores runnable or reusable skill packages.
 
 Before adding or updating a skill, read `../docs/skills/skill-standard.md` and `../docs/standards/skill-routing.md`.
+Also read effective repository or host guidance. Claude Code receives this
+directory's rules through `CLAUDE.md`; runtime Skill text must not assume that
+every host reads `AGENTS.md` directly.
 
 ## Naming And Routing
 
@@ -32,13 +35,19 @@ Shared cross-skill protocols are authored under `protocols/` and synchronized
 into self-contained published packages with
 `python3 scripts/sync-shared-protocols.py`. Do not hand-edit a generated copy.
 Skill-specific validation thresholds and cross-artifact term contracts belong in
-`contracts/skill-validation.json`, not as new prose literals in the validator.
+[`../contracts/skill-validation.json`](../contracts/skill-validation.json), not
+as new prose literals in the validator.
+Package maintenance rules belong here and in the repository standards, not in a
+runtime `SKILL.md` Maintenance section.
 
 Before review or delivery, run from the repository root:
 
 ```bash
+python3 scripts/sync-shared-protocols.py --check
 python3 scripts/validate-skills.py
-python3 scripts/test_validate_skills.py
+python3 -m unittest discover -s scripts -p 'test_*.py'
+python3 scripts/eval-skill-contracts.py --validate-only
+python3 scripts/measure-skill-footprint.py --baseline-ref HEAD
 git diff --check
 ```
 

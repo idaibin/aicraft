@@ -1,6 +1,6 @@
 ---
 name: ops-browser
-description: "Use when directly operating or verifying pages through an available browser surface, including ChatGPT desktop built-in, cloud/agent, controlled Chrome, or managed sessions, or collecting evidence for an already-isolated browser-layer failure. Do not use for unexplained or cross-system root-cause diagnosis."
+description: "Use when directly operating or verifying a specified page, or gathering evidence for an isolated browser-layer failure; require an available browser, verified target, and proven capability, not unexplained or cross-system diagnosis."
 ---
 
 # Ops Browser
@@ -94,10 +94,6 @@ Operate browser pages and collect evidence without conflating browser surfaces. 
 ## Output Contract
 
 Report the Capability Snapshot and snapshot ID, selected browser surface and mode, browser/session and tab identity evidence, state origin (desktop built-in/cloud/Chrome/managed), account/workspace evidence or `Not verified`, Handoff Result with unchanged `operation_id` when delegated, before/action/side-effect/after evidence, whether visible focus or user takeover was required, viewport(s), browser debug loop when relevant, direct browser facts, suspected prompt-injection stops, evidence returned to `diagnose` or the caller, upload/download paths and cleanup, degraded, blocked, or ambiguous claims, caller-owned orchestration fields left unchanged, and temporary page/window cleanup.
-
-## Skill Maintenance
-
-When maintaining this package, keep `SKILL.md` concise, move detailed examples to `references/`, update `agents/openai.yaml`, and run `python3 scripts/validate-skills.py`.
 
 ## References
 

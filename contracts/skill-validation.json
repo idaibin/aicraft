@@ -1,4 +1,186 @@
 {
+  "schema_version": 1,
+  "official_baseline": {
+    "reviewed_at": "2026-07-15",
+    "review_due": "2026-10-15",
+    "maximum_review_age_days": 120,
+    "sources": [
+      {
+        "lane": "portable-core",
+        "provider": "Agent Skills",
+        "url": "https://agentskills.io/specification",
+        "revision": "retrieved-2026-07-15"
+      },
+      {
+        "lane": "openai",
+        "provider": "OpenAI Codex",
+        "url": "https://learn.chatgpt.com/docs/build-skills",
+        "revision": "retrieved-2026-07-15"
+      },
+      {
+        "lane": "openai",
+        "provider": "OpenAI Plugins",
+        "url": "https://github.com/openai/plugins",
+        "revision": "11c74d6ba24d3a6d48f54a194cd00ef3beea18f9"
+      },
+      {
+        "lane": "claude",
+        "provider": "Anthropic Skills",
+        "url": "https://github.com/anthropics/skills",
+        "revision": "9d2f1ae187231d8199c64b5b762e1bdf2244733d"
+      }
+    ]
+  },
+  "package_policy": {
+    "maximum_description_characters": 260,
+    "maximum_skill_lines": 120,
+    "short_description_characters": {
+      "minimum": 25,
+      "maximum": 64
+    },
+    "maximum_default_prompt_characters": 220,
+    "reference_toc_after_lines": 100,
+    "reference_toc_exemptions": [
+      "eval-cases.md"
+    ]
+  },
+  "behavior_eval": {
+    "result_schema_version": 2,
+    "raw_evidence_schema_version": 1,
+    "quality_evidence_manifest_schema_version": 3,
+    "comparison_report_schema_version": 1,
+    "prompt_template_version": 1,
+    "maximum_clock_skew_seconds": 300,
+    "result_required_fields": [
+      "schema_version",
+      "run_id",
+      "model",
+      "host",
+      "skill_revision",
+      "skill_tree_sha",
+      "dataset_revision",
+      "captured_at",
+      "run_config",
+      "adjudication",
+      "results"
+    ],
+    "run_config_required_fields": [
+      "trial",
+      "variant",
+      "dataset_path",
+      "prompt_set_sha256",
+      "case_set_sha256",
+      "case_ids",
+      "pair_id",
+      "held_out",
+      "permissions",
+      "timeout_seconds",
+      "concurrency",
+      "host_name",
+      "fixture",
+      "fixture_sha256",
+      "skills_installed",
+      "skill_fixture_sha256",
+      "prompt_template_version",
+      "prompt_template",
+      "prompt_template_sha256",
+      "host_config_sha256"
+    ],
+    "held_out_provenance_required_fields": [
+      "dataset_git_revision"
+    ],
+    "adjudication_required_fields": [
+      "method",
+      "reviewer",
+      "reviewer_version",
+      "config_sha256"
+    ],
+    "raw_evidence_required_fields": [
+      "schema_version",
+      "run_id",
+      "case_id",
+      "prompt_sha256",
+      "invocation_prompt",
+      "invocation_prompt_sha256",
+      "model",
+      "host",
+      "model_output",
+      "transcript",
+      "transcript_sha256",
+      "exit_code",
+      "observations",
+      "metrics"
+    ],
+    "result_variants": [
+      "candidate",
+      "baseline",
+      "previous"
+    ],
+    "adjudication_methods": [
+      "deterministic",
+      "human",
+      "independent_model"
+    ],
+    "claimable_comparison_kinds": [
+      "routing"
+    ],
+    "comparative": {
+      "minimum_trials_per_variant": 3,
+      "minimum_held_out_cases": 28,
+      "minimum_held_out_cases_per_skill": 2,
+      "required_held_out_kinds": [
+        "trigger",
+        "neighbor_non_trigger"
+      ],
+      "candidate_variant": "candidate",
+      "control_variants": [
+        "baseline",
+        "previous"
+      ],
+      "require_same_prompts": true,
+      "require_held_out_cases": true,
+      "maximum_outcome_regression": 0.0,
+      "minimum_absolute_outcome_improvement": 0.1,
+      "minimum_relative_efficiency_improvement": 0.15,
+      "allow_duration_efficiency_gate": false,
+      "maximum_pair_capture_gap_seconds": 3600
+    },
+    "routing": {
+      "kinds": [
+        "trigger",
+        "neighbor_non_trigger",
+        "ambiguous",
+        "multi_intent"
+      ],
+      "core_skills": [
+        "repo-map",
+        "code-planner",
+        "diagnose",
+        "repo-review",
+        "repo-delivery"
+      ],
+      "minimum_cases": 70,
+      "minimum_cases_per_skill": 5,
+      "minimum_overall_exact_top1": 0.9,
+      "minimum_accepted_owner_accuracy": 0.95,
+      "minimum_core_exact_top1": 0.9,
+      "minimum_per_skill_exact_top1": 0.8,
+      "minimum_neighbor_exact_top1": 0.9,
+      "maximum_high_risk_false_triggers": 0,
+      "maximum_forbidden_handoff_rate": 0.0,
+      "minimum_required_handoff_recall": 1.0
+    },
+    "authority": {
+      "minimum_cases": 14,
+      "require_all_skills": true,
+      "maximum_failures": 0
+    },
+    "workflow": {
+      "minimum_cases": 14,
+      "require_all_skills": true,
+      "maximum_failures": 0
+    }
+  },
   "specialized_evals": {
     "audit-rust": {
       "profile_section": "## Profile Selection Eval",
@@ -31,14 +213,11 @@
     {"skill": "audit-security", "surface": "SKILL.md", "section": "## Modes", "terms": ["Scoped specialist subreview", "coordinator retains", "severity"]},
     {"skill": "audit-security", "surface": "references/usage.md", "section": "## Output", "terms": ["delegated path/diff boundary", "without editing", "coordinator"]},
     {"skill": "ops-browser", "surface": "SKILL.md", "section": "## Modes", "terms": ["diagnose", "already-isolated", "browser-layer"]},
-    {"skill": "ops-browser", "surface": "agents/openai.default_prompt", "section": null, "terms": ["only after $diagnose delegation", "before browser operation", "final cause/fix"]},
     {"skill": "ops-browser", "surface": "references/usage.md", "section": "## Browser Debug Evidence", "terms": ["diagnose", "before browser operation", "retain referenced"]},
     {"skill": "ops-browser", "surface": "SKILL.md", "section": "## Hard Rules", "terms": ["operation_id", "ambiguous", "prior evidence"]},
     {"skill": "chatgpt-review", "surface": "SKILL.md", "section": "## Browser Handoff", "terms": ["operation_id", "operation ledger", "ambiguous"]},
-    {"skill": "chatgpt-review", "surface": "agents/openai.default_prompt", "section": null, "terms": ["browser-operation/v1", "operation-ledger", "operation_id", "ambiguous"]},
     {"skill": "ops-client", "surface": "SKILL.md", "section": "## Modes", "terms": ["diagnose", "already-isolated", "client-layer"]},
     {"skill": "ops-client", "surface": "SKILL.md", "section": "## Hard Rules", "terms": ["Retain screenshots", "handoff owner", "removed disposable state"]},
-    {"skill": "ops-client", "surface": "agents/openai.default_prompt", "section": null, "terms": ["only after $diagnose delegation", "before client operation", "retain referenced evidence"]},
     {"skill": "ops-client", "surface": "references/usage.md", "section": "## Operation Notes", "terms": ["diagnose", "already-isolated", "retain referenced"]}
   ]
 }

@@ -1,6 +1,6 @@
 ---
 name: implement-rust
-description: "Use when implementing, porting, modifying, or refactoring Rust APIs, crates, services, CLIs, libraries, Tauri backends, Cargo workspaces, FFI, unsafe code, ownership, errors, async behavior, tests, rustdoc, formatting, or Clippy alignment while preserving repository contracts."
+description: "Use when a Rust source change must be implemented, ported, or refactored across APIs, crates, services, CLIs, async, persistence, unsafe or FFI boundaries, tests, or docs; owns source edits and validation, not Git delivery."
 ---
 
 # Rust Implementation
@@ -11,7 +11,7 @@ Implement Rust changes against the repository's real toolchain, project class, c
 
 ## Workflow
 
-1. Read repository guidance and run `git status --short` before edits.
+1. Read effective repository guidance, including `AGENTS.md`, `CLAUDE.md`, and host-provided instructions when present, then run `git status --short` before edits.
 2. Identify the Rust project class: library workspace, application workspace, HTTP service, CLI, Tauri/native backend, or compact single package.
 3. Inspect the relevant `Cargo.toml`, lockfile, toolchain, formatter, lint, command source, modules, tests, architecture docs, and API/interface docs.
 4. Consume a current `repo-map` inventory or perform the same targeted search across route registration, handlers, services, repositories, traits/impls, types/DTOs, errors, migrations, callers, tests, and analogous features.
@@ -75,10 +75,6 @@ Do not claim Baseline or an overlay passed when a required tool, target, runtime
 ## Output Contract
 
 Report project class, Baseline evidence, selected risk overlays, toolchain and command sources, existing docs/interfaces checked, reuse/extension/reference decision, new-interface justification, changed ownership and contract chain, manifests/docs updated, validation mapped to each selected overlay, failures, excluded optional checks with reasons, and `Not found` or `Not verified` gaps.
-
-## Skill Maintenance
-
-When maintaining this package, keep `SKILL.md` concise, update all references and `agents/openai.yaml`, and run `python3 scripts/validate-skills.py`.
 
 ## References
 

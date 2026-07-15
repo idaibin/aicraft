@@ -1,6 +1,6 @@
 ---
 name: human-writing
-description: Use when drafting, rewriting, diagnosing, or adapting source-grounded Chinese personal and technical writing, factual project or product copy, and developer-community posts while preserving evidence, voice, disclosures, and technical meaning.
+description: "Use when drafting, rewriting, diagnosing, or adapting source-grounded Chinese writing or factual product/project copy while preserving supplied facts, attribution, uncertainty, disclosures, author voice, and technical meaning."
 ---
 
 # Human Writing
@@ -66,10 +66,6 @@ Load `references/content-modes.md` and `references/platform-calibration.md` when
 - **Safe partial edit:** return the supported artifact without invented additions; retain placeholders only when the user requested them.
 - **Blocked artifact:** return `Not enough context:` followed by the minimum missing facts and affected claim type.
 - Preserve frontmatter and code fences when editing repository content unless the user asks to change them.
-
-## Maintenance
-
-When changing triggers, modes, or output behavior, update `references/eval-cases.md`, the quality rubric, platform calibration, examples, and `agents/openai.yaml`. In AICraft, run `python3 scripts/validate-skills.py --skill human-writing`, `python3 scripts/eval-human-writing.py`, and `python3 scripts/test_validate_skills.py` before publishing.
 
 ## References
 

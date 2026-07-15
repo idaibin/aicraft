@@ -70,8 +70,9 @@ feature
 → architecture or feature documentation
 ```
 
-Keep the map in the repository's existing `AGENTS.md`, project map, architecture
-docs, feature index, or equivalent. Do not invent a second index when one exists.
+Keep the map in existing repository guidance (`AGENTS.md`, `CLAUDE.md`, or a
+host-provided equivalent), project map, architecture docs, or feature index. Do
+not invent a second index when one exists.
 
 Names such as `common`, `utils`, `helper`, `manager`, or `service` are review
 signals, not automatic violations. Check whether the module has a narrow stable

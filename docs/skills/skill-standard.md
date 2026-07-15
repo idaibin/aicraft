@@ -6,7 +6,7 @@ Read `../standards/skill-routing.md` together with this document when adding, sp
 
 ## Package Shape
 
-Each skill package must use this structure:
+Each AICraft skill package must use this structure:
 
 ```text
 skills/<skill-name>/
@@ -17,6 +17,11 @@ skills/<skill-name>/
 ```
 
 Optional `scripts/` or `assets/` are allowed only when they directly support the skill. Do not add package-local `README.md`, changelogs, install notes, or narrative process docs.
+
+The portable Agent Skills minimum is `SKILL.md`; `agents/openai.yaml` is an
+AICraft-required OpenAI integration surface, not a portable requirement. See
+[`../quality/official-skill-alignment.md`](../quality/official-skill-alignment.md)
+for provider lanes and pinned sources.
 
 ## Naming And Metadata
 
@@ -35,7 +40,8 @@ Optional `scripts/` or `assets/` are allowed only when they directly support the
 - `description` must start with `Use when`.
 - `description` must describe trigger conditions, not the full workflow.
 - Quote frontmatter string values when they contain YAML-significant punctuation such as `: `.
-- Keep the frontmatter concise; target description length is under 500 characters.
+- Keep the frontmatter concise and within the repository policy in
+  [`../../contracts/skill-validation.json`](../../contracts/skill-validation.json).
 - Do not use long `Triggers include ...` lists in frontmatter. Put rich trigger examples in `references/usage.md` and `references/eval-cases.md`.
 - Use English trigger phrases and realistic user wording by default for public, reusable skills. Add localized triggers only when the skill is explicitly audience-specific.
 - Do not keep obsolete skill names inside a skill package. Put migration or rejection notes in root documentation, where package-level stale-name checks do not treat them as active routing instructions.
@@ -69,13 +75,18 @@ Examples:
 - Hard Rules: scope, safety, write, staging, tool, authorization, and verification constraints.
 - Output Contract: what the agent must report or produce.
 - References: direct links to reference files that may be loaded only when needed.
-- Maintenance: a short note to update eval cases, metadata, and indexes when triggers, profiles, or output contracts change.
 
 Keep detailed examples, checklists, templates, and evals in `references/`.
+Keep package-maintenance instructions in `skills/AGENTS.md` and repository
+standards rather than loading them during every Skill invocation.
 
 ## References
 
 Reference files must be one level deep under `references/` and linked from `SKILL.md`.
+Long operational references must include a compact contents section when they
+cross the repository threshold. The threshold and explicit exemptions, such as
+eval-case corpora, live in
+[`../../contracts/skill-validation.json`](../../contracts/skill-validation.json).
 
 Use references for:
 
@@ -96,13 +107,16 @@ of each published package; they are not independent authoring surfaces.
 
 ## Agent Metadata
 
-Each skill should include `agents/openai.yaml` with:
+Each AICraft skill must include `agents/openai.yaml` with:
 
 - `display_name`
 - `short_description`
 - `default_prompt`
 
 These values must match the current `SKILL.md`. Update them whenever the skill name, modes/profiles, primary object, mutation boundary, major triggers, or output contract changes.
+
+This file belongs to the OpenAI lane. Do not treat its fields as portable
+Agent Skills metadata or copy them into Claude-only frontmatter.
 
 The repository validator checks metadata structure, lengths, required self-routing, and referenced Skill names. Semantic synchronization remains a required review step.
 
@@ -112,7 +126,8 @@ Inside `default_prompt`, bare `$name` syntax is reserved for routing to a shippe
 
 Every repository-facing skill must:
 
-- read relevant `AGENTS.md` or nearest repo guidance first when present;
+- read effective repository and host guidance first, including `AGENTS.md`,
+  `CLAUDE.md` imports, or host-provided instructions when present;
 - check `git status --short` before planning writes or commits;
 - preserve unrelated local changes;
 - use real paths, commands, configs, revisions, and code evidence;
@@ -163,7 +178,10 @@ When a skill boundary changes, add pairwise trigger/non-trigger cases against ev
 - `diagnose` versus matching `implement-*` skills;
 - `audit-frontend` versus `repo-review` and `implement-frontend`.
 
-Every published package must score at least 8 for every quality case. Authorization, mutation, external-action, and evidence-integrity violations are hard failures and cannot be offset by other scores.
+Every published package must satisfy its documented quality acceptance rules
+and the repository validator. Authorization, mutation, external-action, and
+evidence-integrity violations are hard failures and cannot be offset by other
+scores.
 
 ## Status And Evidence
 
@@ -179,8 +197,12 @@ Structure verification covers repository/package consistency only. Behavior
 verification requires real natural-language routing, authority, stop, and
 handoff results bound to a model, host, committed Skill revision, dataset, and
 raw result. Workflow verification additionally requires end-to-end repository
-task evidence. Do not infer either from Markdown eval tables or compare against
-an unskilled-model baseline as a prerequisite.
+task evidence. Producer-authored hashes make retained evidence tamper-evident;
+they do not authenticate the host or independently prove self-reported action
+labels. Until the repository adds an independent semantic verifier, authority
+and workflow remain `not_verified`. Do not infer either from Markdown eval
+tables. A baseline is not required for contract evaluation, but a controlled
+previous/no-Skill baseline is required for a narrowly scoped improvement claim.
 
 Record the current inventory and evidence boundary in
 `docs/quality/status.md`. A public install bundle describes scope only and must
@@ -209,8 +231,9 @@ Before considering a skill package ready:
 ```bash
 python3 scripts/sync-shared-protocols.py --check
 python3 scripts/validate-skills.py
-python3 scripts/test_validate_skills.py
+python3 -m unittest discover -s scripts -p 'test_*.py'
 python3 scripts/eval-skill-contracts.py --validate-only
+python3 scripts/measure-skill-footprint.py --baseline-ref HEAD
 rg -n "^name:|^description: Use when" skills/<skill-name>/SKILL.md
 find skills/<skill-name> -maxdepth 3 -type f | sort
 rg -n "Triggers include" skills/<skill-name>/SKILL.md
@@ -226,6 +249,9 @@ The `Triggers include` command must return no results. Also verify:
 - pairwise evals cover the closest neighboring skills;
 - `docs/skills/routing-graph.json` lists every package and keeps every nearest-neighbor edge symmetric;
 - no stale names, placeholders, required repository-local prompt dependencies, or broken links remain;
+- the official-source review recorded in
+  `contracts/skill-validation.json` is current and agrees with
+  `docs/quality/official-skill-alignment.md`;
 - `git diff --check` passes.
 
 After publishing, users install with `npx skills add https://github.com/idaibin/aicraft` and update installed copies with `npx skills update --project` or `npx skills update --global`. Use `--list` only to inspect source discoverability and `npx skills list` to inspect installed skills.

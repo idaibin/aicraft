@@ -1,6 +1,6 @@
 ---
 name: audit-security
-description: "Use when a known code change or scoped API, config, dependency, upload/download, logging, auth, authorization, token/session, CORS/CSRF, secret, privacy, or release surface needs a lightweight evidence-grounded security audit rather than a repository-wide or deep vulnerability scan, including when repo-review delegates an explicit security surface for a read-only specialist subreview."
+description: "Use when a known code or config surface needs a scoped, read-only security audit, including bounded specialist delegation from repo-review; stay within evidenced trust boundaries and exclude repository-wide, exhaustive, or multi-pass scans."
 ---
 
 # Security Audit
@@ -67,10 +67,6 @@ Audit known code and configuration surfaces for concrete security risks. Use thi
 ## Output Contract
 
 Start with severity-ranked findings. If no blocking findings are found, state that only for the audited scope and list residual `Not verified` areas. Include the audit mode; in specialist mode, name the delegated path/diff boundary and coordinating `repo-review` owner. Include selected profiles, assets and trust boundaries, checked files/endpoints/configs, evidence, impact, recommended fix or validation, optional tools not run, and intentionally excluded scope.
-
-## Skill Maintenance
-
-When maintaining this package, update `references/eval-cases.md`, `references/usage.md`, `agents/openai.yaml`, and framework-specific guidance when triggers, profiles, or output contracts change. In AICraft, run `python3 scripts/validate-skills.py --skill audit-security` before publishing.
 
 ## References
 

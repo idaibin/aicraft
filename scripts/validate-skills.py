@@ -4,10 +4,13 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
+import subprocess
 import sys
 from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 
 
@@ -32,6 +35,7 @@ SKILL_INVOCATION_RE = re.compile(r"(?<![A-Za-z0-9_.])\$([a-z][a-z0-9-]*)")
 EVAL_CASES_FILE = "eval-cases.md"
 ROUTING_GRAPH_FILE = "docs/skills/routing-graph.json"
 QUALITY_STATUS_FILE = "docs/quality/status.md"
+QUALITY_EVIDENCE_FILE = "docs/quality/evidence-manifest.json"
 VALIDATION_CONTRACT_FILE = "contracts/skill-validation.json"
 EVAL_REQUIRED_SECTIONS = (
     "## Trigger Eval",
@@ -40,10 +44,6 @@ EVAL_REQUIRED_SECTIONS = (
     "## Scoring",
 )
 FORBIDDEN_DESCRIPTION_PHRASES = ("Triggers include",)
-MAX_DESCRIPTION_CHARS = 500
-MAX_SKILL_LINES = 500
-MAX_SHORT_DESCRIPTION_CHARS = 120
-MAX_DEFAULT_PROMPT_CHARS = 800
 MIN_TRIGGER_CASES = 3
 MIN_NON_TRIGGER_CASES = 3
 MIN_QUALITY_CASES = 4
@@ -74,14 +74,124 @@ TEXT_FILE_SUFFIXES = {".md", ".yaml", ".yml", ".py", ".sh", ".json", ".toml", ".
 def load_validation_contracts() -> dict[str, object]:
     path = Path(__file__).resolve().parents[1] / VALIDATION_CONTRACT_FILE
     with path.open(encoding="utf-8") as handle:
-        payload = json.load(handle)
+        payload = json.load(handle, object_pairs_hook=_reject_contract_duplicate_keys)
     if not isinstance(payload, dict):
         raise ValueError(f"{VALIDATION_CONTRACT_FILE} must contain an object")
     return payload
 
 
+def _reject_contract_duplicate_keys(
+    pairs: list[tuple[str, object]],
+) -> dict[str, object]:
+    result: dict[str, object] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate JSON key {key!r}")
+        result[key] = value
+    return result
+
+
 VALIDATION_CONTRACTS = load_validation_contracts()
 AUDIT_RUST_CONTRACT = VALIDATION_CONTRACTS["specialized_evals"]["audit-rust"]
+PACKAGE_POLICY = VALIDATION_CONTRACTS["package_policy"]
+QUALITY_EVIDENCE_SCHEMA_VERSION = int(
+    VALIDATION_CONTRACTS["behavior_eval"][
+        "quality_evidence_manifest_schema_version"
+    ]
+)
+CLAIMABLE_COMPARISON_KINDS = set(
+    VALIDATION_CONTRACTS["behavior_eval"]["claimable_comparison_kinds"]
+)
+MAX_DESCRIPTION_CHARS = int(PACKAGE_POLICY["maximum_description_characters"])
+MAX_SKILL_LINES = int(PACKAGE_POLICY["maximum_skill_lines"])
+MIN_SHORT_DESCRIPTION_CHARS = int(
+    PACKAGE_POLICY["short_description_characters"]["minimum"]
+)
+MAX_SHORT_DESCRIPTION_CHARS = int(
+    PACKAGE_POLICY["short_description_characters"]["maximum"]
+)
+MAX_DEFAULT_PROMPT_CHARS = int(PACKAGE_POLICY["maximum_default_prompt_characters"])
+REFERENCE_TOC_AFTER_LINES = int(PACKAGE_POLICY["reference_toc_after_lines"])
+REFERENCE_TOC_EXEMPTIONS = set(PACKAGE_POLICY["reference_toc_exemptions"])
+
+
+def validate_official_baseline(
+    contracts: dict[str, object], *, today: date | None = None
+) -> list[str]:
+    """Require a dated, provider-complete official standards baseline."""
+
+    errors: list[str] = []
+    baseline = contracts.get("official_baseline")
+    if not isinstance(baseline, dict):
+        return ["repository: official_baseline must be an object"]
+
+    parsed_dates: dict[str, date] = {}
+    for key in ("reviewed_at", "review_due"):
+        raw = baseline.get(key)
+        if not isinstance(raw, str):
+            errors.append(f"repository: official_baseline.{key} must be an ISO date")
+            continue
+        try:
+            parsed_dates[key] = date.fromisoformat(raw)
+        except ValueError:
+            errors.append(f"repository: official_baseline.{key} must be an ISO date")
+
+    reviewed_at = parsed_dates.get("reviewed_at")
+    review_due = parsed_dates.get("review_due")
+    if reviewed_at and review_due:
+        current = today or date.today()
+        if reviewed_at > current:
+            errors.append(
+                "repository: official_baseline.reviewed_at cannot be in the future"
+            )
+        if review_due < reviewed_at:
+            errors.append("repository: official_baseline.review_due precedes reviewed_at")
+        maximum_age = baseline.get("maximum_review_age_days")
+        if isinstance(maximum_age, bool) or not isinstance(maximum_age, int) or maximum_age < 1:
+            errors.append(
+                "repository: official_baseline.maximum_review_age_days must be a positive integer"
+            )
+        elif (review_due - reviewed_at).days > maximum_age:
+            errors.append(
+                "repository: official_baseline review window exceeds maximum_review_age_days"
+            )
+        if current > review_due:
+            errors.append(
+                f"repository: official skill baseline review expired on {review_due.isoformat()}"
+            )
+
+    sources = baseline.get("sources")
+    if not isinstance(sources, list) or not sources:
+        errors.append("repository: official_baseline.sources must be a non-empty object list")
+        return errors
+    observed_lanes: set[str] = set()
+    for index, source in enumerate(sources, 1):
+        if not isinstance(source, dict):
+            errors.append(f"repository: official_baseline source {index} must be an object")
+            continue
+        lane = source.get("lane")
+        if not isinstance(lane, str) or not lane:
+            errors.append(f"repository: official_baseline source {index} missing lane")
+        else:
+            observed_lanes.add(lane)
+        for key in ("provider", "url", "revision"):
+            value = source.get(key)
+            if not isinstance(value, str) or not value.strip():
+                errors.append(
+                    f"repository: official_baseline source {index} missing {key}"
+                )
+        url = source.get("url")
+        if isinstance(url, str) and not url.startswith("https://"):
+            errors.append(
+                f"repository: official_baseline source {index} url must use https"
+            )
+    required_lanes = {"portable-core", "openai", "claude"}
+    missing_lanes = required_lanes - observed_lanes
+    if missing_lanes:
+        errors.append(
+            f"repository: official_baseline missing provider lanes {sorted(missing_lanes)}"
+        )
+    return errors
 
 
 @dataclass(frozen=True)
@@ -171,6 +281,653 @@ def validate_repository_indexes(root: Path, packages: list[SkillPackage]) -> lis
     return errors
 
 
+def validate_quality_evidence(
+    root: Path,
+) -> tuple[list[str], dict[tuple[str, str], set[int]]]:
+    """Validate immutable, executable behavior/workflow evidence records."""
+
+    errors: list[str] = []
+    trials: dict[tuple[str, str], set[int]] = {}
+    manifest_path = root / QUALITY_EVIDENCE_FILE
+    if not manifest_path.is_file():
+        return errors, trials
+    try:
+        payload = json.loads(
+            manifest_path.read_text(encoding="utf-8"),
+            object_pairs_hook=reject_duplicate_json_keys,
+        )
+    except (OSError, json.JSONDecodeError, ValueError) as error:
+        return [f"repository: cannot read {QUALITY_EVIDENCE_FILE}: {error}"], trials
+    if not isinstance(payload, dict):
+        return [f"repository: {QUALITY_EVIDENCE_FILE} must contain an object"], trials
+    if payload.get("schema_version") != QUALITY_EVIDENCE_SCHEMA_VERSION:
+        errors.append(
+            f"repository: {QUALITY_EVIDENCE_FILE} schema_version must be "
+            f"{QUALITY_EVIDENCE_SCHEMA_VERSION}"
+        )
+    claims = payload.get("claims")
+    if not isinstance(claims, list) or any(
+        not isinstance(item, dict) for item in claims
+    ):
+        errors.append(
+            f"repository: {QUALITY_EVIDENCE_FILE} claims must be an object list"
+        )
+        claims = []
+    records = payload.get("evidence")
+    if not isinstance(records, list) or any(not isinstance(item, dict) for item in records):
+        errors.append(f"repository: {QUALITY_EVIDENCE_FILE} evidence must be an object list")
+        return errors, trials
+    comparisons = payload.get("comparisons")
+    if not isinstance(comparisons, list) or any(
+        not isinstance(item, dict) for item in comparisons
+    ):
+        errors.append(
+            f"repository: {QUALITY_EVIDENCE_FILE} comparisons must be an object list"
+        )
+        comparisons = []
+
+    evaluator = root / "scripts" / "eval-skill-contracts.py"
+    known_kinds = {"routing", "authority", "workflow"}
+    observed_ids: set[str] = set()
+    observed_trials: set[tuple[str, str, int]] = set()
+    observed_run_ids: set[str] = set()
+    observed_bundle_paths: set[Path] = set()
+    observed_bundle_hashes: set[str] = set()
+    observed_raw_paths: set[Path] = set()
+    observed_raw_hashes: set[str] = set()
+    valid_evidence: dict[str, dict[str, object]] = {}
+    root_resolved = root.resolve()
+    for index, record in enumerate(records, 1):
+        evidence_id = record.get("id")
+        if not isinstance(evidence_id, str) or not evidence_id.strip():
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {index} missing id"
+            )
+            continue
+        if evidence_id in observed_ids:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} duplicates evidence id {evidence_id}"
+            )
+            continue
+        observed_ids.add(evidence_id)
+
+        kind = record.get("kind")
+        if kind not in known_kinds:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} has unknown kind {kind!r}"
+            )
+            continue
+        dataset = record.get("dataset")
+        if (
+            not isinstance(dataset, str)
+            or not dataset.strip()
+            or Path(dataset).is_absolute()
+        ):
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} dataset must be a relative path"
+            )
+            continue
+        dataset_path = (root / dataset).resolve()
+        try:
+            dataset_path.relative_to(root_resolved)
+        except ValueError:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} dataset escapes repository"
+            )
+            continue
+        if not dataset_path.is_file():
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} dataset does not exist"
+            )
+            continue
+        expected_dataset_hash = record.get("dataset_sha256")
+        actual_dataset_hash = hashlib.sha256(dataset_path.read_bytes()).hexdigest()
+        if (
+            not isinstance(expected_dataset_hash, str)
+            or re.fullmatch(r"[0-9a-f]{64}", expected_dataset_hash) is None
+            or expected_dataset_hash != actual_dataset_hash
+        ):
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} dataset hash mismatch"
+            )
+            continue
+        bundle = record.get("bundle")
+        if not isinstance(bundle, str) or not bundle.strip() or Path(bundle).is_absolute():
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} bundle must be a relative path"
+            )
+            continue
+        bundle_path = (root / bundle).resolve()
+        try:
+            bundle_path.relative_to(root_resolved)
+        except ValueError:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} bundle escapes repository"
+            )
+            continue
+        if not bundle_path.is_file():
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} bundle does not exist"
+            )
+            continue
+        if bundle_path in observed_bundle_paths:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} reuses bundle path {bundle}"
+            )
+            continue
+        expected_hash = record.get("bundle_sha256")
+        actual_hash = hashlib.sha256(bundle_path.read_bytes()).hexdigest()
+        if (
+            not isinstance(expected_hash, str)
+            or re.fullmatch(r"[0-9a-f]{64}", expected_hash) is None
+            or expected_hash != actual_hash
+        ):
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} bundle hash mismatch"
+            )
+            continue
+        if actual_hash in observed_bundle_hashes:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} replays an existing bundle hash"
+            )
+            continue
+        observed_bundle_paths.add(bundle_path)
+        observed_bundle_hashes.add(actual_hash)
+        try:
+            bundle_payload = json.loads(
+                bundle_path.read_text(encoding="utf-8"),
+                object_pairs_hook=reject_duplicate_json_keys,
+            )
+            run_config = bundle_payload["run_config"]
+            variant = run_config["variant"]
+            trial = run_config["trial"]
+        except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError) as error:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} cannot read run_config: {error}"
+            )
+            continue
+        if variant not in {"candidate", "baseline", "previous"} or (
+            isinstance(trial, bool) or not isinstance(trial, int) or trial < 1
+        ):
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} has invalid variant/trial"
+            )
+            continue
+        run_id = bundle_payload.get("run_id")
+        if not isinstance(run_id, str) or not run_id.strip():
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} missing run_id"
+            )
+            continue
+        if run_id in observed_run_ids:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} duplicates run_id {run_id}"
+            )
+            continue
+        observed_run_ids.add(run_id)
+
+        skill_revision = bundle_payload.get("skill_revision")
+        if not isinstance(skill_revision, str) or re.fullmatch(
+            r"[0-9a-f]{40}", skill_revision
+        ) is None:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} has invalid skill_revision"
+            )
+            continue
+        if variant == "candidate":
+            skill_diff = subprocess.run(
+                ["git", "diff", "--quiet", skill_revision, "--", "skills"],
+                cwd=root,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            if skill_diff.returncode != 0:
+                detail = (skill_diff.stderr or skill_diff.stdout).strip()
+                suffix = f": {detail}" if detail else ""
+                errors.append(
+                    f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} skill_revision "
+                    f"does not match the current skills tree{suffix}"
+                )
+                continue
+            untracked_skills = subprocess.run(
+                ["git", "ls-files", "--others", "--exclude-standard", "--", "skills"],
+                cwd=root,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            if untracked_skills.returncode != 0 or untracked_skills.stdout.strip():
+                errors.append(
+                    f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} cannot bind to a skills tree with untracked files"
+                )
+                continue
+        skill_tree_sha = bundle_payload.get("skill_tree_sha")
+        if not isinstance(skill_tree_sha, str) or re.fullmatch(
+            r"[0-9a-f]{40}", skill_tree_sha
+        ) is None:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} has invalid skill_tree_sha"
+            )
+            continue
+        revision_tree = subprocess.run(
+            ["git", "rev-parse", f"{skill_revision}:skills"],
+            cwd=root,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if (
+            revision_tree.returncode != 0
+            or revision_tree.stdout.strip() != skill_tree_sha
+        ):
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} skill_tree_sha "
+                "does not match skill_revision"
+            )
+            continue
+
+        results = bundle_payload.get("results")
+        if not isinstance(results, list) or any(
+            not isinstance(item, dict) for item in results
+        ):
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} results must be an object list"
+            )
+            continue
+        raw_replay = False
+        bundle_root = bundle_path.parent.resolve()
+        for result in results:
+            raw_evidence = result.get("raw_evidence")
+            raw_hash = result.get("raw_evidence_sha256")
+            if (
+                not isinstance(raw_evidence, str)
+                or not raw_evidence.strip()
+                or Path(raw_evidence).is_absolute()
+                or not isinstance(raw_hash, str)
+                or re.fullmatch(r"[0-9a-f]{64}", raw_hash) is None
+            ):
+                errors.append(
+                    f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} has invalid raw evidence metadata"
+                )
+                raw_replay = True
+                break
+            raw_path = (bundle_root / raw_evidence).resolve()
+            try:
+                raw_path.relative_to(bundle_root)
+            except ValueError:
+                errors.append(
+                    f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} raw evidence escapes its bundle"
+                )
+                raw_replay = True
+                break
+            if not raw_path.is_file() or hashlib.sha256(raw_path.read_bytes()).hexdigest() != raw_hash:
+                errors.append(
+                    f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} raw evidence hash mismatch"
+                )
+                raw_replay = True
+                break
+            if raw_path in observed_raw_paths or raw_hash in observed_raw_hashes:
+                errors.append(
+                    f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} replays raw evidence"
+                )
+                raw_replay = True
+                break
+            observed_raw_paths.add(raw_path)
+            observed_raw_hashes.add(raw_hash)
+        if raw_replay:
+            continue
+        trial_key = (str(kind), str(variant), trial)
+        if trial_key in observed_trials:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} duplicates {kind}/{variant} trial {trial}"
+            )
+            continue
+
+        completed = subprocess.run(
+            [
+                sys.executable,
+                str(evaluator),
+                f"--{kind}-dataset",
+                str(dataset_path),
+                f"--{kind}-results",
+                str(bundle_path),
+            ],
+            cwd=root,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if completed.returncode != 0:
+            detail = (completed.stderr or completed.stdout).strip().splitlines()
+            suffix = f": {detail[-1]}" if detail else ""
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} evidence {evidence_id} did not pass scorer{suffix}"
+            )
+            continue
+        observed_trials.add(trial_key)
+        trials.setdefault((str(kind), str(variant)), set()).add(trial)
+        valid_evidence[evidence_id] = {
+            "kind": str(kind),
+            "variant": str(variant),
+            "trial": trial,
+            "model": bundle_payload.get("model"),
+            "host": bundle_payload.get("host"),
+            "host_name": run_config.get("host_name"),
+            "skill_revision": skill_revision,
+            "bundle_path": bundle_path,
+            "bundle_sha256": actual_hash,
+            "dataset_path": dataset_path,
+            "dataset_sha256": actual_dataset_hash,
+        }
+
+    comparison_errors, passing_comparisons = validate_quality_comparisons(
+        root, comparisons, valid_evidence
+    )
+    errors.extend(comparison_errors)
+    claim_fields = {
+        "id",
+        "status",
+        "comparison_id",
+        "dimension",
+        "kind",
+        "host_name",
+        "host_version",
+        "model",
+        "candidate_skill_revision",
+        "control_variant",
+        "control_skill_revision",
+        "dataset_sha256",
+        "skills",
+    }
+    observed_claim_ids: set[str] = set()
+    for index, claim in enumerate(claims, 1):
+        claim_id = claim.get("id")
+        if not isinstance(claim_id, str) or not claim_id.strip():
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} claim {index} missing id"
+            )
+            continue
+        if claim_id in observed_claim_ids:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} duplicates claim id {claim_id}"
+            )
+            continue
+        observed_claim_ids.add(claim_id)
+        if set(claim) != claim_fields:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} claim {claim_id} fields must be "
+                f"{sorted(claim_fields)}"
+            )
+            continue
+        if claim.get("status") != "verified":
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} claim {claim_id} status must be verified; "
+                "omit unverified claims"
+            )
+            continue
+        comparison_id = claim.get("comparison_id")
+        if comparison_id not in passing_comparisons:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} claim {claim_id} requires its "
+                "replayed passing comparison"
+            )
+            continue
+        expected = passing_comparisons[str(comparison_id)]
+        if expected["kind"] not in CLAIMABLE_COMPARISON_KINDS:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} claim {claim_id} kind "
+                f"{expected['kind']!r} is producer-attested only and cannot be verified"
+            )
+            continue
+        dimension = claim.get("dimension")
+        if dimension not in expected["dimensions"]:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} claim {claim_id} dimension "
+                f"{dimension!r} did not pass its comparison gate"
+            )
+            continue
+        scoped_fields = {
+            "kind": "kind",
+            "host_name": "host_name",
+            "host_version": "host",
+            "model": "model",
+            "candidate_skill_revision": "candidate_skill_revision",
+            "control_variant": "control_variant",
+            "control_skill_revision": "control_skill_revision",
+            "dataset_sha256": "dataset_sha256",
+            "skills": "skills",
+        }
+        for claim_key, expected_key in scoped_fields.items():
+            if claim.get(claim_key) != expected[expected_key]:
+                errors.append(
+                    f"repository: {QUALITY_EVIDENCE_FILE} claim {claim_id} {claim_key} "
+                    "does not match its comparison scope"
+                )
+    return errors, trials
+
+
+def validate_quality_comparisons(
+    root: Path,
+    comparisons: list[dict[str, object]],
+    evidence: dict[str, dict[str, object]],
+) -> tuple[list[str], dict[str, dict[str, object]]]:
+    """Replay comparison reports from validated immutable evidence bundles."""
+
+    errors: list[str] = []
+    passing: dict[str, dict[str, object]] = {}
+    comparator = root / "scripts" / "compare-skill-evals.py"
+    root_resolved = root.resolve()
+    observed_ids: set[str] = set()
+    observed_reports: set[Path] = set()
+    observed_report_hashes: set[str] = set()
+
+    for index, record in enumerate(comparisons, 1):
+        comparison_id = record.get("id")
+        if not isinstance(comparison_id, str) or not comparison_id.strip():
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} comparison {index} missing id"
+            )
+            continue
+        if comparison_id in observed_ids:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} duplicates comparison id {comparison_id}"
+            )
+            continue
+        observed_ids.add(comparison_id)
+        kind = record.get("kind")
+        if kind not in {"routing", "authority", "workflow"}:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} comparison {comparison_id} has unknown kind {kind!r}"
+            )
+            continue
+
+        selected: dict[str, list[str]] = {}
+        invalid_selection = False
+        for key in ("candidate_evidence", "control_evidence"):
+            values = record.get(key)
+            if (
+                not isinstance(values, list)
+                or not values
+                or any(not isinstance(item, str) or not item.strip() for item in values)
+                or len(values) != len(set(values))
+            ):
+                errors.append(
+                    f"repository: {QUALITY_EVIDENCE_FILE} comparison {comparison_id} "
+                    f"{key} must be a non-empty unique string list"
+                )
+                invalid_selection = True
+                break
+            selected[key] = values
+        if invalid_selection:
+            continue
+        if set(selected["candidate_evidence"]) & set(selected["control_evidence"]):
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} comparison {comparison_id} reuses evidence across variants"
+            )
+            continue
+        evidence_ids = [
+            *selected["candidate_evidence"],
+            *selected["control_evidence"],
+        ]
+        missing = [evidence_id for evidence_id in evidence_ids if evidence_id not in evidence]
+        if missing:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} comparison {comparison_id} references invalid evidence {sorted(missing)}"
+            )
+            continue
+        candidate_records = [evidence[item] for item in selected["candidate_evidence"]]
+        control_records = [evidence[item] for item in selected["control_evidence"]]
+        all_records = [*candidate_records, *control_records]
+        if any(item["kind"] != kind for item in all_records):
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} comparison {comparison_id} mixes evidence kinds"
+            )
+            continue
+        if any(item["variant"] != "candidate" for item in candidate_records):
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} comparison {comparison_id} candidate_evidence must use candidate bundles"
+            )
+            continue
+        control_variants = {str(item["variant"]) for item in control_records}
+        if len(control_variants) != 1 or "candidate" in control_variants:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} comparison {comparison_id} control_evidence must use one control variant"
+            )
+            continue
+        dataset_paths = {Path(item["dataset_path"]) for item in all_records}
+        dataset_hashes = {str(item["dataset_sha256"]) for item in all_records}
+        if len(dataset_paths) != 1 or len(dataset_hashes) != 1:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} comparison {comparison_id} must use one dataset"
+            )
+            continue
+
+        report = record.get("report")
+        if not isinstance(report, str) or not report.strip() or Path(report).is_absolute():
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} comparison {comparison_id} report must be a relative path"
+            )
+            continue
+        report_path = (root / report).resolve()
+        try:
+            report_path.relative_to(root_resolved)
+        except ValueError:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} comparison {comparison_id} report escapes repository"
+            )
+            continue
+        if not report_path.is_file():
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} comparison {comparison_id} report does not exist"
+            )
+            continue
+        report_hash = hashlib.sha256(report_path.read_bytes()).hexdigest()
+        expected_report_hash = record.get("report_sha256")
+        if (
+            not isinstance(expected_report_hash, str)
+            or re.fullmatch(r"[0-9a-f]{64}", expected_report_hash) is None
+            or expected_report_hash != report_hash
+        ):
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} comparison {comparison_id} report hash mismatch"
+            )
+            continue
+        if report_path in observed_reports or report_hash in observed_report_hashes:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} comparison {comparison_id} replays a comparison report"
+            )
+            continue
+        observed_reports.add(report_path)
+        observed_report_hashes.add(report_hash)
+        try:
+            recorded_report = json.loads(
+                report_path.read_text(encoding="utf-8"),
+                object_pairs_hook=reject_duplicate_json_keys,
+            )
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError, ValueError) as error:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} comparison {comparison_id} cannot read report: {error}"
+            )
+            continue
+
+        candidate_records.sort(key=lambda item: int(item["trial"]))
+        control_records.sort(key=lambda item: int(item["trial"]))
+        command = [
+            sys.executable,
+            str(comparator),
+            "--kind",
+            str(kind),
+            "--dataset",
+            str(next(iter(dataset_paths))),
+        ]
+        for item in candidate_records:
+            command.extend(("--candidate", str(item["bundle_path"])))
+        for item in control_records:
+            command.extend(("--control", str(item["bundle_path"])))
+        completed = subprocess.run(
+            command,
+            cwd=root,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        try:
+            replayed_report = json.loads(
+                completed.stdout,
+                object_pairs_hook=reject_duplicate_json_keys,
+            )
+        except (json.JSONDecodeError, ValueError) as error:
+            detail = (completed.stderr or completed.stdout).strip()
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} comparison {comparison_id} replay produced invalid JSON: {detail or error}"
+            )
+            continue
+        if completed.returncode != 0 or replayed_report.get("status") != "PASS":
+            detail = replayed_report.get("errors", [])
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} comparison {comparison_id} did not pass replay: {detail}"
+            )
+            continue
+        if replayed_report != recorded_report:
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} comparison {comparison_id} report does not match replay"
+            )
+            continue
+        comparison_metrics = replayed_report.get("comparison")
+        if not isinstance(comparison_metrics, dict):
+            errors.append(
+                f"repository: {QUALITY_EVIDENCE_FILE} comparison {comparison_id} report "
+                "missing comparison metrics"
+            )
+            continue
+        dimensions: list[str] = []
+        if comparison_metrics.get("outcome_threshold_met") is True:
+            dimensions.append("outcome")
+        if (
+            comparison_metrics.get("outcome_non_regression") is True
+            and comparison_metrics.get("token_threshold_met") is True
+        ):
+            dimensions.append("token_efficiency")
+        candidate_record = candidate_records[0]
+        control_record = control_records[0]
+        passing[str(comparison_id)] = {
+            "kind": str(kind),
+            "host_name": candidate_record["host_name"],
+            "host": candidate_record["host"],
+            "model": candidate_record["model"],
+            "candidate_skill_revision": candidate_record["skill_revision"],
+            "control_variant": control_record["variant"],
+            "control_skill_revision": control_record["skill_revision"],
+            "dataset_sha256": candidate_record["dataset_sha256"],
+            "skills": sorted(
+                path.parent.name for path in (root / "skills").glob("*/SKILL.md")
+            ),
+            "dimensions": dimensions,
+        }
+    return errors, passing
+
+
 def validate_quality_status(root: Path, packages: list[SkillPackage]) -> list[str]:
     errors: list[str] = []
     path = root / QUALITY_STATUS_FILE
@@ -178,6 +935,14 @@ def validate_quality_status(root: Path, packages: list[SkillPackage]) -> list[st
         text = path.read_text(encoding="utf-8")
     except OSError as error:
         return [f"repository: cannot read {QUALITY_STATUS_FILE}: {error}"]
+
+    evidence_errors, evidence_trials = validate_quality_evidence(root)
+    errors.extend(evidence_errors)
+    minimum_trials = int(
+        VALIDATION_CONTRACTS["behavior_eval"]["comparative"][
+            "minimum_trials_per_variant"
+        ]
+    )
 
     rows = markdown_table_rows(text, "## Skill Status")
     expected = {package.name for package in packages}
@@ -210,6 +975,31 @@ def validate_quality_status(root: Path, packages: list[SkillPackage]) -> list[st
             if state not in VALIDATION_STATES:
                 errors.append(
                     f"repository: {QUALITY_STATUS_FILE} skill {name} has unknown {axis} state {state!r}"
+                )
+        if behavior == "verified":
+            if "authority" not in CLAIMABLE_COMPARISON_KINDS:
+                errors.append(
+                    f"repository: {QUALITY_STATUS_FILE} skill {name} behavior=verified "
+                    "is unavailable while authority evidence is producer-attested only"
+                )
+            for kind in ("routing", "authority"):
+                recorded = len(evidence_trials.get((kind, "candidate"), set()))
+                if recorded < minimum_trials:
+                    errors.append(
+                        f"repository: {QUALITY_STATUS_FILE} skill {name} behavior=verified "
+                        f"requires {minimum_trials} passing candidate {kind} trials; found {recorded}"
+                    )
+        if workflow == "verified":
+            if "workflow" not in CLAIMABLE_COMPARISON_KINDS:
+                errors.append(
+                    f"repository: {QUALITY_STATUS_FILE} skill {name} workflow=verified "
+                    "is unavailable while workflow evidence is producer-attested only"
+                )
+            recorded = len(evidence_trials.get(("workflow", "candidate"), set()))
+            if recorded < minimum_trials:
+                errors.append(
+                    f"repository: {QUALITY_STATUS_FILE} skill {name} workflow=verified "
+                    f"requires {minimum_trials} passing candidate workflow trials; found {recorded}"
                 )
 
     for name in sorted(expected - set(observed)):
@@ -322,59 +1112,268 @@ def validate_routing_graph(root: Path, packages: list[SkillPackage]) -> list[str
     return errors
 
 
-def read_frontmatter(skill_md: Path) -> dict[str, str]:
-    lines = skill_md.read_text(encoding="utf-8").splitlines()
-    if len(lines) < 3 or lines[0] != "---":
-        return {}
-
-    frontmatter: dict[str, str] = {}
-    for line in lines[1:]:
-        if line == "---":
-            return frontmatter
-        if ":" not in line:
-            continue
-        key, value = line.split(":", 1)
-        frontmatter[key.strip()] = value.strip().strip('"')
-    return {}
+class StrictYamlError(ValueError):
+    """Raised when a repository metadata file leaves the supported YAML subset."""
 
 
-def frontmatter_yaml_string_errors(skill_md: Path) -> list[str]:
-    lines = skill_md.read_text(encoding="utf-8").splitlines()
-    if len(lines) < 3 or lines[0] != "---":
-        return []
+def _yaml_without_comment(value: str) -> str:
+    """Remove a YAML comment outside quotes from one scalar line."""
 
-    errors: list[str] = []
-    for line in lines[1:]:
-        if line == "---":
-            break
-        if ":" not in line:
-            continue
-        key, raw_value = line.split(":", 1)
-        value = raw_value.strip()
-        if not value:
-            continue
-        is_quoted = (value.startswith('"') and value.endswith('"')) or (
-            value.startswith("'") and value.endswith("'")
-        )
-        if not is_quoted and ": " in value:
-            errors.append(
-                f"{key.strip()}: quote frontmatter string values that contain ': '"
+    quote: str | None = None
+    escaped = False
+    index = 0
+    while index < len(value):
+        character = value[index]
+        if quote == '"':
+            if escaped:
+                escaped = False
+            elif character == "\\":
+                escaped = True
+            elif character == quote:
+                quote = None
+        elif quote == "'":
+            if character == "'" and index + 1 < len(value) and value[index + 1] == "'":
+                index += 1
+            elif character == quote:
+                quote = None
+        elif character in {'"', "'"}:
+            quote = character
+        elif character == "#" and (index == 0 or value[index - 1].isspace()):
+            return value[:index].rstrip()
+        index += 1
+    return value.rstrip()
+
+
+def _parse_yaml_scalar(raw_value: str, *, line_number: int) -> object:
+    value = _yaml_without_comment(raw_value).strip()
+    if not value:
+        raise StrictYamlError(f"line {line_number}: scalar value must not be empty")
+
+    if value.startswith('"'):
+        escaped = False
+        closing = -1
+        for index, character in enumerate(value[1:], 1):
+            if escaped:
+                escaped = False
+            elif character == "\\":
+                escaped = True
+            elif character == '"':
+                closing = index
+                break
+        if closing < 0:
+            raise StrictYamlError(f"line {line_number}: unterminated double-quoted scalar")
+        trailing = value[closing + 1 :].strip()
+        if trailing:
+            raise StrictYamlError(
+                f"line {line_number}: unexpected content after quoted scalar"
             )
+        try:
+            parsed = json.loads(value[: closing + 1])
+        except json.JSONDecodeError as error:
+            raise StrictYamlError(
+                f"line {line_number}: invalid double-quoted scalar: {error.msg}"
+            ) from error
+        if not isinstance(parsed, str):
+            raise StrictYamlError(f"line {line_number}: expected a string scalar")
+        return parsed
+
+    if value.startswith("'"):
+        result: list[str] = []
+        index = 1
+        while index < len(value):
+            character = value[index]
+            if character == "'":
+                if index + 1 < len(value) and value[index + 1] == "'":
+                    result.append("'")
+                    index += 2
+                    continue
+                trailing = value[index + 1 :].strip()
+                if trailing:
+                    raise StrictYamlError(
+                        f"line {line_number}: unexpected content after quoted scalar"
+                    )
+                return "".join(result)
+            result.append(character)
+            index += 1
+        raise StrictYamlError(f"line {line_number}: unterminated single-quoted scalar")
+
+    if value[0] in "-?:,[]{}#&*!|>@`" or re.search(r":(?:\s|$)", value):
+        raise StrictYamlError(
+            f"line {line_number}: unsupported or ambiguous plain scalar"
+        )
+    lowered = value.casefold()
+    if lowered in {
+        "null",
+        "~",
+        "true",
+        "false",
+        "yes",
+        "no",
+        "on",
+        "off",
+    } or re.fullmatch(r"[-+]?(?:\d[\d_]*)(?:\.\d[\d_]*)?", value):
+        raise StrictYamlError(
+            f"line {line_number}: non-string YAML scalars are not supported"
+        )
+    return value
+
+
+def parse_strict_yaml_mapping(yaml_text: str) -> dict[str, object]:
+    """Parse the repository's intentionally small, two-level YAML mapping subset."""
+
+    result: dict[str, object] = {}
+    active_child: dict[str, object] | None = None
+    for line_number, raw_line in enumerate(yaml_text.splitlines(), 1):
+        if not raw_line.strip() or raw_line.lstrip().startswith("#"):
+            continue
+        if "\t" in raw_line:
+            raise StrictYamlError(f"line {line_number}: tabs are not allowed")
+        indentation = len(raw_line) - len(raw_line.lstrip(" "))
+        if indentation not in {0, 2}:
+            raise StrictYamlError(
+                f"line {line_number}: indentation must be zero or two spaces"
+            )
+        content = raw_line[indentation:]
+        if ":" not in content:
+            raise StrictYamlError(f"line {line_number}: expected key: value")
+        key, raw_value = content.split(":", 1)
+        if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_-]*", key) is None:
+            raise StrictYamlError(f"line {line_number}: invalid mapping key {key!r}")
+
+        target = result if indentation == 0 else active_child
+        if target is None:
+            raise StrictYamlError(
+                f"line {line_number}: nested key has no parent mapping"
+            )
+        if key in target:
+            raise StrictYamlError(f"line {line_number}: duplicate key {key!r}")
+
+        without_comment = _yaml_without_comment(raw_value).strip()
+        if indentation == 0 and not without_comment:
+            child: dict[str, object] = {}
+            result[key] = child
+            active_child = child
+            continue
+        if indentation == 2 and not without_comment:
+            raise StrictYamlError(
+                f"line {line_number}: nested mappings deeper than interface are unsupported"
+            )
+        target[key] = _parse_yaml_scalar(raw_value, line_number=line_number)
+        if indentation == 0:
+            active_child = None
+    return result
+
+
+def _frontmatter_payload(skill_md: Path) -> tuple[dict[str, object], list[str]]:
+    lines = skill_md.read_text(encoding="utf-8").splitlines()
+    if not lines or lines[0] != "---":
+        return {}, ["frontmatter must start with '---'"]
+    try:
+        closing = lines[1:].index("---") + 1
+    except ValueError:
+        return {}, ["frontmatter is missing closing '---'"]
+    try:
+        payload = parse_strict_yaml_mapping("\n".join(lines[1:closing]))
+    except StrictYamlError as error:
+        return {}, [f"frontmatter is invalid YAML: {error}"]
+    return payload, []
+
+
+def read_frontmatter(skill_md: Path) -> dict[str, str]:
+    payload, errors = _frontmatter_payload(skill_md)
+    if errors:
+        return {}
+    return {
+        key: value
+        for key, value in payload.items()
+        if isinstance(value, str)
+    }
+
+
+def frontmatter_contract_errors(skill_md: Path) -> list[str]:
+    payload, errors = _frontmatter_payload(skill_md)
+    if errors:
+        return errors
+    expected_keys = {"name", "description"}
+    for key in sorted(set(payload) - expected_keys):
+        errors.append(
+            f"frontmatter key {key!r} is not part of this repository's portable core"
+        )
+    for key in sorted(expected_keys - set(payload)):
+        errors.append(f"frontmatter missing key {key!r}")
+    for key in sorted(expected_keys & set(payload)):
+        value = payload[key]
+        if not isinstance(value, str) or not value.strip():
+            errors.append(f"frontmatter key {key!r} must be a non-empty string")
     return errors
 
 
+def skill_name_errors(name: str) -> list[str]:
+    errors: list[str] = []
+    if not name or len(name) > 64 or SKILL_NAME_RE.fullmatch(name) is None:
+        errors.append("must contain 1-64 lowercase letters, digits, or hyphens")
+    if name.startswith("-") or name.endswith("-"):
+        errors.append("must not start or end with a hyphen")
+    if "--" in name:
+        errors.append("must not contain consecutive hyphens")
+    return errors
+
+
+def frontmatter_yaml_string_errors(skill_md: Path) -> list[str]:
+    # Kept as a compatibility shim for callers; strict parsing now owns this check.
+    return []
+
+
 def yaml_value_exists(yaml_text: str, key: str) -> bool:
-    return re.search(rf"^\s*{re.escape(key)}\s*:\s*.+$", yaml_text, re.MULTILINE) is not None
+    return bool(yaml_scalar(yaml_text, key))
 
 
 def yaml_scalar(yaml_text: str, key: str) -> str:
-    match = re.search(rf"^\s*{re.escape(key)}\s*:\s*(.+)$", yaml_text, re.MULTILINE)
-    if match is None:
+    try:
+        payload = parse_strict_yaml_mapping(yaml_text)
+    except StrictYamlError:
         return ""
-    value = match.group(1).strip()
-    if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
-        return value[1:-1]
-    return value
+    interface = payload.get("interface")
+    if not isinstance(interface, dict):
+        return ""
+    value = interface.get(key)
+    return value if isinstance(value, str) else ""
+
+
+def openai_yaml_contract(yaml_text: str) -> tuple[dict[str, str], list[str]]:
+    """Validate and return the exact provider interface metadata schema."""
+
+    try:
+        payload = parse_strict_yaml_mapping(yaml_text)
+    except StrictYamlError as error:
+        return {}, [f"invalid YAML: {error}"]
+    errors: list[str] = []
+    if set(payload) != {"interface"}:
+        unknown = sorted(set(payload) - {"interface"})
+        missing = "interface" not in payload
+        if missing:
+            errors.append("top level must contain interface")
+        if unknown:
+            errors.append(f"top level contains unsupported keys {unknown}")
+    interface = payload.get("interface")
+    if not isinstance(interface, dict):
+        errors.append("interface must be a mapping")
+        return {}, errors
+    required = {"display_name", "short_description", "default_prompt"}
+    missing_keys = sorted(required - set(interface))
+    unknown_keys = sorted(set(interface) - required)
+    if missing_keys:
+        errors.append(f"interface missing keys {missing_keys}")
+    if unknown_keys:
+        errors.append(f"interface contains unsupported keys {unknown_keys}")
+    values: dict[str, str] = {}
+    for key in sorted(required & set(interface)):
+        value = interface[key]
+        if not isinstance(value, str) or not value.strip():
+            errors.append(f"interface.{key} must be a non-empty string")
+        else:
+            values[key] = value
+    return values, errors
 
 
 def has_markdown_reference(package_path: Path) -> bool:
@@ -816,6 +1815,19 @@ def validate_references(package_path: Path, skill_md_text: str, *, label: str) -
             relative = nested_reference.relative_to(package_path)
             errors.append(f"{label}: reference files must be one level deep: {relative}")
 
+    for reference_file in reference_files:
+        reference_text = reference_file.read_text(encoding="utf-8")
+        line_count = len(reference_text.splitlines())
+        if (
+            line_count > REFERENCE_TOC_AFTER_LINES
+            and reference_file.name not in REFERENCE_TOC_EXEMPTIONS
+            and "## Contents" not in reference_text
+        ):
+            errors.append(
+                f"{label}: references/{reference_file.name} has {line_count} lines and "
+                f"must include ## Contents after {REFERENCE_TOC_AFTER_LINES} lines"
+            )
+
     eval_cases = references_dir / EVAL_CASES_FILE
     if not eval_cases.is_file():
         errors.append(f"{label}: missing references/{EVAL_CASES_FILE}")
@@ -847,13 +1859,15 @@ def validate_package(package: SkillPackage, *, label: str) -> tuple[list[str], Q
     openai_yaml = package_path / "agents" / "openai.yaml"
     skill_md_text = ""
 
-    if not SKILL_NAME_RE.match(package.name):
-        errors.append(f"{label}: invalid skill directory name: {package.name}")
+    for name_error in skill_name_errors(package.name):
+        errors.append(f"{label}: invalid skill directory name {package.name!r}: {name_error}")
 
     if not skill_md.is_file():
         errors.append(f"{label}: missing SKILL.md")
     else:
         skill_md_text = skill_md.read_text(encoding="utf-8")
+        for frontmatter_error in frontmatter_contract_errors(skill_md):
+            errors.append(f"{label}: SKILL.md {frontmatter_error}")
         for frontmatter_error in frontmatter_yaml_string_errors(skill_md):
             errors.append(f"{label}: SKILL.md {frontmatter_error}")
         frontmatter = read_frontmatter(skill_md)
@@ -861,6 +1875,9 @@ def validate_package(package: SkillPackage, *, label: str) -> tuple[list[str], Q
         description = frontmatter.get("description", "")
         if actual_name != package.name:
             errors.append(f"{label}: SKILL.md name must be {package.name!r}, found {actual_name!r}")
+        if actual_name is not None:
+            for name_error in skill_name_errors(actual_name):
+                errors.append(f"{label}: SKILL.md name {name_error}")
         if not description.startswith("Use when"):
             errors.append(f"{label}: SKILL.md description must start with 'Use when'")
         if len(description) > MAX_DESCRIPTION_CHARS:
@@ -878,20 +1895,22 @@ def validate_package(package: SkillPackage, *, label: str) -> tuple[list[str], Q
                 errors.append(f"{label}: SKILL.md missing section {section!r}")
         if "## Workflow" not in skill_md_text and "## Modes" not in skill_md_text:
             errors.append(f"{label}: SKILL.md must include Workflow or Modes")
-        if "## Maintenance" not in skill_md_text and "## Skill Maintenance" not in skill_md_text:
-            errors.append(f"{label}: SKILL.md must include Maintenance")
 
     if not openai_yaml.is_file():
         errors.append(f"{label}: missing agents/openai.yaml")
     else:
         yaml_text = openai_yaml.read_text(encoding="utf-8")
-        for key in ("display_name", "short_description", "default_prompt"):
-            if not yaml_value_exists(yaml_text, key):
-                errors.append(f"{label}: agents/openai.yaml missing {key}")
-        if f"${package.name}" not in yaml_text:
+        interface, yaml_errors = openai_yaml_contract(yaml_text)
+        for yaml_error in yaml_errors:
+            errors.append(f"{label}: agents/openai.yaml {yaml_error}")
+        short_description = interface.get("short_description", "")
+        default_prompt = interface.get("default_prompt", "")
+        if default_prompt and f"${package.name}" not in default_prompt:
             errors.append(f"{label}: agents/openai.yaml default prompt should mention ${package.name}")
-        short_description = yaml_scalar(yaml_text, "short_description")
-        default_prompt = yaml_scalar(yaml_text, "default_prompt")
+        if short_description and len(short_description) < MIN_SHORT_DESCRIPTION_CHARS:
+            errors.append(
+                f"{label}: short_description must be at least {MIN_SHORT_DESCRIPTION_CHARS} characters"
+            )
         if len(short_description) > MAX_SHORT_DESCRIPTION_CHARS:
             errors.append(
                 f"{label}: short_description must be {MAX_SHORT_DESCRIPTION_CHARS} characters or fewer"
@@ -900,6 +1919,14 @@ def validate_package(package: SkillPackage, *, label: str) -> tuple[list[str], Q
             errors.append(
                 f"{label}: default_prompt must be {MAX_DEFAULT_PROMPT_CHARS} characters or fewer"
             )
+        expected_prefix = f"Use ${package.name}"
+        if default_prompt and not default_prompt.startswith(expected_prefix):
+            errors.append(
+                f"{label}: default_prompt must start with {expected_prefix!r}"
+            )
+        sentence_endings = re.findall(r"[.!?](?=\s|$)", default_prompt)
+        if len(sentence_endings) > 1:
+            errors.append(f"{label}: default_prompt must be one concise sentence")
 
     if not has_markdown_reference(package_path):
         errors.append(f"{label}: missing references/*.md")
@@ -1166,6 +2193,7 @@ def main() -> int:
         )
     )
     if not args.skill:
+        source_errors.extend(validate_official_baseline(VALIDATION_CONTRACTS))
         source_errors.extend(validate_repository_indexes(root, packages))
         source_errors.extend(validate_quality_status(root, packages))
         source_errors.extend(validate_routing_graph(root, packages))

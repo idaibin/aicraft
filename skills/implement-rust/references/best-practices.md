@@ -3,6 +3,17 @@
 Apply repository guidance first. Use these rules when the repository does not
 define a stricter or intentionally different contract.
 
+## Contents
+
+- [Interfaces And Ownership](#interfaces-and-ownership)
+- [Option, Result, And Errors](#option-result-and-errors)
+- [Control Flow And Allocation](#control-flow-and-allocation)
+- [Traits, Dispatch, And State](#traits-dispatch-and-state)
+- [Concurrency And Unsafe](#concurrency-and-unsafe)
+- [FFI And Native Resources](#ffi-and-native-resources)
+- [Ports And Large Rewrites](#ports-and-large-rewrites)
+- [Tests, Documentation, And Lints](#tests-documentation-and-lints)
+
 ## Interfaces And Ownership
 
 - Read architecture/API docs and the nearest complete feature before designing

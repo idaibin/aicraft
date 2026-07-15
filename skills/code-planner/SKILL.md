@@ -1,6 +1,6 @@
 ---
 name: code-planner
-description: "Use when future codebase work needs a plan before implementation: split requirements into scoped executable tasks with owners, dependencies, validation gates, reject criteria, and auditable subagent coordination."
+description: "Use when future code work needs an executable plan before implementation; define scoped tasks, owners, dependencies, validation, reject criteria, and auditable coordination without source or Git mutation."
 ---
 
 # Code Planner
@@ -11,7 +11,7 @@ Turn a codebase requirement into scoped work units with required reads, owned sc
 
 ## Workflow
 
-1. Read repo guidance first: root `AGENTS.md`, nearest subproject `AGENTS.md`, `AGENT.md`, or chat-supplied rules.
+1. Read effective repository guidance first, including `AGENTS.md`, `CLAUDE.md`, and host-provided instructions when present.
 2. Run `git status --short` before planning writes, assigning work, staging, or committing.
 3. Inspect only the docs, code, diffs, contracts, commands, logs, or runtime state needed to make the plan executable.
 4. Identify project class, repository standards, protected paths, and whether the work adds, reuses, moves, renames, or deletes a structural boundary.
@@ -71,10 +71,6 @@ For a small task, these fields may be compressed into a single concise block. Co
 ## Output Contract
 
 Start with verified current state, project class, standards, dirty-tree risks, complexity class, and selected owner model. Then provide task packages with dependencies, validation, done criteria, reject criteria, structure/contract integration gates, non-goals, assumptions, and `Not verified` items. When subagents are selected, include the delegation justification, write-conflict analysis, expected returned evidence, and main-thread integration checks.
-
-## Skill Maintenance
-
-When maintaining this package, update `references/eval-cases.md`, `references/usage.md`, and `agents/openai.yaml` with trigger, owner-model, task-contract, or output changes. In AICraft, run `python3 scripts/validate-skills.py` before publishing; end-user installs use `npx skills add https://github.com/idaibin/aicraft`, and end-user updates use `npx skills update`.
 
 ## References
 

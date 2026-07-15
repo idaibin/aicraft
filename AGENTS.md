@@ -31,9 +31,18 @@ This file defines how AI agents should work on this repository. It is not the pr
 - `skills/` contains publishable or reusable skill packages.
 - `prompts/` contains reusable prompt assets.
 - `scripts/validate-skills.py` validates source skill packages for repository development.
-- `scripts/test_validate_skills.py` runs validator regression tests.
+- `scripts/test_*.py` contains validator, runner, and comparison regressions.
+- `scripts/run-skill-routing-eval.py` plans reproducible routing trials and
+  requires explicit `--execute` before it calls a model host.
+- `scripts/compare-skill-evals.py` replays matched candidate/control evidence.
+- `contracts/skill-validation.json` is the machine-readable authority for
+  package limits, behavior-eval coverage and score gates, result schemas, and
+  official-source review freshness.
 
 When editing or adding skill packages under `skills/`, also read `skills/AGENTS.md`, `docs/skills/skill-standard.md`, and `docs/standards/skill-routing.md`.
+When a provider format or official baseline changes, update the contract,
+validator fixtures, tests, and `docs/quality/official-skill-alignment.md`
+together; do not preserve stale checks only because old fixtures pass.
 
 ## Skill Validation
 
@@ -42,8 +51,9 @@ Before reviewing, committing, or publishing skill changes, run:
 ```bash
 python3 scripts/sync-shared-protocols.py --check
 python3 scripts/validate-skills.py
-python3 scripts/test_validate_skills.py
+python3 -m unittest discover -s scripts -p 'test_*.py'
 python3 scripts/eval-skill-contracts.py --validate-only
+python3 scripts/measure-skill-footprint.py --baseline-ref HEAD
 ```
 
 Also run `git diff --check` and report any runtime or external behavior that was not verified.

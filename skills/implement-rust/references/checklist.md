@@ -1,5 +1,18 @@
 # Rust Implementation Checklist
 
+## Contents
+
+- [Required Context](#required-context)
+- [Validation Selection](#validation-selection)
+- [Interface Reuse Gate](#interface-reuse-gate)
+- [Project Class And Structure](#project-class-and-structure)
+- [Implementation](#implementation)
+- [Ports And Rewrites](#ports-and-rewrites)
+- [Reuse And Extraction](#reuse-and-extraction)
+- [Structural Lifecycle](#structural-lifecycle)
+- [Validation](#validation)
+- [Review](#review)
+
 ## Required Context
 
 - Read the nearest repository guidance and run `git status --short`.

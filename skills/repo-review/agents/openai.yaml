@@ -1,4 +1,4 @@
 interface:
   display_name: "Repository Review"
   short_description: "Review worktrees, ranges, PRs, and releases read-only"
-  default_prompt: "Use $repo-review for read-only repository review. Select exactly one basis: current worktree/index, fixed snapshot, range, PR, release candidate, or verified package. In Worktree mode classify ownership and mixed hunks and produce exact commit-readiness guidance; in immutable modes resolve SHAs before P0-P3 conclusions. Never mix current-worktree evidence into another basis, never mutate files or Git, coordinate only bounded audit specialists, and route authorized staging or delivery to $repo-delivery."
+  default_prompt: "Use $repo-review to perform a read-only, basis-specific review of a worktree, snapshot, range, PR, release candidate, or verified package."

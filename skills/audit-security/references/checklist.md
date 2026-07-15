@@ -2,6 +2,15 @@
 
 Use this checklist when applying `audit-security` to a code, API, config, dependency, or release security audit. Trigger phrases include `security audit`, `security review`, `authorization risk`, `IDOR`, `API security`, `token leak`, `sensitive data`, and `pre-release security check`.
 
+## Contents
+
+- [Scope Setup](#scope-setup)
+- [Profile Selection](#profile-selection)
+- [Scoped Threat Sketch](#scoped-threat-sketch)
+- [Severity](#severity)
+- [Reporting](#reporting)
+- [Reject Conditions](#reject-conditions)
+
 ## Scope Setup
 
 1. Read relevant repo guidance when present.

@@ -6,6 +6,18 @@ do not partially review or score it. A Combined audit uses the union of selected
 sections plus the interaction checks. If required evidence is unavailable, keep
 the profile selected and mark the exact claim `Not verified`.
 
+## Contents
+
+- [Common Grounding](#1-common-grounding)
+- [Architecture/Baseline](#2-architecturebaseline-profile)
+- [Ownership/Errors](#3-ownershiperrors-profile)
+- [Concurrency/Runtime](#4-concurrencyruntime-profile)
+- [Performance/Memory](#5-performancememory-profile)
+- [SQLite](#6-sqlite-profile)
+- [Unsafe/FFI](#7-unsafeffi-profile)
+- [Combined Interactions](#8-combined-profile-interactions)
+- [Evidence And Reporting](#9-common-evidence-and-reporting)
+
 ## 1. Common Grounding
 
 - [ ] Read nearest repository guidance and current `git status --short`.

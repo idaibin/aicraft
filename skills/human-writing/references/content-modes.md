@@ -4,6 +4,16 @@ Select one primary mode. Combine modes only when the user asks for a platform ad
 
 All modes inherit `fact-integrity.md`. The rules below describe only mode-specific structure and emphasis; they do not redefine source precedence, attribution, semantic fidelity, relationship disclosure, or external-claim handling.
 
+## Contents
+
+- [Short-Form](#short-form)
+- [Factual Soft Copy](#factual-soft-copy)
+- [Personal Technical Essay](#personal-technical-essay)
+- [Tutorial](#tutorial)
+- [Engineering Retrospective](#engineering-retrospective)
+- [Architecture Note](#architecture-note)
+- [Resource List](#resource-list)
+
 ## Short-Form
 
 Use for a social post, caption, announcement, concise opinion, or product note.

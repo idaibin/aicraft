@@ -1,4 +1,4 @@
 interface:
   display_name: "Frontend Audit"
   short_description: "Audit selected frontend framework and styling profiles"
-  default_prompt: "Use $audit-frontend for a read-only frontend domain audit or bounded specialist review under $repo-review. Detect the product surface; select React, Vue Composition, Vue Options, or repository-native rules; select only styling systems present, such as Tailwind, CSS Modules, Sass/Less, CSS-in-JS, Ant Design, or shadcn/ui; then select applicable Architecture/Reuse, State/Data/Contracts, Component/Layout/Design System, Accessibility, Performance, and Desktop Boundary profiles, marking the rest Out of scope. Report severity-ranked evidence and route fixes to $implement-frontend and Git mutation to $repo-delivery."
+  default_prompt: "Use $audit-frontend to run a read-only, profile-selected frontend audit and return evidence-ranked findings without editing code."

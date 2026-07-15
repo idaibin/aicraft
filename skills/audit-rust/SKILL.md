@@ -1,6 +1,6 @@
 ---
 name: audit-rust
-description: "Use when auditing or profiling complex Rust CLIs, libraries, Tokio services, Tauri backends, Cargo workspaces, local-first single binaries, or SQLite-backed applications, especially for toolchain baselines, crate boundaries, structural lifecycle, ownership, errors, concurrency, CPU and memory evidence, database migrations and query plans, unsafe or FFI safety, quality gates, and architecture-document alignment."
+description: "Use when a Rust workspace or known Rust surface needs a scoped, read-only audit of architecture, ownership, errors, concurrency, performance, persistence, or unsafe boundaries, including bounded specialist work delegated by repo-review."
 ---
 
 # Rust Audit
@@ -14,7 +14,7 @@ Audit Rust engineering from repository evidence. Select only the audit profiles 
 Resolve conflicts in this order:
 
 1. The user's current explicit request.
-2. The nearest applicable `AGENTS.md` or repository guidance.
+2. Effective repository guidance, including `AGENTS.md`, `CLAUDE.md`, and host-provided instructions when present.
 3. Existing project code, toolchain, and architecture.
 4. Project documentation and interface contracts.
 5. This skill.
@@ -81,10 +81,6 @@ Do not rewrite a working local design merely to resemble an external project.
 ## Output Contract
 
 Start with selected profiles and severity-ranked findings. For each finding, report impact, exact location, evidence, remediation direction, and validation gap. Then summarize project class; coordinating owner when this is a scoped specialist subreview; guidance/manifests/code/migrations/docs/tests/commands inspected; existing candidates; ownership and invariants; selected profile evidence; structural lifecycle; workload and before/after data where applicable; explicitly excluded profiles; and `Not found` or `Not verified` gaps.
-
-## Skill Maintenance
-
-Keep this entry procedural. When triggers, modes, or rules change, update references, `agents/openai.yaml`, eval cases, README/install indexes, and run `python3 scripts/validate-skills.py --skill audit-rust`.
 
 ## References
 

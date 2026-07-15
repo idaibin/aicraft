@@ -17,6 +17,8 @@ structure, behavior, and workflow evidence separately. See
 [`docs/quality/status.md`](docs/quality/status.md) for the current record.
 The evidence roadmap is in
 [`docs/quality/validation-plan.md`](docs/quality/validation-plan.md).
+The current portable, OpenAI, and Claude source baseline is recorded in
+[`docs/quality/official-skill-alignment.md`](docs/quality/official-skill-alignment.md).
 
 ## Repository Boundary
 
@@ -184,14 +186,21 @@ For repository development, validate source skill packages before publishing cha
 ```bash
 python3 scripts/sync-shared-protocols.py --check
 python3 scripts/validate-skills.py
-python3 scripts/test_validate_skills.py
+python3 -m unittest discover -s scripts -p 'test_*.py'
 python3 scripts/eval-skill-contracts.py --validate-only
+python3 scripts/measure-skill-footprint.py --baseline-ref HEAD
 git diff --check
 ```
 
 The validator also checks the symmetric nearest-neighbor routing inventory in
 [`docs/skills/routing-graph.json`](docs/skills/routing-graph.json) and requires
 both endpoint skills to cover each other in routing evals.
+Package limits, behavior-eval minimums, score gates, result schemas, and the
+official-source review date are authoritative in
+[`contracts/skill-validation.json`](contracts/skill-validation.json); prose
+documentation does not maintain duplicate numeric thresholds. Dataset totals
+are coverage counts, not OpenAI or Claude scores. Structure validation likewise
+does not claim that a model routed correctly or completed a workflow.
 
 Useful targeted package checks:
 
