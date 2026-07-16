@@ -2,6 +2,18 @@
 
 Load this reference only when voice, rhythm, or template residue materially affects the task. It is an editorial diagnostic, never a source of facts or invented experience.
 
+## Contents
+
+- [Voice Calibration](#voice-calibration)
+- [Cluster Diagnosis](#cluster-diagnosis)
+- [Pattern Families](#pattern-families)
+- [Protected And Secondhand Text](#protected-and-secondhand-text)
+- [Research-Process Leakage](#research-process-leakage)
+- [Iterative-Edit Seams](#iterative-edit-seams)
+- [Chinese Technical Prose](#chinese-technical-prose)
+- [Human Signals Worth Preserving](#human-signals-worth-preserving)
+- [Stop Rule](#stop-rule)
+
 ## Voice Calibration
 
 Prefer, in order:
@@ -29,6 +41,59 @@ Treat a passage as templated only when several signals reinforce one another:
 
 One heading, list, transition, dash, short sentence, or familiar phrase is not evidence by itself. Technical conventions, accessibility requirements, and platform formatting can create legitimate repetition.
 
+Parallel sentences, stable technical nouns, tables, and lists may be the clearest way to define separate responsibilities, states, or comparison axes. An abstract opening may also be a precise map of the sections that immediately follow. Diagnose a defect only when the structure loses information, obscures priority, or repeats the same reasoning without a new role.
+
+Repeated questions can mark the reader's next inference; repeated code can expose one controlled change; a long detour can eliminate a plausible wrong model; a heading-free passage can preserve a continuous derivation. Treat these as defects only when they fail to perform that job. Every editorial rule should name the reader failure it prevents rather than target a surface pattern.
+
+Do not turn frequent model habits into universal bans. Passive voice can keep the object of interest in focus; a dash can preserve a real cadence; an adverb, rhetorical question, list of three, or repeated technical noun can be the clearest choice. Rewrite only when the form contributes to a diagnosed cluster or weakens meaning, trust, rhythm, or reader comprehension.
+
+## Pattern Families
+
+Use this compact inventory to find clusters, not to count forbidden tokens. A surface form becomes an editing problem only when it performs one of the reader failures in the last column.
+
+| Family | Contextual signals | Reader failure to confirm |
+| --- | --- | --- |
+| Inflated importance or promotion | ordinary facts framed as historic shifts, broad trends, proof of excellence, or generic excitement | replaces the supported mechanism, result, limit, or reason the reader cares |
+| Vague authority or synthetic depth | unnamed experts, unsupported consensus, ornamental `-ing` clauses, or a generic challenge-and-future section | hides provenance or simulates analysis without adding evidence |
+| Mechanical variation | avoiding simple `is / has`, cycling synonyms for one stable concept, false `from X to Y` ranges, or forced groups of three | makes the subject harder to track or creates coverage the source does not support |
+| Scripted rhetoric | scheduled contrasts, `not just X but Y`, tutorial announcements, fake-candid openers, or a rhetorical question before an ordinary answer | delays the point or manufactures intimacy, surprise, or authority |
+| Manufactured surface polish | repeated bold labels, emoji decoration, title-case headings, identical paragraph shapes, or punctuation used on a schedule | turns formatting and rhythm into a visible template instead of serving the content |
+| Chatbot and uncertainty residue | praise, offers to continue, training-cutoff disclaimers, stacked hedges, or speculative filler around missing facts | addresses the prompt instead of the reader or disguises an evidence gap |
+| Generic uplift | vague optimism, universal lessons, or a conclusion that merely says the work matters | replaces the earned judgment, limitation, next action, or unresolved question |
+
+Give four failure shapes an explicit pass:
+
+- **Diff-anchored narration:** an evergreen document says what was added, replaced, or improved instead of describing the current behavior. Keep change narration in release notes, migration guides, correction notes, and other version-scoped artifacts; elsewhere rewrite around the present contract.
+- **Manufactured punchlines:** several clipped declarations or fragments try to make every sentence land. Keep one short sentence when it earns emphasis; join or vary a run that creates drama without information.
+- **Aphorism formulas:** a concrete claim is recast as a portable slogan or grand metaphor. Restore the mechanism, condition, or consequence the phrase is standing in for.
+- **Fake-candid openers:** `说实话`, `你知道吗`, `真正的问题是`, `Here's the thing`, or a one-word question creates a theatrical pause before a routine claim. Keep genuine conversational wording when it belongs to the author; remove the stage direction when it only manufactures intimacy.
+
+## Protected And Secondhand Text
+
+Do not diagnose watched language inside quotations, titles, proper names, code, fixtures, or examples as though the author wrote it directly. First classify whether the text is evidence, an object under discussion, or editable prose. Preserve it verbatim when its wording is the evidence or the task protects it. If a surrounding sentence is templated, edit the frame rather than silently changing the quoted material.
+
+Professional polish, formal vocabulary, mixed registers, curly quotes, an isolated transition, a single dash, and one short emphatic sentence are not reliable signals by themselves. Prefer a false-negative style decision over flattening a recognizable human voice when no reader harm is visible.
+
+## Research-Process Leakage
+
+Treat every item below as a contextual review signal, not an automatic defect. Act only when it replaces the requested subject with source-process narration, exposes background-only material, duplicates an existing claim, changes the argument, or creates a visible editing seam.
+
+Background research leaks into the artifact when the text explains how the editor reached a conclusion instead of expressing the author's experience or argument. Common signals include:
+
+- headings centered on `Git 记录`, `聊天记录`, `检索结果`, or `分析过程` when those sources are not the requested topic
+- sentences such as `如果只看 README`, `记录没有美化过程`, `从沟通记录可以看出`, or `下面的判断来自...`
+- commit counts, file totals, hashes, or source-ledger categories used as narrative decoration rather than necessary evidence
+- repeated reminders that the draft is factual, source-grounded, or based on research
+- editor commentary that tells the reader what the article is trying not to do
+
+Do not ban source names mechanically. A Git postmortem, release history, investigative report, correction note, or cited external claim may need visible provenance. Otherwise keep the research in the reasoning layer and write the resulting scene, choice, cost, uncertainty, or changed judgment in the author's frame.
+
+## Iterative-Edit Seams
+
+Follow-up edits can leave visible seams even when every paragraph is individually sound. Treat a late section as a seam only when its information logically belongs earlier, repeats a claim, changes a role or commitment without updating related passages, or leaves the conclusion inconsistent. Reintegrate the point at the decision or transition it explains, then reread the surrounding section and ending.
+
+Do not remove every additive transition mechanically. Keep it when the chronology or argument genuinely adds a second point. The defect is structural afterthought, not the word itself.
+
 ## Chinese Technical Prose
 
 - Put the subject and action close together; prefer concrete verbs over abstract management nouns.
@@ -46,4 +111,4 @@ Keep genuine uncertainty, disagreement, asymmetric emphasis, rejected alternativ
 
 ## Stop Rule
 
-After factual, structural, and voice blockers are resolved, stop when further edits only normalize preference-level wording. A clean but source-shaped sentence is better than a more polished house style.
+After factual, structural, and voice blockers are resolved, compare the candidate against the unchanged source. Stop when the edit has no concrete reader benefit, only normalizes preference-level wording, weakens a precise term, changes a qualifier, or invents narrative motion. A clean but source-shaped sentence is better than a more polished house style; `original` is a valid finished decision.

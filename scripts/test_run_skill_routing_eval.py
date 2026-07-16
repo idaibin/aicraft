@@ -53,7 +53,12 @@ class RoutingRunnerTests(unittest.TestCase):
             host=host,
             variant=variant,
             trial=2,
-            pair_id="00000000-0000-4000-8000-000000000002",
+            comparison_group_id="00000000-0000-4000-8000-000000000002",
+            campaign_id="00000000-0000-4000-8000-000000000099",
+            campaign_path_relative="evals/routing-campaign.json",
+            campaign_sha256="f" * 64,
+            evaluation_protocol_revision="a" * 40,
+            evaluation_protocol_sha256="9" * 64,
             held_out=True,
             model="test-model",
             timeout_seconds=20,
@@ -78,6 +83,74 @@ class RoutingRunnerTests(unittest.TestCase):
             (package / "SKILL.md").write_text(f"# {owner}\n", encoding="utf-8")
         return "c" * 64
 
+    def _invoke_one_case_with_host_responses(
+        self, root: Path, responses, *, sleep_side_effect=None
+    ):
+        """Invoke one case without a real host while retaining raw attempts."""
+
+        config = self._config(root)
+        case = config.cases[0]
+        raw_root = root / "raw"
+        raw_root.mkdir()
+        invocations = []
+
+        def fake_prepare(case_root: Path, **_kwargs):
+            case_root.mkdir(parents=True)
+            return case_root
+
+        def fake_environment(_host: str, isolated_home: Path):
+            isolated_home.mkdir(parents=True)
+            return {"HOME": str(isolated_home)}
+
+        def fake_subprocess(command, **kwargs):
+            index = len(invocations)
+            if index >= len(responses):
+                self.fail("runner exceeded the expected host invocation count")
+            response = responses[index]
+            invocations.append(
+                {
+                    "cwd": Path(kwargs["cwd"]),
+                    "home": Path(kwargs["env"]["HOME"]),
+                }
+            )
+            model_response = response.get("response")
+            if model_response is not None:
+                response_path = Path(
+                    command[command.index("--output-last-message") + 1]
+                )
+                response_path.write_text(
+                    json.dumps(model_response), encoding="utf-8"
+                )
+            return subprocess.CompletedProcess(
+                command,
+                response.get("exit_code", 1),
+                response.get("stdout", ""),
+                response.get("stderr", ""),
+            )
+
+        sleep = mock.Mock(side_effect=sleep_side_effect)
+        with mock.patch.object(
+            RUNNER, "_prepare_case_repo", side_effect=fake_prepare
+        ), mock.patch.object(
+            RUNNER, "_isolated_host_environment", side_effect=fake_environment
+        ), mock.patch.object(
+            RUNNER.subprocess, "run", side_effect=fake_subprocess
+        ), mock.patch.object(
+            RUNNER.time, "sleep", sleep
+        ):
+            outcome = RUNNER._invoke_case(
+                config,
+                case,
+                run_id="00000000-0000-4000-8000-000000000123",
+                host_version="codex-cli 9.9",
+                temp_root=root / "temporary",
+                skill_fixture=None,
+                raw_root=raw_root,
+            )
+
+        raw = json.loads(outcome.raw_path.read_text(encoding="utf-8"))
+        return outcome, raw, invocations, sleep
+
     def test_prompt_contains_only_natural_request_and_fixed_owner_enum(self) -> None:
         case = {
             "id": "secret-case-id",
@@ -94,6 +167,61 @@ class RoutingRunnerTests(unittest.TestCase):
         for evaluator_key in ("expected_owner", "forbidden_owners", "high_risk", case["id"]):
             self.assertNotIn(evaluator_key, prompt)
         self.assertNotIn("correct owner", prompt.casefold())
+        self.assertIn("responsible for the requested outcome", prompt)
+        self.assertIn("authorization boundary", prompt)
+        self.assertIn("next externally meaningful state", prompt)
+        self.assertIn("must actually execute a bounded part", prompt)
+        self.assertIn("clearly requested subsequent phase", prompt)
+        self.assertIn("optional recommendations", prompt)
+        self.assertIn("alternatives", prompt)
+        self.assertIn("unrequested future work", prompt)
+        self.assertIn("return an empty handoffs array", prompt)
+
+    def test_codex_policy_disables_remote_plugin_and_records_isolation(self) -> None:
+        policy = RUNNER._host_policy("codex", "gpt-5-test")
+        command = policy["command_template"]
+
+        disable_index = command.index("--disable")
+        self.assertEqual("remote_plugin", command[disable_index + 1])
+        self.assertIn("remote-plugin-disabled", policy["permissions"])
+        self.assertEqual(
+            "disabled by explicit Codex CLI feature override",
+            policy["environment_isolation"]["remote_plugin"],
+        )
+
+    def test_canonical_command_template_matches_executed_command(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for host in ("codex", "claude"):
+                host_root = root / host
+                host_root.mkdir()
+                config = self._config(host_root, host=host)
+                repo = root / f"{host}-repo"
+                schema = root / f"{host}-schema.json"
+                response = root / f"{host}-response.json"
+                prompt = "label-free prompt"
+                actual = RUNNER._host_command(
+                    config,
+                    repo=repo,
+                    schema_path=schema,
+                    response_path=response,
+                    prompt=prompt,
+                )
+                replacements = {
+                    "<CASE_REPO>": str(repo),
+                    "<MODEL>": config.model,
+                    "<SCHEMA_PATH>": str(schema),
+                    "<RESPONSE_PATH>": str(response),
+                    "<LABEL_FREE_PROMPT>": prompt,
+                    "<RESPONSE_SCHEMA>": RUNNER._canonical_json(
+                        RUNNER.ROUTING_RESPONSE_SCHEMA
+                    ),
+                    "<EMPTY>": "",
+                }
+                expected = [replacements.get(item, item) for item in RUNNER._host_policy(
+                    host, config.model
+                )["command_template"]]
+                self.assertEqual(expected, actual)
 
     def test_response_schema_uses_openai_supported_subset_and_parser_enforces_uniqueness(
         self,
@@ -152,7 +280,42 @@ class RoutingRunnerTests(unittest.TestCase):
         mocked_run.assert_not_called()
         plan = json.loads(stdout.getvalue())
         self.assertFalse(plan["execute"])
+        self.assertEqual(
+            "00000000-0000-4000-8000-000000000000",
+            plan["comparison_group_id"],
+        )
+        self.assertNotIn("pair_id", plan)
         self.assertEqual("dry-run only; no model CLI was invoked", plan["note"])
+
+    def test_comparison_group_cli_accepts_only_v2_flag(self) -> None:
+        group_id = "00000000-0000-4000-8000-000000000005"
+        arguments = RUNNER._build_parser().parse_args(
+            [
+                "--host",
+                "codex",
+                "--variant",
+                "candidate",
+                "--model",
+                "gpt-5-test",
+                "--comparison-group-id",
+                group_id,
+            ]
+        )
+
+        self.assertEqual(group_id, arguments.comparison_group_id)
+        with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+            RUNNER._build_parser().parse_args(
+                [
+                    "--host",
+                    "codex",
+                    "--variant",
+                    "candidate",
+                    "--model",
+                    "gpt-5-test",
+                    "--pair-id",
+                    group_id,
+                ]
+            )
 
     def test_execute_rejects_case_subset_before_any_model_cli(self) -> None:
         stderr = io.StringIO()
@@ -223,6 +386,17 @@ class RoutingRunnerTests(unittest.TestCase):
         )
         self.assertEqual((10, 4), RUNNER._extract_usage(missing, host="claude"))
         self.assertEqual((10, 4), RUNNER._extract_usage(null, host="claude"))
+
+    def test_usage_requires_positive_input_and_output_tokens(self) -> None:
+        for usage in (
+            {"input_tokens": 0, "output_tokens": 4},
+            {"input_tokens": 10, "output_tokens": 0},
+        ):
+            with self.subTest(usage=usage):
+                self.assertEqual(
+                    (None, None),
+                    RUNNER._extract_usage(json.dumps({"usage": usage}), host="codex"),
+                )
 
     def test_claude_usage_fails_closed_for_invalid_cache_tokens(self) -> None:
         for invalid in (True, -1, 1.5, "5"):
@@ -325,7 +499,7 @@ class RoutingRunnerTests(unittest.TestCase):
             run_config = validator._validate_held_out_provenance.call_args.args[2]
             self.assertEqual("previous", run_config["variant"])
 
-    def test_success_writes_schema_v3_bundle_and_unique_hashed_raw_v2(self) -> None:
+    def test_success_writes_schema_v6_bundle_and_unique_hashed_raw_v3(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             config = self._config(root)
@@ -342,6 +516,8 @@ class RoutingRunnerTests(unittest.TestCase):
                 self.assertIn("read-only", command)
                 self.assertIn("--ephemeral", command)
                 self.assertIn("--ignore-user-config", command)
+                disable_index = command.index("--disable")
+                self.assertEqual("remote_plugin", command[disable_index + 1])
                 environment = kwargs["env"]
                 self.assertNotEqual(os.environ.get("HOME"), environment["HOME"])
                 self.assertTrue(Path(environment["HOME"]).is_dir())
@@ -381,10 +557,14 @@ class RoutingRunnerTests(unittest.TestCase):
             self.assertIsNotNone(outcome.bundle_path)
             bundle = json.loads(outcome.bundle_path.read_text(encoding="utf-8"))
             uuid.UUID(bundle["run_id"])
-            self.assertEqual(3, bundle["schema_version"])
+            self.assertEqual(6, bundle["schema_version"])
             self.assertTrue(bundle["complete"])
             self.assertEqual("evals/routing-held-out.jsonl", bundle["run_config"]["dataset_path"])
-            self.assertEqual(config.pair_id, bundle["run_config"]["pair_id"])
+            self.assertEqual(
+                config.comparison_group_id,
+                bundle["run_config"]["comparison_group_id"],
+            )
+            self.assertNotIn("pair_id", bundle["run_config"])
             self.assertEqual(
                 config.dataset_git_revision,
                 bundle["run_config"]["dataset_git_revision"],
@@ -411,9 +591,18 @@ class RoutingRunnerTests(unittest.TestCase):
                 "c" * 64, bundle["run_config"]["skill_fixture_sha256"]
             )
             self.assertTrue(bundle["run_config"]["skills_installed"])
+            self.assertIn(
+                "remote_plugin disabled", bundle["run_config"]["isolation"]
+            )
+            self.assertIn(
+                "remote-plugin-disabled", bundle["run_config"]["permissions"]
+            )
             self.assertRegex(bundle["run_config"]["host_config_sha256"], r"^[0-9a-f]{64}$")
+            self.assertRegex(
+                bundle["run_config"]["retry_policy_sha256"], r"^[0-9a-f]{64}$"
+            )
             self.assertEqual("deterministic", bundle["adjudication"]["method"])
-            self.assertEqual("3", bundle["adjudication"]["reviewer_version"])
+            self.assertEqual("6", bundle["adjudication"]["reviewer_version"])
             self.assertRegex(bundle["adjudication"]["config_sha256"], r"^[0-9a-f]{64}$")
 
             evidence_paths = [item["raw_evidence"] for item in bundle["results"]]
@@ -427,7 +616,7 @@ class RoutingRunnerTests(unittest.TestCase):
                     hashlib.sha256(raw_path.read_bytes()).hexdigest(),
                 )
                 raw = json.loads(raw_path.read_text(encoding="utf-8"))
-                self.assertEqual(2, raw["schema_version"])
+                self.assertEqual(3, raw["schema_version"])
                 self.assertEqual(0, raw["exit_code"])
                 self.assertTrue(raw["stdout"])
                 self.assertIn("stderr", raw)
@@ -439,6 +628,21 @@ class RoutingRunnerTests(unittest.TestCase):
                     hashlib.sha256(raw["transcript"].encode("utf-8")).hexdigest(),
                 )
                 self.assertEqual(raw["observations"], json.loads(raw["model_output"]))
+                self.assertEqual(1, raw["metrics"]["attempt_count"])
+                self.assertEqual(0, raw["metrics"]["retry_count"])
+                self.assertEqual(1, result["metrics"]["attempt_count"])
+                self.assertEqual(0, result["metrics"]["retry_count"])
+                self.assertEqual(
+                    bundle["run_config"]["retry_policy_sha256"],
+                    raw["retry_policy_sha256"],
+                )
+                self.assertEqual(1, len(raw["host_attempts"]))
+                host_attempt = raw["host_attempts"][0]
+                self.assertEqual(1, host_attempt["attempt_index"])
+                self.assertFalse(host_attempt["retryable"])
+                self.assertEqual(0, host_attempt["backoff_seconds_before_next"])
+                self.assertEqual(raw["stdout"], host_attempt["stdout"])
+                self.assertEqual(raw["observations"], host_attempt["observations"])
 
             baseline_bundle = json.loads(
                 baseline_outcome.bundle_path.read_text(encoding="utf-8")
@@ -451,6 +655,222 @@ class RoutingRunnerTests(unittest.TestCase):
                 baseline_bundle["run_config"]["skill_fixture_sha256"]
             )
             self.assertFalse(baseline_bundle["run_config"]["skills_installed"])
+
+    def test_exact_codex_capacity_then_success_retries_once_with_fresh_isolation(
+        self,
+    ) -> None:
+        capacity = "\n".join(
+            (
+                json.dumps({"type": "thread.started"}),
+                json.dumps(
+                    {
+                        "type": "error",
+                        "message": (
+                            "Selected model is at capacity. "
+                            "Please try a different model."
+                        ),
+                    }
+                ),
+                json.dumps(
+                    {
+                        "type": "turn.failed",
+                        "error": {
+                            "message": (
+                                "Selected model is at capacity. "
+                                "Please try a different model."
+                            )
+                        },
+                    }
+                ),
+            )
+        )
+        success_stdout = json.dumps(
+            {
+                "type": "turn.completed",
+                "usage": {"input_tokens": 15, "output_tokens": 3},
+            }
+        )
+
+        with tempfile.TemporaryDirectory() as temporary:
+            outcome, raw, invocations, sleep = (
+                self._invoke_one_case_with_host_responses(
+                    Path(temporary),
+                    (
+                        {"exit_code": 1, "stdout": capacity},
+                        {
+                            "exit_code": 0,
+                            "stdout": success_stdout,
+                            "response": {
+                                "actual_owner": "repo-map",
+                                "handoffs": [],
+                            },
+                        },
+                    ),
+                )
+            )
+
+        self.assertTrue(outcome.succeeded)
+        self.assertEqual(2, len(invocations))
+        self.assertNotEqual(invocations[0]["cwd"], invocations[1]["cwd"])
+        self.assertNotEqual(invocations[0]["home"], invocations[1]["home"])
+        self.assertEqual("attempt-1", invocations[0]["cwd"].name)
+        self.assertEqual("attempt-2", invocations[1]["cwd"].name)
+        self.assertEqual("attempt-1", invocations[0]["home"].name)
+        self.assertEqual("attempt-2", invocations[1]["home"].name)
+        sleep.assert_called_once_with(5)
+        self.assertEqual(2, raw["metrics"]["attempt_count"])
+        self.assertEqual(1, raw["metrics"]["retry_count"])
+        first, second = raw["host_attempts"]
+        self.assertEqual("model_capacity", first["error_class"])
+        self.assertTrue(first["retryable"])
+        self.assertEqual(5, first["backoff_seconds_before_next"])
+        self.assertIsNone(first["metrics"]["input_tokens"])
+        self.assertIsNone(first["metrics"]["output_tokens"])
+        self.assertIsNone(second["error_class"])
+        self.assertFalse(second["retryable"])
+        self.assertEqual(0, second["backoff_seconds_before_next"])
+        self.assertEqual(15, raw["metrics"]["input_tokens"])
+        self.assertEqual(3, raw["metrics"]["output_tokens"])
+
+    def test_near_match_capacity_error_does_not_retry(self) -> None:
+        near_match = json.dumps(
+            {"message": "Selected model is at capacity; please try again."}
+        )
+
+        with tempfile.TemporaryDirectory() as temporary:
+            outcome, raw, invocations, sleep = (
+                self._invoke_one_case_with_host_responses(
+                    Path(temporary),
+                    ({"exit_code": 1, "stdout": near_match},),
+                )
+            )
+
+        self.assertFalse(outcome.succeeded)
+        self.assertEqual(1, len(invocations))
+        sleep.assert_not_called()
+        self.assertEqual(1, raw["metrics"]["attempt_count"])
+        self.assertEqual(0, raw["metrics"]["retry_count"])
+        self.assertIsNone(raw["host_attempts"][0]["error_class"])
+        self.assertFalse(raw["host_attempts"][0]["retryable"])
+
+    def test_two_capacity_failures_stop_after_exactly_two_attempts(self) -> None:
+        capacity = json.dumps(
+            {
+                "message": (
+                    "Selected model is at capacity. "
+                    "Please try a different model."
+                )
+            }
+        )
+
+        with tempfile.TemporaryDirectory() as temporary:
+            outcome, raw, invocations, sleep = (
+                self._invoke_one_case_with_host_responses(
+                    Path(temporary),
+                    (
+                        {"exit_code": 1, "stderr": capacity},
+                        {"exit_code": 1, "stderr": capacity},
+                    ),
+                )
+            )
+
+        self.assertFalse(outcome.succeeded)
+        self.assertEqual(2, len(invocations))
+        sleep.assert_called_once_with(5)
+        self.assertEqual(2, raw["metrics"]["attempt_count"])
+        self.assertEqual(1, raw["metrics"]["retry_count"])
+        self.assertEqual(
+            ["model_capacity", "model_capacity"],
+            [attempt["error_class"] for attempt in raw["host_attempts"]],
+        )
+        self.assertEqual(
+            [5, 0],
+            [
+                attempt["backoff_seconds_before_next"]
+                for attempt in raw["host_attempts"]
+            ],
+        )
+
+    def test_completed_attempt_is_checkpointed_before_retry_backoff(self) -> None:
+        capacity = json.dumps(
+            {
+                "message": (
+                    "Selected model is at capacity. "
+                    "Please try a different model."
+                )
+            }
+        )
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            with self.assertRaisesRegex(InterruptedError, "interrupted backoff"):
+                self._invoke_one_case_with_host_responses(
+                    root,
+                    ({"exit_code": 1, "stdout": capacity},),
+                    sleep_side_effect=InterruptedError("interrupted backoff"),
+                )
+            raw_paths = list((root / "raw").glob("*.json"))
+            self.assertEqual(1, len(raw_paths))
+            raw = json.loads(raw_paths[0].read_text(encoding="utf-8"))
+
+        self.assertEqual(1, len(raw["host_attempts"]))
+        self.assertEqual("model_capacity", raw["host_attempts"][0]["error_class"])
+        self.assertEqual(5, raw["host_attempts"][0]["backoff_seconds_before_next"])
+        self.assertEqual(1, raw["metrics"]["attempt_count"])
+        self.assertEqual(0, raw["metrics"]["retry_count"])
+
+    def test_valid_route_or_token_bearing_capacity_failure_does_not_retry(
+        self,
+    ) -> None:
+        capacity_message = (
+            "Selected model is at capacity. Please try a different model."
+        )
+        scenarios = (
+            {
+                "name": "valid route",
+                "response": {"actual_owner": "repo-map", "handoffs": []},
+                "stdout": json.dumps({"message": capacity_message}),
+            },
+            {
+                "name": "token-bearing",
+                "stdout": "\n".join(
+                    (
+                        json.dumps({"message": capacity_message}),
+                        json.dumps(
+                            {
+                                "usage": {
+                                    "input_tokens": 12,
+                                    "output_tokens": 3,
+                                }
+                            }
+                        ),
+                    )
+                ),
+            },
+        )
+
+        for scenario in scenarios:
+            with self.subTest(scenario=scenario["name"]), tempfile.TemporaryDirectory() as temporary:
+                outcome, raw, invocations, sleep = (
+                    self._invoke_one_case_with_host_responses(
+                        Path(temporary),
+                        (
+                            {
+                                "exit_code": 1,
+                                "stdout": scenario["stdout"],
+                                "response": scenario.get("response"),
+                            },
+                        ),
+                    )
+                )
+
+            self.assertFalse(outcome.succeeded)
+            self.assertEqual(1, len(invocations))
+            sleep.assert_not_called()
+            self.assertEqual(1, raw["metrics"]["attempt_count"])
+            self.assertEqual(0, raw["metrics"]["retry_count"])
+            self.assertIsNone(raw["host_attempts"][0]["error_class"])
+            self.assertFalse(raw["host_attempts"][0]["retryable"])
 
     def test_claude_bundle_records_normalized_cache_inclusive_tokens(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -551,6 +971,9 @@ class RoutingRunnerTests(unittest.TestCase):
             self.assertFalse(failure["complete"])
             self.assertEqual(["case-two"], [item["id"] for item in failure["failed_cases"]])
             self.assertEqual(2, len(list((outcome.run_dir / "raw" / "routing").glob("*.json"))))
+            attempt = json.loads((outcome.run_dir / "attempt.json").read_text())
+            self.assertEqual("failure", attempt["status"])
+            self.assertEqual(config.campaign_id, attempt["campaign_id"])
 
     def test_previous_installs_committed_fixture_and_baseline_stays_empty(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -620,6 +1043,7 @@ class RoutingRunnerTests(unittest.TestCase):
                 "HOME": str(source_home),
                 "CODEX_HOME": str(codex_home),
                 "CLAUDE_CONFIG_DIR": str(claude_home),
+                "AICRAFT_TEST_SECRET": "must-not-propagate",
             }
             with mock.patch.dict(os.environ, environment, clear=False):
                 codex_environment = RUNNER._isolated_host_environment(
@@ -628,6 +1052,8 @@ class RoutingRunnerTests(unittest.TestCase):
                 claude_environment = RUNNER._isolated_host_environment(
                     "claude", root / "claude-isolated"
                 )
+            self.assertNotIn("AICRAFT_TEST_SECRET", codex_environment)
+            self.assertNotIn("AICRAFT_TEST_SECRET", claude_environment)
 
             isolated_codex = Path(codex_environment["CODEX_HOME"])
             isolated_claude = Path(claude_environment["CLAUDE_CONFIG_DIR"])
@@ -643,6 +1069,30 @@ class RoutingRunnerTests(unittest.TestCase):
             )
             self.assertFalse((isolated_claude / "settings.json").exists())
             self.assertFalse((isolated_claude / "skills").exists())
+
+    def test_isolated_environment_preserves_allowlisted_volta_home(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source_home = root / "source-home"
+            codex_home = source_home / ".codex"
+            volta_home = root / "volta-home"
+            codex_home.mkdir(parents=True)
+            volta_home.mkdir()
+            (codex_home / "auth.json").write_text("codex-auth", encoding="utf-8")
+
+            environment = {
+                "HOME": str(source_home),
+                "CODEX_HOME": str(codex_home),
+                "VOLTA_HOME": str(volta_home),
+                "AICRAFT_TEST_SECRET": "must-not-propagate",
+            }
+            with mock.patch.dict(os.environ, environment, clear=True):
+                isolated = RUNNER._isolated_host_environment(
+                    "codex", root / "codex-isolated"
+                )
+
+            self.assertEqual(str(volta_home), isolated["VOLTA_HOME"])
+            self.assertNotIn("AICRAFT_TEST_SECRET", isolated)
 
     def test_success_path_self_validates_with_real_evaluator(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -669,7 +1119,12 @@ class RoutingRunnerTests(unittest.TestCase):
                 host="codex",
                 variant="candidate",
                 trial=1,
-                pair_id="00000000-0000-4000-8000-000000000010",
+                comparison_group_id="00000000-0000-4000-8000-000000000010",
+                campaign_id=None,
+                campaign_path_relative=None,
+                campaign_sha256=None,
+                evaluation_protocol_revision=None,
+                evaluation_protocol_sha256=None,
                 held_out=False,
                 model="gpt-5-test",
                 timeout_seconds=20,
