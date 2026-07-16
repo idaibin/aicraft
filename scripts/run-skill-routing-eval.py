@@ -71,6 +71,7 @@ class RunnerError(ValueError):
 class GitRevision:
     commit: str
     skills_tree: str
+    skill_names: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -198,7 +199,9 @@ def _git_bytes(arguments: Sequence[str]) -> bytes:
     return completed.stdout
 
 
-def resolve_revision(revision_spec: str) -> GitRevision:
+def resolve_revision(
+    revision_spec: str, *, allow_historical_subset: bool = False
+) -> GitRevision:
     commit = _git_text(["rev-parse", "--verify", f"{revision_spec}^{{commit}}"])
     if re.fullmatch(r"[0-9a-f]{40}", commit) is None:
         raise RunnerError(f"resolved Skill revision is not a full Git commit: {commit!r}")
@@ -214,14 +217,24 @@ def resolve_revision(revision_spec: str) -> GitRevision:
         and parts[0] == "skills"
         and parts[2] == "SKILL.md"
     }
-    if discovered != set(OWNER_ENUM):
-        missing = sorted(set(OWNER_ENUM) - discovered)
-        extra = sorted(discovered - set(OWNER_ENUM))
+    current_inventory = set(OWNER_ENUM)
+    extra = sorted(discovered - current_inventory)
+    if not discovered or extra:
         raise RunnerError(
-            f"Skill revision must contain the fixed 14-package inventory; "
-            f"missing={missing}, extra={extra}"
+            "Skill revision must contain a non-empty subset of the current "
+            f"package inventory; extra={extra}"
         )
-    return GitRevision(commit=commit, skills_tree=skills_tree)
+    if not allow_historical_subset and discovered != current_inventory:
+        missing = sorted(current_inventory - discovered)
+        raise RunnerError(
+            "Candidate Skill revision must contain the current "
+            f"{len(OWNER_ENUM)}-package inventory; missing={missing}"
+        )
+    return GitRevision(
+        commit=commit,
+        skills_tree=skills_tree,
+        skill_names=tuple(sorted(discovered)),
+    )
 
 
 def _repository_dataset_path(value: str) -> tuple[Path, str]:
@@ -432,7 +445,7 @@ def _materialize_skill_fixture(revision: GitRevision, destination: Path) -> str:
             or path.is_absolute()
             or len(path.parts) < 3
             or path.parts[0] != "skills"
-            or path.parts[1] not in OWNER_ENUM
+            or path.parts[1] not in revision.skill_names
             or ".." in path.parts
             or path.as_posix() != path_text
         ):
@@ -449,8 +462,10 @@ def _materialize_skill_fixture(revision: GitRevision, destination: Path) -> str:
         digest.update(mode.encode("ascii") + b"\0")
         digest.update(content)
         digest.update(b"\0")
-    if seen_skill_docs != set(OWNER_ENUM):
-        raise RunnerError("exported fixture does not contain the fixed 14-package inventory")
+    if seen_skill_docs != set(revision.skill_names):
+        raise RunnerError(
+            "exported fixture does not match the resolved revision inventory"
+        )
     return digest.hexdigest()
 
 
@@ -1473,11 +1488,17 @@ def _configuration_from_args(arguments: argparse.Namespace) -> RunConfig:
             campaign, arguments.variant
         )
         if arguments.skill_revision is not None:
-            supplied_revision = resolve_revision(arguments.skill_revision)
+            supplied_revision = resolve_revision(
+                arguments.skill_revision,
+                allow_historical_subset=arguments.variant == "previous",
+            )
             if supplied_revision.commit != expected_revision:
                 raise RunnerError("--skill-revision does not match the campaign variant")
         revision_spec = expected_revision
-    revision = resolve_revision(revision_spec)
+    revision = resolve_revision(
+        revision_spec,
+        allow_historical_subset=arguments.variant == "previous",
+    )
     comparison_group_id = arguments.comparison_group_id
     if campaign is not None:
         declared_groups = campaign.trial_groups

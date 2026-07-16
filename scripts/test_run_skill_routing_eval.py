@@ -32,7 +32,11 @@ SPEC.loader.exec_module(RUNNER)
 
 class RoutingRunnerTests(unittest.TestCase):
     def _revision(self):
-        return RUNNER.GitRevision(commit="a" * 40, skills_tree="b" * 40)
+        return RUNNER.GitRevision(
+            commit="a" * 40,
+            skills_tree="b" * 40,
+            skill_names=tuple(RUNNER.OWNER_ENUM),
+        )
 
     def _cases(self):
         return (
@@ -501,7 +505,9 @@ class RoutingRunnerTests(unittest.TestCase):
             ), mock.patch.object(
                 RUNNER,
                 "resolve_revision",
-                return_value=RUNNER.GitRevision("b" * 40, "c" * 40),
+                return_value=RUNNER.GitRevision(
+                    "b" * 40, "c" * 40, tuple(RUNNER.OWNER_ENUM)
+                ),
             ), mock.patch.object(
                 RUNNER, "_git_text", return_value="a" * 40
             ), mock.patch.object(
@@ -1169,6 +1175,64 @@ class RoutingRunnerTests(unittest.TestCase):
         self.assertEqual(
             validator.committed_skill_fixture_hash(revision.commit), runner_hash
         )
+
+    def test_previous_revision_accepts_and_exports_historical_inventory_subset(
+        self,
+    ) -> None:
+        historical_names = tuple(
+            owner for owner in RUNNER.OWNER_ENUM if owner != "domain-modeling"
+        )
+        tracked = "\n".join(
+            f"skills/{owner}/SKILL.md" for owner in historical_names
+        )
+
+        with mock.patch.object(
+            RUNNER,
+            "_git_text",
+            side_effect=["a" * 40, "b" * 40, tracked],
+        ):
+            revision = RUNNER.resolve_revision(
+                "previous", allow_historical_subset=True
+            )
+        self.assertEqual(historical_names, revision.skill_names)
+
+        with mock.patch.object(
+            RUNNER,
+            "_git_text",
+            side_effect=["a" * 40, "b" * 40, tracked],
+        ), self.assertRaisesRegex(
+            RUNNER.RunnerError, "Candidate Skill revision"
+        ):
+            RUNNER.resolve_revision("previous")
+
+        records = b"".join(
+            (
+                f"100644 blob {'c' * 40}\tskills/{owner}/SKILL.md".encode(
+                    "utf-8"
+                )
+                + b"\0"
+            )
+            for owner in historical_names
+        )
+
+        def committed_bytes(arguments):
+            if arguments[0] == "ls-tree":
+                return records
+            if arguments[:2] == ["cat-file", "blob"]:
+                return b"---\nname: historical\ndescription: historical\n---\n"
+            self.fail(f"unexpected Git command: {arguments}")
+
+        with tempfile.TemporaryDirectory() as temporary, mock.patch.object(
+            RUNNER, "_git_bytes", side_effect=committed_bytes
+        ):
+            destination = Path(temporary) / "skills"
+            destination.mkdir()
+            RUNNER._materialize_skill_fixture(revision, destination)
+            self.assertEqual(
+                set(historical_names),
+                {path.name for path in destination.iterdir()},
+            )
+            self.assertFalse((destination / "domain-modeling").exists())
 
     def test_isolated_environment_copies_only_host_credentials(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
