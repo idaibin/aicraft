@@ -186,10 +186,11 @@ Use the same prompts, fixture, model, host, permissions, timeout, and rubric for
 all comparative variants. Use one `comparison_group_id` for the candidate,
 previous, and no-Skill runs in each trial, a versioned model identifier, and the
 same canonical isolated-environment policy. The policy hash binds the source
-variable allowlist and fixed overrides, not the actual PATH, proxy, locale, or
-certificate values, so run the group from one controlled parent environment
-and record any runtime drift. Run matched groups in parallel when the host
-supports it and record any randomized-interleaving fallback. Each campaign
+variable allowlist and fixed overrides, including required executable-toolchain
+roots such as `VOLTA_HOME`, but not the actual PATH, toolchain-root, proxy,
+locale, or certificate values. Run the group from one controlled parent
+environment and record any runtime drift. Run matched groups in parallel when
+the host supports it and record any randomized-interleaving fallback. Each campaign
 slot permits one attempt. The runner writes `attempt.json` before calling the
 host; a failed or interrupted attempt consumes that slot. Preserve the complete
 artifact root and create a new post-anchor campaign instead of retrying under a

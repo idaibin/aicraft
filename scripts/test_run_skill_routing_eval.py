@@ -768,6 +768,30 @@ class RoutingRunnerTests(unittest.TestCase):
             self.assertFalse((isolated_claude / "settings.json").exists())
             self.assertFalse((isolated_claude / "skills").exists())
 
+    def test_isolated_environment_preserves_allowlisted_volta_home(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source_home = root / "source-home"
+            codex_home = source_home / ".codex"
+            volta_home = root / "volta-home"
+            codex_home.mkdir(parents=True)
+            volta_home.mkdir()
+            (codex_home / "auth.json").write_text("codex-auth", encoding="utf-8")
+
+            environment = {
+                "HOME": str(source_home),
+                "CODEX_HOME": str(codex_home),
+                "VOLTA_HOME": str(volta_home),
+                "AICRAFT_TEST_SECRET": "must-not-propagate",
+            }
+            with mock.patch.dict(os.environ, environment, clear=True):
+                isolated = RUNNER._isolated_host_environment(
+                    "codex", root / "codex-isolated"
+                )
+
+            self.assertEqual(str(volta_home), isolated["VOLTA_HOME"])
+            self.assertNotIn("AICRAFT_TEST_SECRET", isolated)
+
     def test_success_path_self_validates_with_real_evaluator(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

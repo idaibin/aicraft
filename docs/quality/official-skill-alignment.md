@@ -135,7 +135,8 @@ parallel when the host supports it, at least the required repeated trials,
 held-out requests for changed discovery text, raw traces, duration and token
 data when exposed by the host, outcome grading, and workspace-diff evidence.
 The current hash binds the environment-variable allowlist and fixed isolation
-overrides, not the actual PATH, proxy, locale, or certificate values; that
+overrides, including required executable-toolchain roots such as `VOLTA_HOME`,
+not the actual PATH, toolchain-root, proxy, locale, or certificate values; that
 runtime drift remains visible only through trusted execution records. See
 [`validation-plan.md`](validation-plan.md) and [`status.md`](status.md).
 

@@ -223,6 +223,7 @@
           "SSL_CERT_DIR",
           "SSL_CERT_FILE",
           "TMPDIR",
+          "VOLTA_HOME",
           "all_proxy",
           "http_proxy",
           "https_proxy",
