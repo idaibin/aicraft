@@ -196,3 +196,8 @@ unverified claims. Routing claims also bind the evaluation anchor, dataset Git
 revision, and held-out provenance path/hash. The current contract permits
 scoped routing outcome or token efficiency claims only; it rejects global
 “improvement” wording and authority/workflow claims.
+
+Failed comparison reports are ineligible for the quality manifest. Archive an
+exact failed report and a clearly labeled non-claim summary under
+`docs/history/evals/`, and state whether the raw bundles are committed and
+replayable from repository contents.

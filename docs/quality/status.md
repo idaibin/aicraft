@@ -9,10 +9,13 @@ maturity labels or treat format validation as proof of model behavior.
 - Evidence revision: the commit containing this file; resolve with
   `git log -1 --format=%H -- docs/quality/status.md`
 - Structure host: local repository validator on macOS
-- Behavior host and model: `Not verified`
+- Behavior host and model: `codex-cli 0.144.1` / `gpt-5.6-sol` routing
+  comparison executed; quality gate failed
 - Workflow host and model: `Not verified`
-- Comparative previous/no-Skill run: `Not verified`
-- Held-out provenance: `Committed and hash-bound; live evaluation not verified`
+- Comparative previous/no-Skill run: previous revision comparison executed;
+  status `FAIL`
+- Held-out provenance: `Committed and hash-bound; three paired live trials
+  executed, not claimable`
 
 `Structure = verified` means the source package and repository consistency
 checks passed. It does not prove live model routing, authority behavior, or
@@ -60,8 +63,10 @@ freshness are defined by
 [`contracts/skill-validation.json`](../../contracts/skill-validation.json).
 
 The routing, authority, and workflow datasets satisfy static schema and coverage
-validation at this revision. No model-bound evidence manifest is recorded, so
-behavior and workflow remain `not_verified`.
+validation at this revision. No passing model-bound evidence is recorded in the
+manifest. The latest failed comparison is archived under
+[`docs/history/evals/`](../history/evals/2026-07-16-codex-gpt56-routing-comparison.md),
+so behavior and workflow remain `not_verified`.
 
 Authority/workflow raw hashes and trace/workspace/verifier bindings are
 tamper-evident only under a trusted evidence producer. They do not authenticate
@@ -87,15 +92,45 @@ This is a context-footprint measurement, not a model-behavior, quality, speed,
 or token-usage result. Those claims remain `not_verified` until the controlled
 comparison contract passes.
 
+## Live Routing Comparison (Failed Gate)
+
+On `2026-07-16`, the Codex runner executed three paired candidate/previous
+trials over the 28-case held-out dataset: 168 successful model calls in total.
+All six bundles were complete, with 28 raw observations each, zero timeouts,
+zero non-zero exits, and matching host, model, dataset, provenance, anchor,
+trial, pair, and revision bindings.
+
+| Measure | Candidate `9c7f6488` | Previous `abebbfc9` | Result |
+| --- | ---: | ---: | --- |
+| Exact owner outcome | 83/84 (98.81%) | 84/84 (100.00%) | -1.19 percentage points |
+| Mean Token use per trial | 380,939 | 387,674 | 1.74% reduction; below the 15% gate |
+| Forbidden handoffs | 9 | 4 | candidate did not pass the routing contract |
+| Mean duration per trial | 676,536 ms | 662,293 ms | candidate 2.15% slower; duration is not a gate |
+
+The archived comparison report status is `FAIL` with comparison self-hash
+`e7b8cf2bbd5b76fcac84bc9ebf0b48c1972269eed4084959e1b37a54dd222519`.
+The candidate's first trial also had one owner error (`audit-rust` expected,
+`diagnose` returned). The local raw bundles and generated report remain ignored
+runtime artifacts under `eval-results/`; the exact report copy linked below is
+historical only. Neither the bundles nor the failed comparison are registered
+in `evidence-manifest.json`, and no verified behavior or improvement claim is
+made. The held-out cases must not be used to tune this candidate.
+
+See the
+[`2026-07-16 Codex routing comparison`](../history/evals/2026-07-16-codex-gpt56-routing-comparison.md)
+for the bound scope, exact report, and repository replay boundary.
+
 ## Unverified Scope
 
-- Live top-1 routing and neighboring non-trigger accuracy
+- A passing live top-1 routing and neighboring non-trigger contract; the
+  recorded Codex comparison failed
 - Authority enforcement under real model/tool execution
 - Stop conditions and cross-skill handoff behavior
 - End-to-end repository workflow completion and interruption recovery
 - Claude Code compatibility
 - Technology stacks outside the repository's future recorded workflow corpus
-- Scoped comparative routing outcome or token improvement over a previous/no-Skill run
+- Scoped comparative routing outcome or Token improvement over a previous/no-Skill
+  run; the recorded Codex comparison did not meet either gate
 - Any time improvement claim; duration is reported but not a current gate
 
 Future behavior or workflow verification must bind every raw result to the
