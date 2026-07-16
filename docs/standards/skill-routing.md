@@ -26,7 +26,8 @@ Framework-specific or domain-specific checks should stay as profiles when these 
 | Skill | Primary object | Mutation | Primary output |
 | --- | --- | --- | --- |
 | `repo-map` | workspace/repository semantics and reuse map | read-only by default; repo-map write only after explicit request | real boundaries, task routes, verified reuse entries, alignment gaps |
-| `code-planner` | future implementation requirement | read-only | executable tasks, dependencies, owners, validation and reject gates |
+| `domain-modeling` | business language, concepts, lifecycle, rules, and contexts | read-only by default; domain-artifact write only after explicit request | evidence-backed domain model, decisions, contradictions, and open questions |
+| `code-planner` | future implementation requirement | read-only | grounded spec, technical design, acceptance criteria, executable slices, dependencies, and validation gates |
 | `diagnose` | concrete failure symptom | read-only for tracked repository and Git state | reproduction loop, confirmed cause, regression seam, implementation handoff |
 | `repo-review` | local worktree/index or immutable snapshot/range/PR/release/package | read-only | basis-specific readiness, staging guidance, or consolidated P0-P3 findings |
 | `implement-frontend` | requested frontend source change | source mutation | implemented and validated frontend change |
@@ -39,6 +40,21 @@ Framework-specific or domain-specific checks should stay as profiles when these 
 | `ops-client` | real desktop client process/window | authorized client actions | process/window/runtime evidence |
 | `chatgpt-review` | external ChatGPT review package or round | local artifact write or authorized external action | prepared/routed package, attributed response, local verification |
 | `human-writing` | supplied technical draft | text transformation | edited publication-ready text |
+
+## Engineering Lifecycle
+
+```text
+repo-map (repository truth unknown)
+  -> domain-modeling (business language or lifecycle unclear)
+  -> code-planner (technical design and task slices needed)
+  -> implement-* (source mutation requested)
+  -> repo-review (Standards and Spec axes)
+  -> repo-delivery (authorized Git mutation)
+```
+
+This chain is composable, not mandatory ceremony. Start at the earliest unresolved owner and stop at the last outcome the user requested.
+
+`domain-modeling` and `code-planner` remain separate: the former defines business meaning and rules independent of implementation, while the latter converts confirmed requirements into technical design, acceptance criteria, task ownership, dependencies, and validation.
 
 ## `repo-map` And `repo-review`
 

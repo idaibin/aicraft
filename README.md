@@ -93,7 +93,7 @@ Install selected skills:
 
 ```bash
 npx skills add https://github.com/idaibin/aicraft \
-  --skill repo-map code-planner diagnose repo-review repo-delivery audit-security chatgpt-review implement-frontend implement-rust audit-frontend audit-rust ops-browser ops-client human-writing
+  --skill repo-map domain-modeling code-planner diagnose repo-review repo-delivery audit-security chatgpt-review implement-frontend implement-rust audit-frontend audit-rust ops-browser ops-client human-writing
 ```
 
 List available skills without installing:
@@ -110,7 +110,8 @@ rename migration, see [`INSTALL.md`](INSTALL.md).
 | Skill | Use when |
 | --- | --- |
 | `repo-map` | Maintaining the smallest useful semantic repository map of real boundaries, commands, task routes, and verified reusable components, functions, types, or APIs. |
-| `code-planner` | Planning future codebase work, splitting tasks, defining validation gates, and coordinating auditable subagents before implementation. |
+| `domain-modeling` | Clarifying business language, entities, relationships, lifecycle, invariants, scenarios, and bounded contexts before technical design. |
+| `code-planner` | Turning requirements into grounded specifications, technical design, acceptance criteria, vertical task slices, and validation gates. |
 | `diagnose` | Reproducing technical failures, isolating variables, confirming root causes, and handing verified remediation to the matching implementation skill. |
 | `repo-review` | Read-only review of local worktrees, fixed commits/ranges, PRs, releases, or review packages, with basis-specific ownership/readiness or P0-P3 findings. |
 | `repo-delivery` | Delivering reviewed local changes with path-limited staging, commits, pushes, branch sync, squash-to-main, cleanup, and remote proof. |
@@ -126,7 +127,7 @@ rename migration, see [`INSTALL.md`](INSTALL.md).
 
 ### Functional Categories
 
-- **Core Engineering:** `repo-map`, `code-planner`, `diagnose`, `repo-review`, `repo-delivery`
+- **Core Engineering:** `repo-map`, `domain-modeling`, `code-planner`, `diagnose`, `repo-review`, `repo-delivery`
 - **Implementation:** `implement-rust`, `implement-frontend`
 - **Specialist Audit:** `audit-rust`, `audit-frontend`, `audit-security`
 - **Runtime Operations:** `ops-browser`, `ops-client`
@@ -142,14 +143,14 @@ independently for structure, live behavior, and end-to-end workflow evidence.
 ```text
 simple change: implement-* -> repo-review -> repo-delivery
 unknown failure: diagnose -> implement-* -> repo-review -> repo-delivery
-complex change: repo-map -> code-planner -> implement-* -> repo-review -> repo-delivery
+complex product change: repo-map (if needed) -> domain-modeling (if needed) -> code-planner -> implement-* -> repo-review -> repo-delivery
 read-only review: repo-review -> audit-* only when needed
 external review: chatgpt-review only after an explicit request
 ```
 
 ### Installation Bundles
 
-- **Core Read-only:** `repo-map`, `code-planner`, `diagnose`, `repo-review`
+- **Core Read-only:** `repo-map`, `domain-modeling`, `code-planner`, `diagnose`, `repo-review`
 - **Engineering:** Core Read-only plus `repo-delivery`, `implement-rust`, and `implement-frontend`
 - **Full:** all published skills
 

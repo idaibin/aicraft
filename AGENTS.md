@@ -8,6 +8,8 @@ This file defines how AI agents should work on this repository. It is not the pr
 - Only when the user explicitly asks to install skills from `https://github.com/idaibin/aicraft`, read `INSTALL.md` and follow that installation flow.
 - Do not switch into installation mode just because this repository contains `skills/`.
 - Use `repo-map` for separate repository mapping, reuse inventory, or docs/code alignment.
+- Use `domain-modeling` for business language, entities, relationships, lifecycle, invariants, and bounded contexts before technical planning when those concepts are unresolved.
+- Use `code-planner` for requirement readiness, technical design, acceptance criteria, and executable task slices before complex implementation.
 - Use `diagnose` for concrete failures; permanent remediation transitions to the matching implementation skill.
 - Use `implement-frontend` or `implement-rust` for requested code changes.
 - Use `audit-frontend`, `audit-rust`, or `audit-security` for bounded read-only domain audits.

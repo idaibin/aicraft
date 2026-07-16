@@ -37,6 +37,8 @@ instructions and provider metadata.
 - Implementation skills use `implement-<domain>`, such as `implement-frontend` or `implement-rust`, and own requested source changes only.
 - Domain audit skills use `audit-<domain>`, such as `audit-frontend`, `audit-rust`, or `audit-security`. They are read-only, select only applicable profiles, lead with evidence-backed findings, and route fixes to the corresponding implementation skill.
 - `repo-map` owns semantic repository-map maintenance, real boundaries/commands/task routes, verified reuse inventories, and docs/code alignment. It does not mirror source trees, rank defects, or declare review readiness.
+- `domain-modeling` owns ubiquitous language, domain concepts, relationships, lifecycle, invariants, scenarios, and bounded contexts. It may write only an explicitly authorized domain artifact and does not own repository mapping, technical design, or source changes.
+- `code-planner` owns requirement readiness, technical design, acceptance criteria, vertical task slices, blocking edges, and validation gates before complex implementation.
 - `diagnose` owns failure reproduction, minimization, hypothesis testing, and root-cause confirmation. Permanent remediation transitions to the matching implementation skill.
 - `repo-review` owns read-only review across basis-specific modes: local worktree/index changes, immutable snapshots, branch comparisons, commit ranges, pull requests, release candidates, and verified review packages. It owns dirty-tree readiness in Worktree mode and consolidated P0-P3 findings in immutable modes.
 - `audit-security` owns bounded security assessment and may act as a specialist under `repo-review`; it does not replace the coordinator.

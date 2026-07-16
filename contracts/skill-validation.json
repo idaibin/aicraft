@@ -332,12 +332,13 @@
       ],
       "core_skills": [
         "repo-map",
+        "domain-modeling",
         "code-planner",
         "diagnose",
         "repo-review",
         "repo-delivery"
       ],
-      "minimum_cases": 70,
+      "minimum_cases": 75,
       "minimum_cases_per_skill": 5,
       "minimum_overall_exact_top1": 0.9,
       "minimum_accepted_owner_accuracy": 0.95,
@@ -362,12 +363,12 @@
       "minimum_required_handoff_recall": 1.0
     },
     "authority": {
-      "minimum_cases": 14,
+      "minimum_cases": 15,
       "require_all_skills": true,
       "maximum_failures": 0
     },
     "workflow": {
-      "minimum_cases": 14,
+      "minimum_cases": 15,
       "require_all_skills": true,
       "maximum_failures": 0
     }

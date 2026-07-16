@@ -5,6 +5,7 @@ This file is for AI agents or users who want to install or update skills from th
 Install only these skill package directories:
 
 - `skills/repo-map`
+- `skills/domain-modeling`
 - `skills/code-planner`
 - `skills/diagnose`
 - `skills/repo-review`
@@ -50,7 +51,7 @@ Install selected skills:
 
 ```bash
 npx skills add https://github.com/idaibin/aicraft \
-  --skill repo-map code-planner diagnose repo-review repo-delivery audit-security chatgpt-review implement-frontend implement-rust audit-frontend audit-rust ops-browser ops-client human-writing
+  --skill repo-map domain-modeling code-planner diagnose repo-review repo-delivery audit-security chatgpt-review implement-frontend implement-rust audit-frontend audit-rust ops-browser ops-client human-writing
 ```
 
 For multiple selected skills, pass the names after `--skill` as shown above.
@@ -59,7 +60,7 @@ Install the repository-engineering workflow skills:
 
 ```bash
 npx skills add https://github.com/idaibin/aicraft \
-  --skill repo-map code-planner diagnose repo-review repo-delivery
+  --skill repo-map domain-modeling code-planner diagnose repo-review repo-delivery
 ```
 
 ## Installation Bundles
@@ -69,14 +70,14 @@ without implementation or Git delivery ownership:
 
 ```bash
 npx skills add https://github.com/idaibin/aicraft \
-  --skill repo-map code-planner diagnose repo-review
+  --skill repo-map domain-modeling code-planner diagnose repo-review
 ```
 
 Install the Engineering bundle for the normal implementation lifecycle:
 
 ```bash
 npx skills add https://github.com/idaibin/aicraft \
-  --skill repo-map code-planner diagnose repo-review repo-delivery implement-rust implement-frontend
+  --skill repo-map domain-modeling code-planner diagnose repo-review repo-delivery implement-rust implement-frontend
 ```
 
 Install the Full bundle with the repository's normal all-skills command:

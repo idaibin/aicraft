@@ -27,6 +27,7 @@ end-to-end task completion.
 | Skill | Functional category | Release | Structure | Behavior | Workflow |
 | --- | --- | --- | --- | --- | --- |
 | `repo-map` | Core Engineering | available | verified | not_verified | not_verified |
+| `domain-modeling` | Core Engineering | available | verified | not_verified | not_verified |
 | `code-planner` | Core Engineering | available | verified | not_verified | not_verified |
 | `diagnose` | Core Engineering | available | verified | not_verified | not_verified |
 | `repo-review` | Core Engineering | available | verified | not_verified | not_verified |

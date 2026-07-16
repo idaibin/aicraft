@@ -3,8 +3,9 @@
   "audit-rust": ["diagnose", "implement-rust", "repo-review"],
   "audit-security": ["repo-map", "repo-review"],
   "chatgpt-review": ["ops-browser", "repo-delivery", "repo-review"],
-  "code-planner": ["repo-map"],
+  "code-planner": ["domain-modeling", "repo-map"],
   "diagnose": ["audit-rust", "implement-frontend", "implement-rust", "ops-browser", "ops-client"],
+  "domain-modeling": ["code-planner", "repo-map"],
   "human-writing": ["repo-map"],
   "implement-frontend": ["audit-frontend", "diagnose", "repo-map"],
   "implement-rust": ["audit-rust", "diagnose", "repo-map"],
@@ -13,6 +14,7 @@
   "repo-map": [
     "audit-security",
     "code-planner",
+    "domain-modeling",
     "human-writing",
     "implement-frontend",
     "implement-rust",

@@ -4,9 +4,10 @@
   "groupings": [
     {
       "title": "Core Engineering",
-      "description": "Independent but interoperable skills for current project mapping, planning, diagnosis, local and immutable review, and Git delivery.",
+      "description": "Independent but interoperable skills for repository mapping, domain modeling, planning, diagnosis, review, and Git delivery.",
       "skills": [
         "repo-map",
+        "domain-modeling",
         "code-planner",
         "diagnose",
         "repo-review",
