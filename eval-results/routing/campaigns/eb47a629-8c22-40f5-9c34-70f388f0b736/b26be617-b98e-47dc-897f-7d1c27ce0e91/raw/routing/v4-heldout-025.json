@@ -1,0 +1,59 @@
+{
+  "case_id": "v4-heldout-025",
+  "completed_at": "2026-07-16T09:16:15.580868Z",
+  "exit_code": 0,
+  "host": "codex-cli 0.144.5",
+  "host_attempts": [
+    {
+      "attempt_index": 1,
+      "backoff_seconds_before_next": 0,
+      "completed_at": "2026-07-16T09:16:15.580319Z",
+      "duration_ms": 24800,
+      "error": null,
+      "error_class": null,
+      "exit_code": 0,
+      "metrics": {
+        "duration_ms": 24800,
+        "input_tokens": 13846,
+        "output_tokens": 21
+      },
+      "model_output": "{\"actual_owner\":\"audit-security\",\"handoffs\":[]}",
+      "observations": {
+        "actual_owner": "audit-security",
+        "handoffs": []
+      },
+      "response": "{\"actual_owner\":\"audit-security\",\"handoffs\":[]}",
+      "retryable": false,
+      "started_at": "2026-07-16T09:15:50.780646Z",
+      "stderr": "Reading additional input from stdin...\n",
+      "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"019f6a36-07b4-7d60-ae9d-51641e51e294\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"audit-security\\\",\\\"handoffs\\\":[]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13846,\"cached_input_tokens\":9984,\"output_tokens\":21,\"reasoning_output_tokens\":0}}\n",
+      "transcript": "STDOUT\n{\"type\":\"thread.started\",\"thread_id\":\"019f6a36-07b4-7d60-ae9d-51641e51e294\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"audit-security\\\",\\\"handoffs\\\":[]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13846,\"cached_input_tokens\":9984,\"output_tokens\":21,\"reasoning_output_tokens\":0}}\n\nSTDERR\nReading additional input from stdin...\n",
+      "transcript_sha256": "93deca40975a4f2ee5a08df548c418d22b03d018e6699df6219326615cdaf728"
+    }
+  ],
+  "invocation_prompt": "Route this natural request to one primary owner and zero or more necessary handoff owners.\nPrimary owner: the published Skill responsible for the requested outcome, including its authorization boundary and next externally meaningful state.\nHandoff owner: another published Skill that must actually execute a bounded part of this current request or own a clearly requested subsequent phase.\nDo not list optional recommendations, alternatives, internal support the primary owner can perform, or unrequested future work as handoffs. If the primary owner can complete the requested outcome alone, return an empty handoffs array.\nNatural request: \"Audit a password-reset flow for token replay, account enumeration, and rate limiting; inspect only the supplied files and do not stage.\"\nOwner enum: [\"audit-frontend\",\"audit-rust\",\"audit-security\",\"chatgpt-review\",\"code-planner\",\"diagnose\",\"human-writing\",\"implement-frontend\",\"implement-rust\",\"ops-browser\",\"ops-client\",\"repo-delivery\",\"repo-map\",\"repo-review\"]\nReturn only JSON with keys actual_owner and handoffs.",
+  "invocation_prompt_sha256": "9cf7ac9495c5d6dd44ed17716f4d9a0076aa712362472e2dab81ec6c46a4831b",
+  "metrics": {
+    "attempt_count": 1,
+    "duration_ms": 24801,
+    "input_tokens": 13846,
+    "output_tokens": 21,
+    "retry_count": 0
+  },
+  "model": "gpt-5.6-sol",
+  "model_output": "{\"actual_owner\":\"audit-security\",\"handoffs\":[]}",
+  "observations": {
+    "actual_owner": "audit-security",
+    "handoffs": []
+  },
+  "prompt_sha256": "4c1d7b2e335100cf77fb2aea6dd1a3c4aabe693dad86a9e9286b3e11db6e7484",
+  "response": "{\"actual_owner\":\"audit-security\",\"handoffs\":[]}",
+  "retry_policy_sha256": "e4e57da98c95f6dda386e6e42a144019c4d59baf72c5f13d2053275abae4067d",
+  "run_id": "b26be617-b98e-47dc-897f-7d1c27ce0e91",
+  "schema_version": 3,
+  "started_at": "2026-07-16T09:15:50.780549Z",
+  "stderr": "Reading additional input from stdin...\n",
+  "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"019f6a36-07b4-7d60-ae9d-51641e51e294\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"audit-security\\\",\\\"handoffs\\\":[]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13846,\"cached_input_tokens\":9984,\"output_tokens\":21,\"reasoning_output_tokens\":0}}\n",
+  "transcript": "STDOUT\n{\"type\":\"thread.started\",\"thread_id\":\"019f6a36-07b4-7d60-ae9d-51641e51e294\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"audit-security\\\",\\\"handoffs\\\":[]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13846,\"cached_input_tokens\":9984,\"output_tokens\":21,\"reasoning_output_tokens\":0}}\n\nSTDERR\nReading additional input from stdin...\n",
+  "transcript_sha256": "93deca40975a4f2ee5a08df548c418d22b03d018e6699df6219326615cdaf728"
+}

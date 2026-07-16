@@ -1,0 +1,63 @@
+{
+  "case_id": "v4-heldout-016",
+  "completed_at": "2026-07-16T09:28:44.385429Z",
+  "exit_code": 0,
+  "host": "codex-cli 0.144.5",
+  "host_attempts": [
+    {
+      "attempt_index": 1,
+      "backoff_seconds_before_next": 0,
+      "completed_at": "2026-07-16T09:28:44.384927Z",
+      "duration_ms": 28034,
+      "error": null,
+      "error_class": null,
+      "exit_code": 0,
+      "metrics": {
+        "duration_ms": 28034,
+        "input_tokens": 13798,
+        "output_tokens": 25
+      },
+      "model_output": "{\"actual_owner\":\"repo-review\",\"handoffs\":[\"audit-rust\"]}",
+      "observations": {
+        "actual_owner": "repo-review",
+        "handoffs": [
+          "audit-rust"
+        ]
+      },
+      "response": "{\"actual_owner\":\"repo-review\",\"handoffs\":[\"audit-rust\"]}",
+      "retryable": false,
+      "started_at": "2026-07-16T09:28:16.350971Z",
+      "stderr": "Reading additional input from stdin...\n",
+      "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"019f6a41-66de-7082-bb0e-7dbc773e3151\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"repo-review\\\",\\\"handoffs\\\":[\\\"audit-rust\\\"]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13798,\"cached_input_tokens\":9984,\"output_tokens\":25,\"reasoning_output_tokens\":0}}\n",
+      "transcript": "STDOUT\n{\"type\":\"thread.started\",\"thread_id\":\"019f6a41-66de-7082-bb0e-7dbc773e3151\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"repo-review\\\",\\\"handoffs\\\":[\\\"audit-rust\\\"]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13798,\"cached_input_tokens\":9984,\"output_tokens\":25,\"reasoning_output_tokens\":0}}\n\nSTDERR\nReading additional input from stdin...\n",
+      "transcript_sha256": "40030c8129eff718cbc479be363b4340aea4b5d07111b7021d7bcfd306429e86"
+    }
+  ],
+  "invocation_prompt": "Route this natural request to one primary owner and zero or more necessary handoff owners.\nPrimary owner: the published Skill responsible for the requested outcome, including its authorization boundary and next externally meaningful state.\nHandoff owner: another published Skill that must actually execute a bounded part of this current request or own a clearly requested subsequent phase.\nDo not list optional recommendations, alternatives, internal support the primary owner can perform, or unrequested future work as handoffs. If the primary owner can complete the requested outcome alone, return an empty handoffs array.\nNatural request: \"Review the fixed Rust commit range and delegate its changed Tokio and unsafe paths to a bounded Rust audit.\"\nOwner enum: [\"audit-frontend\",\"audit-rust\",\"audit-security\",\"chatgpt-review\",\"code-planner\",\"diagnose\",\"human-writing\",\"implement-frontend\",\"implement-rust\",\"ops-browser\",\"ops-client\",\"repo-delivery\",\"repo-map\",\"repo-review\"]\nReturn only JSON with keys actual_owner and handoffs.",
+  "invocation_prompt_sha256": "8dbd0318573dc9129131b88320919e265eeb2436d68b0d56db96d1dea94ee9d6",
+  "metrics": {
+    "attempt_count": 1,
+    "duration_ms": 28035,
+    "input_tokens": 13798,
+    "output_tokens": 25,
+    "retry_count": 0
+  },
+  "model": "gpt-5.6-sol",
+  "model_output": "{\"actual_owner\":\"repo-review\",\"handoffs\":[\"audit-rust\"]}",
+  "observations": {
+    "actual_owner": "repo-review",
+    "handoffs": [
+      "audit-rust"
+    ]
+  },
+  "prompt_sha256": "7224a01137666c9a70458d625f8ffc76a0c6858ced2531fd559fa04168b0e764",
+  "response": "{\"actual_owner\":\"repo-review\",\"handoffs\":[\"audit-rust\"]}",
+  "retry_policy_sha256": "e4e57da98c95f6dda386e6e42a144019c4d59baf72c5f13d2053275abae4067d",
+  "run_id": "6103c3c3-33b0-4d70-b9ad-158c7fe223cd",
+  "schema_version": 3,
+  "started_at": "2026-07-16T09:28:16.350907Z",
+  "stderr": "Reading additional input from stdin...\n",
+  "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"019f6a41-66de-7082-bb0e-7dbc773e3151\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"repo-review\\\",\\\"handoffs\\\":[\\\"audit-rust\\\"]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13798,\"cached_input_tokens\":9984,\"output_tokens\":25,\"reasoning_output_tokens\":0}}\n",
+  "transcript": "STDOUT\n{\"type\":\"thread.started\",\"thread_id\":\"019f6a41-66de-7082-bb0e-7dbc773e3151\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"repo-review\\\",\\\"handoffs\\\":[\\\"audit-rust\\\"]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13798,\"cached_input_tokens\":9984,\"output_tokens\":25,\"reasoning_output_tokens\":0}}\n\nSTDERR\nReading additional input from stdin...\n",
+  "transcript_sha256": "40030c8129eff718cbc479be363b4340aea4b5d07111b7021d7bcfd306429e86"
+}

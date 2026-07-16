@@ -1,0 +1,795 @@
+{
+  "adjudication": {
+    "config_sha256": "88c7533a50a903a69a7b627e16c9f33fe4c884d92c74b3bab9383719e776eacb",
+    "method": "deterministic",
+    "reviewer": "scripts/run-skill-routing-eval.py",
+    "reviewer_version": "6"
+  },
+  "captured_at": "2026-07-16T09:36:50.124908Z",
+  "complete": true,
+  "dataset_revision": "d68d2d8cf7777f35791250659af8ab873a506761d45f65df33f63cc0d9570217",
+  "host": "codex-cli 0.144.5",
+  "model": "gpt-5.6-sol",
+  "results": [
+    {
+      "actual_owner": "audit-frontend",
+      "handoffs": [],
+      "id": "v4-heldout-001",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 22002,
+        "input_tokens": 13804,
+        "output_tokens": 22,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "audit-frontend",
+        "handoffs": []
+      },
+      "prompt_sha256": "08feb9e20afd62e3b1d67094b37ae88417b73ac59646794643573eb5b29f0503",
+      "raw_evidence": "raw/routing/v4-heldout-001.json",
+      "raw_evidence_sha256": "90ddc8f9c340d0257308304ea8b0be0fd66506918bd692d0e2f9ca42c1062116"
+    },
+    {
+      "actual_owner": "audit-rust",
+      "handoffs": [],
+      "id": "v4-heldout-002",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 23709,
+        "input_tokens": 13804,
+        "output_tokens": 22,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "audit-rust",
+        "handoffs": []
+      },
+      "prompt_sha256": "d762b446d04f0aad568be710fe017499bbaabd908fb435591f82523897997319",
+      "raw_evidence": "raw/routing/v4-heldout-002.json",
+      "raw_evidence_sha256": "6bd6c26d9e8a90ae4f34bfe1f448f19752e1113c9d04b84dfd3352db86c5d71a"
+    },
+    {
+      "actual_owner": "audit-security",
+      "handoffs": [],
+      "id": "v4-heldout-003",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 26984,
+        "input_tokens": 13803,
+        "output_tokens": 21,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "audit-security",
+        "handoffs": []
+      },
+      "prompt_sha256": "a8a3e566b097c310b7bcdd5c13ae944e654dac1c0a530f4f4a02b5ce1096b8b6",
+      "raw_evidence": "raw/routing/v4-heldout-003.json",
+      "raw_evidence_sha256": "35ec9e2d6874a6ea9b4300371c8809fa4189571fc0933a175bb73bd2d7bfbed9"
+    },
+    {
+      "actual_owner": "chatgpt-review",
+      "handoffs": [],
+      "id": "v4-heldout-004",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 30888,
+        "input_tokens": 13812,
+        "output_tokens": 57,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "chatgpt-review",
+        "handoffs": []
+      },
+      "prompt_sha256": "54c78156914421d30f2a08145a56bfc40bd4c3a41565841bd8fbf9f240c5dbd7",
+      "raw_evidence": "raw/routing/v4-heldout-004.json",
+      "raw_evidence_sha256": "47606f0cd4a2482bc9b3fbe4e75fa3e0e587b5c6365cd296c4a437f61abc924f"
+    },
+    {
+      "actual_owner": "code-planner",
+      "handoffs": [],
+      "id": "v4-heldout-005",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 16030,
+        "input_tokens": 13803,
+        "output_tokens": 22,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "code-planner",
+        "handoffs": []
+      },
+      "prompt_sha256": "3f20f97c2ef082ba98724ea089b09aa532f7321d20f36e8c5276f15c66262819",
+      "raw_evidence": "raw/routing/v4-heldout-005.json",
+      "raw_evidence_sha256": "17ad07a1d7c76c10277c3522abdac8d60f6b7822c95568560ff1d38933fc2709"
+    },
+    {
+      "actual_owner": "diagnose",
+      "handoffs": [
+        "implement-frontend"
+      ],
+      "id": "v4-heldout-006",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 27065,
+        "input_tokens": 13806,
+        "output_tokens": 161,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "diagnose",
+        "handoffs": [
+          "implement-frontend"
+        ]
+      },
+      "prompt_sha256": "1e27db6cc8436d4d4b1dfb0a67615f9453406b3ebe0881cbfe9bc2ca2c7a8e64",
+      "raw_evidence": "raw/routing/v4-heldout-006.json",
+      "raw_evidence_sha256": "5443b9a457b9323b015508d031c861428d5672e1d75b8c190146dd77fd12ae16"
+    },
+    {
+      "actual_owner": "human-writing",
+      "handoffs": [],
+      "id": "v4-heldout-007",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 18468,
+        "input_tokens": 13800,
+        "output_tokens": 21,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "human-writing",
+        "handoffs": []
+      },
+      "prompt_sha256": "ec1156190e3d1c99dec9fb39ef750ddc516150ed58964e81c76390e6b254c55d",
+      "raw_evidence": "raw/routing/v4-heldout-007.json",
+      "raw_evidence_sha256": "ab02ed2bb11d1ec6b94623907e25796be36ebb36f858e40bbc6c89bd763a4808"
+    },
+    {
+      "actual_owner": "implement-frontend",
+      "handoffs": [
+        "ops-browser",
+        "ops-client"
+      ],
+      "id": "v4-heldout-008",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 24447,
+        "input_tokens": 13802,
+        "output_tokens": 28,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "implement-frontend",
+        "handoffs": [
+          "ops-browser",
+          "ops-client"
+        ]
+      },
+      "prompt_sha256": "9142da819220399d9dfa1ae4092f206a302f173c9f1adbc49aedd7de640ae091",
+      "raw_evidence": "raw/routing/v4-heldout-008.json",
+      "raw_evidence_sha256": "dc74d4b7c77963049bea5801958c289d22a12615651c7ed6c8fcc19242a9b7dc"
+    },
+    {
+      "actual_owner": "implement-rust",
+      "handoffs": [],
+      "id": "v4-heldout-009",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 29959,
+        "input_tokens": 14002,
+        "output_tokens": 22,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "implement-rust",
+        "handoffs": []
+      },
+      "prompt_sha256": "6208c8ea7c7e9543195019d739ec0faf255f80fb791053ed46dc33e3b0aed6d3",
+      "raw_evidence": "raw/routing/v4-heldout-009.json",
+      "raw_evidence_sha256": "ceaa786b54afe15190323174cfd5ac07ec5b8af07164be41423e36059368a291"
+    },
+    {
+      "actual_owner": "ops-browser",
+      "handoffs": [],
+      "id": "v4-heldout-010",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 25927,
+        "input_tokens": 13802,
+        "output_tokens": 21,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "ops-browser",
+        "handoffs": []
+      },
+      "prompt_sha256": "72e9e1faf419ce674f67165cb15c3d6423b93a91faa296ebfe5736213a99e339",
+      "raw_evidence": "raw/routing/v4-heldout-010.json",
+      "raw_evidence_sha256": "3325d3a060600fe9c9cd9be961a96c89d984b48e36a8e8a534ae1f3e0487da7d"
+    },
+    {
+      "actual_owner": "ops-client",
+      "handoffs": [],
+      "id": "v4-heldout-011",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 25590,
+        "input_tokens": 13806,
+        "output_tokens": 21,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "ops-client",
+        "handoffs": []
+      },
+      "prompt_sha256": "eccb5018d5cb43c066fb03c0f19850fa1952405d56d5296e921b8724ae9b2528",
+      "raw_evidence": "raw/routing/v4-heldout-011.json",
+      "raw_evidence_sha256": "c0c219d8388ccbcaad4367cf97549e4149c0571ade22914f63b138fc03fb3426"
+    },
+    {
+      "actual_owner": "repo-delivery",
+      "handoffs": [],
+      "id": "v4-heldout-012",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 26225,
+        "input_tokens": 13800,
+        "output_tokens": 22,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "repo-delivery",
+        "handoffs": []
+      },
+      "prompt_sha256": "4f724bd3683c888d5ec1eb63bb85c5b5df9b34bc7a34c6b628930ef423ce0202",
+      "raw_evidence": "raw/routing/v4-heldout-012.json",
+      "raw_evidence_sha256": "35b6d18b7c59be866414e910a2a20c05ca43d6e19dda23b0c01d94f681ba5d29"
+    },
+    {
+      "actual_owner": "repo-map",
+      "handoffs": [],
+      "id": "v4-heldout-013",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 29839,
+        "input_tokens": 13801,
+        "output_tokens": 21,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "repo-map",
+        "handoffs": []
+      },
+      "prompt_sha256": "7f60d0f4e34587b138756ab31d692f0fc6c575b48c9fbabf5a25a5745fad1e12",
+      "raw_evidence": "raw/routing/v4-heldout-013.json",
+      "raw_evidence_sha256": "1d84a90257144072ba93a6c107138898b44b119a5a337438a7c8ce49dcf1426a"
+    },
+    {
+      "actual_owner": "repo-review",
+      "handoffs": [],
+      "id": "v4-heldout-014",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 23601,
+        "input_tokens": 13805,
+        "output_tokens": 21,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "repo-review",
+        "handoffs": []
+      },
+      "prompt_sha256": "66aa70118f6a1b50fb38cb74f1c17dd75f1027887d46ed531eb00b341d41f2b3",
+      "raw_evidence": "raw/routing/v4-heldout-014.json",
+      "raw_evidence_sha256": "4ebdabf5b2358f344baf54fffd9c86c8a6fa1ac27d084cd14703fa553f6c05da"
+    },
+    {
+      "actual_owner": "repo-review",
+      "handoffs": [
+        "audit-security",
+        "audit-frontend"
+      ],
+      "id": "v4-heldout-015",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 26952,
+        "input_tokens": 13800,
+        "output_tokens": 28,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "repo-review",
+        "handoffs": [
+          "audit-security",
+          "audit-frontend"
+        ]
+      },
+      "prompt_sha256": "9fd3ee94c2493d60292b43891ca3b9dd679529e62d39c98f906cef5a461913d9",
+      "raw_evidence": "raw/routing/v4-heldout-015.json",
+      "raw_evidence_sha256": "e84d092c502fe7620714776691a7fe6ac3d9abed3ee6cc4e435186206111eba2"
+    },
+    {
+      "actual_owner": "repo-review",
+      "handoffs": [
+        "audit-rust"
+      ],
+      "id": "v4-heldout-016",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 28035,
+        "input_tokens": 13798,
+        "output_tokens": 25,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "repo-review",
+        "handoffs": [
+          "audit-rust"
+        ]
+      },
+      "prompt_sha256": "7224a01137666c9a70458d625f8ffc76a0c6858ced2531fd559fa04168b0e764",
+      "raw_evidence": "raw/routing/v4-heldout-016.json",
+      "raw_evidence_sha256": "c67be76f06cd91d0a48244aba9b427583f853ec2c713acb0e092d012918eb92f"
+    },
+    {
+      "actual_owner": "repo-review",
+      "handoffs": [],
+      "id": "v4-heldout-017",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 25749,
+        "input_tokens": 13798,
+        "output_tokens": 21,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "repo-review",
+        "handoffs": []
+      },
+      "prompt_sha256": "e29d3256aba44a12859d6e783ffa0922104cbf6909beb5180357257b07efed31",
+      "raw_evidence": "raw/routing/v4-heldout-017.json",
+      "raw_evidence_sha256": "ceb2dd43729699ff2ecfaea38ab4883e17f9967cda503c5ea7f272464113dc0c"
+    },
+    {
+      "actual_owner": "chatgpt-review",
+      "handoffs": [
+        "ops-browser"
+      ],
+      "id": "v4-heldout-018",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 30541,
+        "input_tokens": 13820,
+        "output_tokens": 26,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "chatgpt-review",
+        "handoffs": [
+          "ops-browser"
+        ]
+      },
+      "prompt_sha256": "57cc075f6440c104693d35d318ec988843cd97529dd47be4b074274475fabf26",
+      "raw_evidence": "raw/routing/v4-heldout-018.json",
+      "raw_evidence_sha256": "986d80d088941f45ce75d7ed329327f5fd6e99830d5bfe1a7fa67bdf74d0f283"
+    },
+    {
+      "actual_owner": "audit-frontend",
+      "handoffs": [],
+      "id": "v4-heldout-019",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 20223,
+        "input_tokens": 13799,
+        "output_tokens": 22,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "audit-frontend",
+        "handoffs": []
+      },
+      "prompt_sha256": "7b84042c952343e0bd7c7309571f0fdc2011371b1b69d27f0dce478304f4aa5f",
+      "raw_evidence": "raw/routing/v4-heldout-019.json",
+      "raw_evidence_sha256": "76784565ff58f5e70062e3aa84efb1d68f85bb1063658a060f2d7ad08034c251"
+    },
+    {
+      "actual_owner": "implement-rust",
+      "handoffs": [
+        "repo-review"
+      ],
+      "id": "v4-heldout-020",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 32108,
+        "input_tokens": 13805,
+        "output_tokens": 25,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "implement-rust",
+        "handoffs": [
+          "repo-review"
+        ]
+      },
+      "prompt_sha256": "820afea10297a6a3043eff7c6503e9f5e1567df65c73a6d4277a7680420d106b",
+      "raw_evidence": "raw/routing/v4-heldout-020.json",
+      "raw_evidence_sha256": "4cc0de38b204ba558378d6b778c91c42d04ae6bd238dd5dfbd7ada908e31de19"
+    },
+    {
+      "actual_owner": "implement-frontend",
+      "handoffs": [],
+      "id": "v4-heldout-021",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 23680,
+        "input_tokens": 13800,
+        "output_tokens": 22,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "implement-frontend",
+        "handoffs": []
+      },
+      "prompt_sha256": "c6bdcb056b08825347277f65daec9be20ad268507075641dabf47d47804a34c1",
+      "raw_evidence": "raw/routing/v4-heldout-021.json",
+      "raw_evidence_sha256": "d5715f54a98dfeb62dedff86c4694e7ed9b24e225c359372daa363fef52f2a3a"
+    },
+    {
+      "actual_owner": "code-planner",
+      "handoffs": [],
+      "id": "v4-heldout-022",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 21196,
+        "input_tokens": 13800,
+        "output_tokens": 22,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "code-planner",
+        "handoffs": []
+      },
+      "prompt_sha256": "dd688ae313ebba6e81957add06acb90f784c700585cad1320972bb5ce41d3d23",
+      "raw_evidence": "raw/routing/v4-heldout-022.json",
+      "raw_evidence_sha256": "b06bfa669bd37cc203280aa718420570faf0c10b22dc524d98221c0c3dc0f627"
+    },
+    {
+      "actual_owner": "diagnose",
+      "handoffs": [],
+      "id": "v4-heldout-023",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 29327,
+        "input_tokens": 13811,
+        "output_tokens": 21,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "diagnose",
+        "handoffs": []
+      },
+      "prompt_sha256": "db1cc7cbc34ea60366b2637cca5e6a92bb3e4727ea36dc23b1bafee7d3be4499",
+      "raw_evidence": "raw/routing/v4-heldout-023.json",
+      "raw_evidence_sha256": "ab580e7b46a5400cdb1cc946427c1d2b113f51bfcd77e3cc4a543730b89e0a69"
+    },
+    {
+      "actual_owner": "repo-map",
+      "handoffs": [],
+      "id": "v4-heldout-024",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 24406,
+        "input_tokens": 13801,
+        "output_tokens": 21,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "repo-map",
+        "handoffs": []
+      },
+      "prompt_sha256": "6b7947ea8010125499f54116f5d58dc8877ddc36e7fcd79a5ab86dde674cadb5",
+      "raw_evidence": "raw/routing/v4-heldout-024.json",
+      "raw_evidence_sha256": "5d3660a632f27b28acbc15117dcb2bf06c17049a137df25b26978fae9f89cdc0"
+    },
+    {
+      "actual_owner": "audit-security",
+      "handoffs": [],
+      "id": "v4-heldout-025",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 24010,
+        "input_tokens": 13804,
+        "output_tokens": 21,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "audit-security",
+        "handoffs": []
+      },
+      "prompt_sha256": "4c1d7b2e335100cf77fb2aea6dd1a3c4aabe693dad86a9e9286b3e11db6e7484",
+      "raw_evidence": "raw/routing/v4-heldout-025.json",
+      "raw_evidence_sha256": "5c9cc78703d2d52fa89db81ffda0b15b7d0b039271059c8a2b3dd8b184b69ab3"
+    },
+    {
+      "actual_owner": "audit-frontend",
+      "handoffs": [],
+      "id": "v4-heldout-026",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 23384,
+        "input_tokens": 13797,
+        "output_tokens": 22,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "audit-frontend",
+        "handoffs": []
+      },
+      "prompt_sha256": "6e9307018bc7397c3241bd6f5819ed6341006704077e0dcf3e6c407718d6b54c",
+      "raw_evidence": "raw/routing/v4-heldout-026.json",
+      "raw_evidence_sha256": "55493cc4795ba7eee2a1e82029e94b1d718599e44be834fdd8ca483ee7f3e011"
+    },
+    {
+      "actual_owner": "ops-browser",
+      "handoffs": [],
+      "id": "v4-heldout-027",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 16330,
+        "input_tokens": 13799,
+        "output_tokens": 21,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "ops-browser",
+        "handoffs": []
+      },
+      "prompt_sha256": "209281c3ca880ca7813984166f51d42de4f287d50eee7eac5df70cea11c4fbfa",
+      "raw_evidence": "raw/routing/v4-heldout-027.json",
+      "raw_evidence_sha256": "a313e628e1e85c0be6dddf3684c85cc99ce00608b77702f3d6f355d918a4c5fc"
+    },
+    {
+      "actual_owner": "chatgpt-review",
+      "handoffs": [],
+      "id": "v4-heldout-028",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 17971,
+        "input_tokens": 13812,
+        "output_tokens": 23,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "chatgpt-review",
+        "handoffs": []
+      },
+      "prompt_sha256": "64ae8f918763c9929b6445f1a8111aa7d053dc66bc12f29968f426042a8bdbb5",
+      "raw_evidence": "raw/routing/v4-heldout-028.json",
+      "raw_evidence_sha256": "068ce2edd6631a33f04edb149ff8e8918eeae0e2ae3b8f1b2b3c2ba046bf1124"
+    },
+    {
+      "actual_owner": "repo-delivery",
+      "handoffs": [],
+      "id": "v4-heldout-029",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 23423,
+        "input_tokens": 13449,
+        "output_tokens": 22,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "repo-delivery",
+        "handoffs": []
+      },
+      "prompt_sha256": "9d564ae2a03eb3c597f8b2a7590a3bd8eb25048b6e2bff24dce65da42885df17",
+      "raw_evidence": "raw/routing/v4-heldout-029.json",
+      "raw_evidence_sha256": "db94fdd29d8e88f0694327839af33169a89dab182ae54b38acf4e6a9b4e7057c"
+    },
+    {
+      "actual_owner": "human-writing",
+      "handoffs": [],
+      "id": "v4-heldout-030",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 22281,
+        "input_tokens": 13804,
+        "output_tokens": 21,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "human-writing",
+        "handoffs": []
+      },
+      "prompt_sha256": "b7ae343e2f398a8f604097c1fe336e8cfedc16862cc1bb02c009e6dd98c552f3",
+      "raw_evidence": "raw/routing/v4-heldout-030.json",
+      "raw_evidence_sha256": "07cc43f8ae6e2bc07deb6305af370858622671624b62d4eb65843f0f369cbc5b"
+    },
+    {
+      "actual_owner": "ops-client",
+      "handoffs": [],
+      "id": "v4-heldout-031",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 22906,
+        "input_tokens": 14009,
+        "output_tokens": 21,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "ops-client",
+        "handoffs": []
+      },
+      "prompt_sha256": "3b3ae111399517b922fa570c0a65280fa16df5b7840de3503651b6fc1bbc2e7c",
+      "raw_evidence": "raw/routing/v4-heldout-031.json",
+      "raw_evidence_sha256": "28ebc269f988d353e2d11fe720082bdfc098cda646bbfcafbd759cf1c75f41cd"
+    },
+    {
+      "actual_owner": "audit-rust",
+      "handoffs": [],
+      "id": "v4-heldout-032",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 25479,
+        "input_tokens": 13803,
+        "output_tokens": 22,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "audit-rust",
+        "handoffs": []
+      },
+      "prompt_sha256": "6bfae818af6bc23dc55dac0ef3a22a5af59b927436b3e5d697e4e9c5ba0eb2b7",
+      "raw_evidence": "raw/routing/v4-heldout-032.json",
+      "raw_evidence_sha256": "28229c918b32fa296511f2623c5068200ce3d971776bf992c4e63e8889b95d3e"
+    },
+    {
+      "actual_owner": "implement-rust",
+      "handoffs": [],
+      "id": "v4-heldout-033",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 19770,
+        "input_tokens": 13449,
+        "output_tokens": 22,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "implement-rust",
+        "handoffs": []
+      },
+      "prompt_sha256": "9133135f0a5535601fbc8bc1aa0b9a2456637af182ebf7fb20a698c570593a6d",
+      "raw_evidence": "raw/routing/v4-heldout-033.json",
+      "raw_evidence_sha256": "2eb22a688f30204db5d4c553744585e0179911594502885a6d238b19481c010b"
+    },
+    {
+      "actual_owner": "repo-review",
+      "handoffs": [],
+      "id": "v4-heldout-034",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 27384,
+        "input_tokens": 13799,
+        "output_tokens": 21,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "repo-review",
+        "handoffs": []
+      },
+      "prompt_sha256": "461762dac8f037cdc10f80524b9e7f902300a5788a70c7cbf2d44146794594d2",
+      "raw_evidence": "raw/routing/v4-heldout-034.json",
+      "raw_evidence_sha256": "7db15669895864cd17984e462d6ab756a73c8b112e22d9e9c0853e19db1d60c4"
+    },
+    {
+      "actual_owner": "repo-map",
+      "handoffs": [
+        "repo-review"
+      ],
+      "id": "v4-heldout-035",
+      "metrics": {
+        "attempt_count": 1,
+        "duration_ms": 23466,
+        "input_tokens": 13800,
+        "output_tokens": 24,
+        "retry_count": 0
+      },
+      "observations": {
+        "actual_owner": "repo-map",
+        "handoffs": [
+          "repo-review"
+        ]
+      },
+      "prompt_sha256": "35d147e90c5a42aa343ffebca5276f2549e440c0d65d7a76db73766a3a636b6f",
+      "raw_evidence": "raw/routing/v4-heldout-035.json",
+      "raw_evidence_sha256": "d4dc386de35cdd08e72e6a82599d374936bf6ab89e4bff40dfbc8b0534ba6573"
+    }
+  ],
+  "run_config": {
+    "attempt_id": "a3ba8423-63d0-48d2-9e61-3a963999acad",
+    "attempt_path": "attempt.json",
+    "campaign_id": "eb47a629-8c22-40f5-9c34-70f388f0b736",
+    "campaign_path": "evals/routing-held-out-v4-campaign.json",
+    "campaign_sha256": "156adcdecc73cfe34c5d512382e14e0947f1bec128641044d7fee69985294386",
+    "case_ids": [
+      "v4-heldout-001",
+      "v4-heldout-002",
+      "v4-heldout-003",
+      "v4-heldout-004",
+      "v4-heldout-005",
+      "v4-heldout-006",
+      "v4-heldout-007",
+      "v4-heldout-008",
+      "v4-heldout-009",
+      "v4-heldout-010",
+      "v4-heldout-011",
+      "v4-heldout-012",
+      "v4-heldout-013",
+      "v4-heldout-014",
+      "v4-heldout-015",
+      "v4-heldout-016",
+      "v4-heldout-017",
+      "v4-heldout-018",
+      "v4-heldout-019",
+      "v4-heldout-020",
+      "v4-heldout-021",
+      "v4-heldout-022",
+      "v4-heldout-023",
+      "v4-heldout-024",
+      "v4-heldout-025",
+      "v4-heldout-026",
+      "v4-heldout-027",
+      "v4-heldout-028",
+      "v4-heldout-029",
+      "v4-heldout-030",
+      "v4-heldout-031",
+      "v4-heldout-032",
+      "v4-heldout-033",
+      "v4-heldout-034",
+      "v4-heldout-035"
+    ],
+    "case_set_sha256": "efc46f1dc623e506682a90f7fe5489c91c2e7aa5d96fbca08bddd7c419fb321a",
+    "comparison_group_id": "47895b6e-13b8-5126-8b01-198149bc1e3d",
+    "concurrency": 1,
+    "dataset_git_revision": "2c4daca114b88655eb7620dae7bdeeef886e6036",
+    "dataset_path": "evals/routing-held-out-v4.jsonl",
+    "environment_policy_sha256": "69372f51b145ca7367022784443b71752ac578845951ebb0a2ef37a5eb3cd80c",
+    "evaluation_anchor_revision": "4a5be052c9b1cdf47557a4e0555c483d7abca95e",
+    "evaluation_protocol_revision": "4a5be052c9b1cdf47557a4e0555c483d7abca95e",
+    "evaluation_protocol_sha256": "44fdc736d082f68ac856afe4f8347f88a3c56398b35f5b2a99c401cc423b559f",
+    "fixture": {
+      "repository": "empty isolated Git repository",
+      "schema_version": 1,
+      "skill_packages_excluded": true,
+      "task": "prompt-only routing selection",
+      "tracked_files": []
+    },
+    "fixture_sha256": "3c9aaa3b4997e7eab6740b2092f51c406200296201762c3235feb0db5f0426d5",
+    "held_out": true,
+    "held_out_provenance_path": "evals/routing-held-out-v4-provenance.json",
+    "held_out_provenance_sha256": "3b55a16744e76f34d10b75d0d49190cbe8177fb31fc7ef8a663be1df0ffd3023",
+    "host_config_sha256": "b6641fda141cbbb0fb898913cd8197361072758540bb5c91808f215e62150a15",
+    "host_name": "codex",
+    "isolation": "committed export; unique repository and isolated HOME per host attempt; remote_plugin disabled",
+    "permissions": "read-only; never-approve; ephemeral; ignore-user-config; remote-plugin-disabled",
+    "prompt_set_sha256": "d68d2d8cf7777f35791250659af8ab873a506761d45f65df33f63cc0d9570217",
+    "prompt_template": "Route this natural request to one primary owner and zero or more necessary handoff owners.\nPrimary owner: the published Skill responsible for the requested outcome, including its authorization boundary and next externally meaningful state.\nHandoff owner: another published Skill that must actually execute a bounded part of this current request or own a clearly requested subsequent phase.\nDo not list optional recommendations, alternatives, internal support the primary owner can perform, or unrequested future work as handoffs. If the primary owner can complete the requested outcome alone, return an empty handoffs array.\nNatural request: <NATURAL_REQUEST_JSON>\nOwner enum: [\"audit-frontend\",\"audit-rust\",\"audit-security\",\"chatgpt-review\",\"code-planner\",\"diagnose\",\"human-writing\",\"implement-frontend\",\"implement-rust\",\"ops-browser\",\"ops-client\",\"repo-delivery\",\"repo-map\",\"repo-review\"]\nReturn only JSON with keys actual_owner and handoffs.",
+    "prompt_template_sha256": "8ef19b29a77c631a34abb5abf67ae0f936ff8b32191fb0ab441e34d14ca4f80d",
+    "prompt_template_version": 2,
+    "retry_policy_sha256": "e4e57da98c95f6dda386e6e42a144019c4d59baf72c5f13d2053275abae4067d",
+    "skill_fixture_sha256": "2aca22b140f2de36e73ca8203f44aef1250833d28d13d7a3c2a6172a98a86034",
+    "skill_install_root": ".agents/skills",
+    "skills_installed": true,
+    "timeout_seconds": 120,
+    "trial": 2,
+    "variant": "previous"
+  },
+  "run_id": "6103c3c3-33b0-4d70-b9ad-158c7fe223cd",
+  "schema_version": 6,
+  "skill_revision": "9d86056cb2e3a7762232cf268beef3a12b1d99d7",
+  "skill_tree_sha": "89e6f7d1f41d4b703bde3ccb221cc89c0c746394"
+}

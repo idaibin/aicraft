@@ -1,0 +1,59 @@
+{
+  "case_id": "v4-heldout-029",
+  "completed_at": "2026-07-16T09:17:46.029712Z",
+  "exit_code": 0,
+  "host": "codex-cli 0.144.5",
+  "host_attempts": [
+    {
+      "attempt_index": 1,
+      "backoff_seconds_before_next": 0,
+      "completed_at": "2026-07-16T09:17:46.029245Z",
+      "duration_ms": 20669,
+      "error": null,
+      "error_class": null,
+      "exit_code": 0,
+      "metrics": {
+        "duration_ms": 20669,
+        "input_tokens": 13841,
+        "output_tokens": 22
+      },
+      "model_output": "{\"actual_owner\":\"repo-delivery\",\"handoffs\":[]}",
+      "observations": {
+        "actual_owner": "repo-delivery",
+        "handoffs": []
+      },
+      "response": "{\"actual_owner\":\"repo-delivery\",\"handoffs\":[]}",
+      "retryable": false,
+      "started_at": "2026-07-16T09:17:25.360389Z",
+      "stderr": "Reading additional input from stdin...\n",
+      "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"019f6a37-77b0-7901-98f3-b9dff5ccef76\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"repo-delivery\\\",\\\"handoffs\\\":[]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13841,\"cached_input_tokens\":9984,\"output_tokens\":22,\"reasoning_output_tokens\":0}}\n",
+      "transcript": "STDOUT\n{\"type\":\"thread.started\",\"thread_id\":\"019f6a37-77b0-7901-98f3-b9dff5ccef76\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"repo-delivery\\\",\\\"handoffs\\\":[]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13841,\"cached_input_tokens\":9984,\"output_tokens\":22,\"reasoning_output_tokens\":0}}\n\nSTDERR\nReading additional input from stdin...\n",
+      "transcript_sha256": "9a037de97551986384a561d5358af799e39701682a31f9492670aa0ea92be73d"
+    }
+  ],
+  "invocation_prompt": "Route this natural request to one primary owner and zero or more necessary handoff owners.\nPrimary owner: the published Skill responsible for the requested outcome, including its authorization boundary and next externally meaningful state.\nHandoff owner: another published Skill that must actually execute a bounded part of this current request or own a clearly requested subsequent phase.\nDo not list optional recommendations, alternatives, internal support the primary owner can perform, or unrequested future work as handoffs. If the primary owner can complete the requested outcome alone, return an empty handoffs array.\nNatural request: \"The change is already reviewed; commit the approved Rust files to the current branch and verify the final ref.\"\nOwner enum: [\"audit-frontend\",\"audit-rust\",\"audit-security\",\"chatgpt-review\",\"code-planner\",\"diagnose\",\"human-writing\",\"implement-frontend\",\"implement-rust\",\"ops-browser\",\"ops-client\",\"repo-delivery\",\"repo-map\",\"repo-review\"]\nReturn only JSON with keys actual_owner and handoffs.",
+  "invocation_prompt_sha256": "f6dd13fd72dbe805b33e7333f6164b647e30c22f4a59a55fda8fe453ed79ce7d",
+  "metrics": {
+    "attempt_count": 1,
+    "duration_ms": 20670,
+    "input_tokens": 13841,
+    "output_tokens": 22,
+    "retry_count": 0
+  },
+  "model": "gpt-5.6-sol",
+  "model_output": "{\"actual_owner\":\"repo-delivery\",\"handoffs\":[]}",
+  "observations": {
+    "actual_owner": "repo-delivery",
+    "handoffs": []
+  },
+  "prompt_sha256": "9d564ae2a03eb3c597f8b2a7590a3bd8eb25048b6e2bff24dce65da42885df17",
+  "response": "{\"actual_owner\":\"repo-delivery\",\"handoffs\":[]}",
+  "retry_policy_sha256": "e4e57da98c95f6dda386e6e42a144019c4d59baf72c5f13d2053275abae4067d",
+  "run_id": "b26be617-b98e-47dc-897f-7d1c27ce0e91",
+  "schema_version": 3,
+  "started_at": "2026-07-16T09:17:25.360310Z",
+  "stderr": "Reading additional input from stdin...\n",
+  "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"019f6a37-77b0-7901-98f3-b9dff5ccef76\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"repo-delivery\\\",\\\"handoffs\\\":[]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13841,\"cached_input_tokens\":9984,\"output_tokens\":22,\"reasoning_output_tokens\":0}}\n",
+  "transcript": "STDOUT\n{\"type\":\"thread.started\",\"thread_id\":\"019f6a37-77b0-7901-98f3-b9dff5ccef76\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"repo-delivery\\\",\\\"handoffs\\\":[]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13841,\"cached_input_tokens\":9984,\"output_tokens\":22,\"reasoning_output_tokens\":0}}\n\nSTDERR\nReading additional input from stdin...\n",
+  "transcript_sha256": "9a037de97551986384a561d5358af799e39701682a31f9492670aa0ea92be73d"
+}

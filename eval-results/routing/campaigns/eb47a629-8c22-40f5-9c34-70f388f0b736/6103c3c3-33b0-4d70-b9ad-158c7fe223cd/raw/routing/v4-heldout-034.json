@@ -1,0 +1,59 @@
+{
+  "case_id": "v4-heldout-034",
+  "completed_at": "2026-07-16T09:35:54.561894Z",
+  "exit_code": 0,
+  "host": "codex-cli 0.144.5",
+  "host_attempts": [
+    {
+      "attempt_index": 1,
+      "backoff_seconds_before_next": 0,
+      "completed_at": "2026-07-16T09:35:54.561266Z",
+      "duration_ms": 27383,
+      "error": null,
+      "error_class": null,
+      "exit_code": 0,
+      "metrics": {
+        "duration_ms": 27383,
+        "input_tokens": 13799,
+        "output_tokens": 21
+      },
+      "model_output": "{\"actual_owner\":\"repo-review\",\"handoffs\":[]}",
+      "observations": {
+        "actual_owner": "repo-review",
+        "handoffs": []
+      },
+      "response": "{\"actual_owner\":\"repo-review\",\"handoffs\":[]}",
+      "retryable": false,
+      "started_at": "2026-07-16T09:35:27.177916Z",
+      "stderr": "Reading additional input from stdin...\n",
+      "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"019f6a47-f5cf-7e11-b9c8-ddfddb4dbcbe\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"repo-review\\\",\\\"handoffs\\\":[]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13799,\"cached_input_tokens\":0,\"output_tokens\":21,\"reasoning_output_tokens\":0}}\n",
+      "transcript": "STDOUT\n{\"type\":\"thread.started\",\"thread_id\":\"019f6a47-f5cf-7e11-b9c8-ddfddb4dbcbe\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"repo-review\\\",\\\"handoffs\\\":[]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13799,\"cached_input_tokens\":0,\"output_tokens\":21,\"reasoning_output_tokens\":0}}\n\nSTDERR\nReading additional input from stdin...\n",
+      "transcript_sha256": "e1d199e08e50f2d088de01746080febb3e8ae389fabce024824c730e433401e4"
+    }
+  ],
+  "invocation_prompt": "Route this natural request to one primary owner and zero or more necessary handoff owners.\nPrimary owner: the published Skill responsible for the requested outcome, including its authorization boundary and next externally meaningful state.\nHandoff owner: another published Skill that must actually execute a bounded part of this current request or own a clearly requested subsequent phase.\nDo not list optional recommendations, alternatives, internal support the primary owner can perform, or unrequested future work as handoffs. If the primary owner can complete the requested outcome alone, return an empty handoffs array.\nNatural request: \"Review the current worktree's database migration read-only for defects and test gaps, and report findings only.\"\nOwner enum: [\"audit-frontend\",\"audit-rust\",\"audit-security\",\"chatgpt-review\",\"code-planner\",\"diagnose\",\"human-writing\",\"implement-frontend\",\"implement-rust\",\"ops-browser\",\"ops-client\",\"repo-delivery\",\"repo-map\",\"repo-review\"]\nReturn only JSON with keys actual_owner and handoffs.",
+  "invocation_prompt_sha256": "79b5c4efc9cba7a3722109ae0390ec930a4133d7a021ffde846e87fb88b06c2b",
+  "metrics": {
+    "attempt_count": 1,
+    "duration_ms": 27384,
+    "input_tokens": 13799,
+    "output_tokens": 21,
+    "retry_count": 0
+  },
+  "model": "gpt-5.6-sol",
+  "model_output": "{\"actual_owner\":\"repo-review\",\"handoffs\":[]}",
+  "observations": {
+    "actual_owner": "repo-review",
+    "handoffs": []
+  },
+  "prompt_sha256": "461762dac8f037cdc10f80524b9e7f902300a5788a70c7cbf2d44146794594d2",
+  "response": "{\"actual_owner\":\"repo-review\",\"handoffs\":[]}",
+  "retry_policy_sha256": "e4e57da98c95f6dda386e6e42a144019c4d59baf72c5f13d2053275abae4067d",
+  "run_id": "6103c3c3-33b0-4d70-b9ad-158c7fe223cd",
+  "schema_version": 3,
+  "started_at": "2026-07-16T09:35:27.177836Z",
+  "stderr": "Reading additional input from stdin...\n",
+  "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"019f6a47-f5cf-7e11-b9c8-ddfddb4dbcbe\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"repo-review\\\",\\\"handoffs\\\":[]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13799,\"cached_input_tokens\":0,\"output_tokens\":21,\"reasoning_output_tokens\":0}}\n",
+  "transcript": "STDOUT\n{\"type\":\"thread.started\",\"thread_id\":\"019f6a47-f5cf-7e11-b9c8-ddfddb4dbcbe\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"repo-review\\\",\\\"handoffs\\\":[]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13799,\"cached_input_tokens\":0,\"output_tokens\":21,\"reasoning_output_tokens\":0}}\n\nSTDERR\nReading additional input from stdin...\n",
+  "transcript_sha256": "e1d199e08e50f2d088de01746080febb3e8ae389fabce024824c730e433401e4"
+}

@@ -1,0 +1,14 @@
+{
+  "artifact": "routing-results.json",
+  "artifact_sha256": "2f51f4e5a5c6ebfefd139bdfb8a6a7ab8ddd323996842a5ebf9f66fd026cb60b",
+  "attempt_id": "4c65fbd2-c9de-424a-a206-cb48e1fdd8bc",
+  "campaign_id": "eb47a629-8c22-40f5-9c34-70f388f0b736",
+  "comparison_group_id": "47895b6e-13b8-5126-8b01-198149bc1e3d",
+  "completed_at": "2026-07-16T09:36:45.183994Z",
+  "run_id": "1f99bf2a-a27b-44ae-9e59-e3df16826a38",
+  "schema_version": 1,
+  "started_at": "2026-07-16T09:22:00.249081Z",
+  "status": "success",
+  "trial": 2,
+  "variant": "baseline"
+}

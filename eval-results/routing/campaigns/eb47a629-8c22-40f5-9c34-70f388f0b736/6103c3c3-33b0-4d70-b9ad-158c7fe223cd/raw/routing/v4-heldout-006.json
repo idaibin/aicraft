@@ -1,0 +1,63 @@
+{
+  "case_id": "v4-heldout-006",
+  "completed_at": "2026-07-16T09:24:25.340212Z",
+  "exit_code": 0,
+  "host": "codex-cli 0.144.5",
+  "host_attempts": [
+    {
+      "attempt_index": 1,
+      "backoff_seconds_before_next": 0,
+      "completed_at": "2026-07-16T09:24:25.339694Z",
+      "duration_ms": 27065,
+      "error": null,
+      "error_class": null,
+      "exit_code": 0,
+      "metrics": {
+        "duration_ms": 27065,
+        "input_tokens": 13806,
+        "output_tokens": 161
+      },
+      "model_output": "{\"actual_owner\":\"diagnose\",\"handoffs\":[\"implement-frontend\"]}",
+      "observations": {
+        "actual_owner": "diagnose",
+        "handoffs": [
+          "implement-frontend"
+        ]
+      },
+      "response": "{\"actual_owner\":\"diagnose\",\"handoffs\":[\"implement-frontend\"]}",
+      "retryable": false,
+      "started_at": "2026-07-16T09:23:58.275105Z",
+      "stderr": "Reading additional input from stdin...\n",
+      "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"019f6a3d-7671-7370-8ced-aa543be7b1d5\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"diagnose\\\",\\\"handoffs\\\":[\\\"implement-frontend\\\"]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13806,\"cached_input_tokens\":9984,\"output_tokens\":161,\"reasoning_output_tokens\":134}}\n",
+      "transcript": "STDOUT\n{\"type\":\"thread.started\",\"thread_id\":\"019f6a3d-7671-7370-8ced-aa543be7b1d5\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"diagnose\\\",\\\"handoffs\\\":[\\\"implement-frontend\\\"]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13806,\"cached_input_tokens\":9984,\"output_tokens\":161,\"reasoning_output_tokens\":134}}\n\nSTDERR\nReading additional input from stdin...\n",
+      "transcript_sha256": "0f21586cac230886acc73ab5abbbd265595fc5ed2c41d7f7f1eb926e1661ddfc"
+    }
+  ],
+  "invocation_prompt": "Route this natural request to one primary owner and zero or more necessary handoff owners.\nPrimary owner: the published Skill responsible for the requested outcome, including its authorization boundary and next externally meaningful state.\nHandoff owner: another published Skill that must actually execute a bounded part of this current request or own a clearly requested subsequent phase.\nDo not list optional recommendations, alternatives, internal support the primary owner can perform, or unrequested future work as handoffs. If the primary owner can complete the requested outcome alone, return an empty handoffs array.\nNatural request: \"When switching organizations, the Vue notification drawer duplicates entries. Isolate the failing state transition, then apply the smallest frontend correction and regression check.\"\nOwner enum: [\"audit-frontend\",\"audit-rust\",\"audit-security\",\"chatgpt-review\",\"code-planner\",\"diagnose\",\"human-writing\",\"implement-frontend\",\"implement-rust\",\"ops-browser\",\"ops-client\",\"repo-delivery\",\"repo-map\",\"repo-review\"]\nReturn only JSON with keys actual_owner and handoffs.",
+  "invocation_prompt_sha256": "c527e71ea4b9cdbff063f2387a903ce1099cd41d9865d9d907d1330ee756b48a",
+  "metrics": {
+    "attempt_count": 1,
+    "duration_ms": 27065,
+    "input_tokens": 13806,
+    "output_tokens": 161,
+    "retry_count": 0
+  },
+  "model": "gpt-5.6-sol",
+  "model_output": "{\"actual_owner\":\"diagnose\",\"handoffs\":[\"implement-frontend\"]}",
+  "observations": {
+    "actual_owner": "diagnose",
+    "handoffs": [
+      "implement-frontend"
+    ]
+  },
+  "prompt_sha256": "1e27db6cc8436d4d4b1dfb0a67615f9453406b3ebe0881cbfe9bc2ca2c7a8e64",
+  "response": "{\"actual_owner\":\"diagnose\",\"handoffs\":[\"implement-frontend\"]}",
+  "retry_policy_sha256": "e4e57da98c95f6dda386e6e42a144019c4d59baf72c5f13d2053275abae4067d",
+  "run_id": "6103c3c3-33b0-4d70-b9ad-158c7fe223cd",
+  "schema_version": 3,
+  "started_at": "2026-07-16T09:23:58.275022Z",
+  "stderr": "Reading additional input from stdin...\n",
+  "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"019f6a3d-7671-7370-8ced-aa543be7b1d5\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"diagnose\\\",\\\"handoffs\\\":[\\\"implement-frontend\\\"]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13806,\"cached_input_tokens\":9984,\"output_tokens\":161,\"reasoning_output_tokens\":134}}\n",
+  "transcript": "STDOUT\n{\"type\":\"thread.started\",\"thread_id\":\"019f6a3d-7671-7370-8ced-aa543be7b1d5\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"diagnose\\\",\\\"handoffs\\\":[\\\"implement-frontend\\\"]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13806,\"cached_input_tokens\":9984,\"output_tokens\":161,\"reasoning_output_tokens\":134}}\n\nSTDERR\nReading additional input from stdin...\n",
+  "transcript_sha256": "0f21586cac230886acc73ab5abbbd265595fc5ed2c41d7f7f1eb926e1661ddfc"
+}

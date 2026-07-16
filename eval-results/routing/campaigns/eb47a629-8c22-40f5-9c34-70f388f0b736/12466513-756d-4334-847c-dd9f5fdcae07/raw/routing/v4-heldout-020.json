@@ -1,0 +1,63 @@
+{
+  "case_id": "v4-heldout-020",
+  "completed_at": "2026-07-16T09:15:01.252294Z",
+  "exit_code": 0,
+  "host": "codex-cli 0.144.5",
+  "host_attempts": [
+    {
+      "attempt_index": 1,
+      "backoff_seconds_before_next": 0,
+      "completed_at": "2026-07-16T09:15:01.251553Z",
+      "duration_ms": 22828,
+      "error": null,
+      "error_class": null,
+      "exit_code": 0,
+      "metrics": {
+        "duration_ms": 22828,
+        "input_tokens": 12247,
+        "output_tokens": 25
+      },
+      "model_output": "{\"actual_owner\":\"implement-rust\",\"handoffs\":[\"repo-review\"]}",
+      "observations": {
+        "actual_owner": "implement-rust",
+        "handoffs": [
+          "repo-review"
+        ]
+      },
+      "response": "{\"actual_owner\":\"implement-rust\",\"handoffs\":[\"repo-review\"]}",
+      "retryable": false,
+      "started_at": "2026-07-16T09:14:38.423676Z",
+      "stderr": "Reading additional input from stdin...\n",
+      "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"019f6a34-e757-7340-870f-28c8512e86b7\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"implement-rust\\\",\\\"handoffs\\\":[\\\"repo-review\\\"]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":12247,\"cached_input_tokens\":5888,\"output_tokens\":25,\"reasoning_output_tokens\":0}}\n",
+      "transcript": "STDOUT\n{\"type\":\"thread.started\",\"thread_id\":\"019f6a34-e757-7340-870f-28c8512e86b7\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"implement-rust\\\",\\\"handoffs\\\":[\\\"repo-review\\\"]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":12247,\"cached_input_tokens\":5888,\"output_tokens\":25,\"reasoning_output_tokens\":0}}\n\nSTDERR\nReading additional input from stdin...\n",
+      "transcript_sha256": "97529523b9889bef3e47843b3e14fa1917319d4afe8c13ab5a44282697b81269"
+    }
+  ],
+  "invocation_prompt": "Route this natural request to one primary owner and zero or more necessary handoff owners.\nPrimary owner: the published Skill responsible for the requested outcome, including its authorization boundary and next externally meaningful state.\nHandoff owner: another published Skill that must actually execute a bounded part of this current request or own a clearly requested subsequent phase.\nDo not list optional recommendations, alternatives, internal support the primary owner can perform, or unrequested future work as handoffs. If the primary owner can complete the requested outcome alone, return an empty handoffs array.\nNatural request: \"Implement a deterministic Rust binary codec for telemetry frames, add property and compatibility tests, then request a read-only review of the resulting diff.\"\nOwner enum: [\"audit-frontend\",\"audit-rust\",\"audit-security\",\"chatgpt-review\",\"code-planner\",\"diagnose\",\"human-writing\",\"implement-frontend\",\"implement-rust\",\"ops-browser\",\"ops-client\",\"repo-delivery\",\"repo-map\",\"repo-review\"]\nReturn only JSON with keys actual_owner and handoffs.",
+  "invocation_prompt_sha256": "bc68a6dbbf9a4ff115045d1d41decbf58ad6f084973f3fa551c4bd52ea9c73b2",
+  "metrics": {
+    "attempt_count": 1,
+    "duration_ms": 22829,
+    "input_tokens": 12247,
+    "output_tokens": 25,
+    "retry_count": 0
+  },
+  "model": "gpt-5.6-sol",
+  "model_output": "{\"actual_owner\":\"implement-rust\",\"handoffs\":[\"repo-review\"]}",
+  "observations": {
+    "actual_owner": "implement-rust",
+    "handoffs": [
+      "repo-review"
+    ]
+  },
+  "prompt_sha256": "820afea10297a6a3043eff7c6503e9f5e1567df65c73a6d4277a7680420d106b",
+  "response": "{\"actual_owner\":\"implement-rust\",\"handoffs\":[\"repo-review\"]}",
+  "retry_policy_sha256": "e4e57da98c95f6dda386e6e42a144019c4d59baf72c5f13d2053275abae4067d",
+  "run_id": "12466513-756d-4334-847c-dd9f5fdcae07",
+  "schema_version": 3,
+  "started_at": "2026-07-16T09:14:38.423612Z",
+  "stderr": "Reading additional input from stdin...\n",
+  "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"019f6a34-e757-7340-870f-28c8512e86b7\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"implement-rust\\\",\\\"handoffs\\\":[\\\"repo-review\\\"]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":12247,\"cached_input_tokens\":5888,\"output_tokens\":25,\"reasoning_output_tokens\":0}}\n",
+  "transcript": "STDOUT\n{\"type\":\"thread.started\",\"thread_id\":\"019f6a34-e757-7340-870f-28c8512e86b7\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"implement-rust\\\",\\\"handoffs\\\":[\\\"repo-review\\\"]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":12247,\"cached_input_tokens\":5888,\"output_tokens\":25,\"reasoning_output_tokens\":0}}\n\nSTDERR\nReading additional input from stdin...\n",
+  "transcript_sha256": "97529523b9889bef3e47843b3e14fa1917319d4afe8c13ab5a44282697b81269"
+}

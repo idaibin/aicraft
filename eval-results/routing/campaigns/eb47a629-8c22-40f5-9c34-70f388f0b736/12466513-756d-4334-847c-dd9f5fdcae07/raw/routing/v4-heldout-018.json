@@ -1,0 +1,59 @@
+{
+  "case_id": "v4-heldout-018",
+  "completed_at": "2026-07-16T09:14:12.298207Z",
+  "exit_code": 0,
+  "host": "codex-cli 0.144.5",
+  "host_attempts": [
+    {
+      "attempt_index": 1,
+      "backoff_seconds_before_next": 0,
+      "completed_at": "2026-07-16T09:14:12.297624Z",
+      "duration_ms": 22905,
+      "error": null,
+      "error_class": null,
+      "exit_code": 0,
+      "metrics": {
+        "duration_ms": 22905,
+        "input_tokens": 12262,
+        "output_tokens": 21
+      },
+      "model_output": "{\"actual_owner\":\"ops-browser\",\"handoffs\":[]}",
+      "observations": {
+        "actual_owner": "ops-browser",
+        "handoffs": []
+      },
+      "response": "{\"actual_owner\":\"ops-browser\",\"handoffs\":[]}",
+      "retryable": false,
+      "started_at": "2026-07-16T09:13:49.393451Z",
+      "stderr": "Reading additional input from stdin...\n",
+      "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"019f6a34-2d54-72f2-bb02-137ed9f13e30\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"ops-browser\\\",\\\"handoffs\\\":[]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":12262,\"cached_input_tokens\":0,\"output_tokens\":21,\"reasoning_output_tokens\":0}}\n",
+      "transcript": "STDOUT\n{\"type\":\"thread.started\",\"thread_id\":\"019f6a34-2d54-72f2-bb02-137ed9f13e30\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"ops-browser\\\",\\\"handoffs\\\":[]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":12262,\"cached_input_tokens\":0,\"output_tokens\":21,\"reasoning_output_tokens\":0}}\n\nSTDERR\nReading additional input from stdin...\n",
+      "transcript_sha256": "442bb04b69857189347746c8990231eee927baf666f84c8cda8586e0a7b4d85b"
+    }
+  ],
+  "invocation_prompt": "Route this natural request to one primary owner and zero or more necessary handoff owners.\nPrimary owner: the published Skill responsible for the requested outcome, including its authorization boundary and next externally meaningful state.\nHandoff owner: another published Skill that must actually execute a bounded part of this current request or own a clearly requested subsequent phase.\nDo not list optional recommendations, alternatives, internal support the primary owner can perform, or unrequested future work as handoffs. If the primary owner can complete the requested outcome alone, return an empty handoffs array.\nNatural request: \"In the already verified and authorized Project session, send one minimal redacted counterexample for an attributed finding, request a targeted rebuttal, record the attribution, and stop; the browser performs only this approved transfer.\"\nOwner enum: [\"audit-frontend\",\"audit-rust\",\"audit-security\",\"chatgpt-review\",\"code-planner\",\"diagnose\",\"human-writing\",\"implement-frontend\",\"implement-rust\",\"ops-browser\",\"ops-client\",\"repo-delivery\",\"repo-map\",\"repo-review\"]\nReturn only JSON with keys actual_owner and handoffs.",
+  "invocation_prompt_sha256": "8ba180bf330c4baa2e7906600e8083414033b93fbda6fdad32af1a74d21dc7ae",
+  "metrics": {
+    "attempt_count": 1,
+    "duration_ms": 22905,
+    "input_tokens": 12262,
+    "output_tokens": 21,
+    "retry_count": 0
+  },
+  "model": "gpt-5.6-sol",
+  "model_output": "{\"actual_owner\":\"ops-browser\",\"handoffs\":[]}",
+  "observations": {
+    "actual_owner": "ops-browser",
+    "handoffs": []
+  },
+  "prompt_sha256": "57cc075f6440c104693d35d318ec988843cd97529dd47be4b074274475fabf26",
+  "response": "{\"actual_owner\":\"ops-browser\",\"handoffs\":[]}",
+  "retry_policy_sha256": "e4e57da98c95f6dda386e6e42a144019c4d59baf72c5f13d2053275abae4067d",
+  "run_id": "12466513-756d-4334-847c-dd9f5fdcae07",
+  "schema_version": 3,
+  "started_at": "2026-07-16T09:13:49.393383Z",
+  "stderr": "Reading additional input from stdin...\n",
+  "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"019f6a34-2d54-72f2-bb02-137ed9f13e30\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"ops-browser\\\",\\\"handoffs\\\":[]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":12262,\"cached_input_tokens\":0,\"output_tokens\":21,\"reasoning_output_tokens\":0}}\n",
+  "transcript": "STDOUT\n{\"type\":\"thread.started\",\"thread_id\":\"019f6a34-2d54-72f2-bb02-137ed9f13e30\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"{\\\"actual_owner\\\":\\\"ops-browser\\\",\\\"handoffs\\\":[]}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":12262,\"cached_input_tokens\":0,\"output_tokens\":21,\"reasoning_output_tokens\":0}}\n\nSTDERR\nReading additional input from stdin...\n",
+  "transcript_sha256": "442bb04b69857189347746c8990231eee927baf666f84c8cda8586e0a7b4d85b"
+}

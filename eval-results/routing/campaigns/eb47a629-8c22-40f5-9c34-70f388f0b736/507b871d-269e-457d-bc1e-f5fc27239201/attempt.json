@@ -1,0 +1,14 @@
+{
+  "artifact": "run-failure.json",
+  "artifact_sha256": "20e8678a877707fc53ccd2bee2cfdde912b3c56afa2593e999019d1129e0b52a",
+  "attempt_id": "a85802e0-0947-41e6-87e8-781ea78bfb0c",
+  "campaign_id": "eb47a629-8c22-40f5-9c34-70f388f0b736",
+  "comparison_group_id": "47895b6e-13b8-5126-8b01-198149bc1e3d",
+  "completed_at": "2026-07-16T09:38:25.015668Z",
+  "run_id": "507b871d-269e-457d-bc1e-f5fc27239201",
+  "schema_version": 1,
+  "started_at": "2026-07-16T09:22:00.825622Z",
+  "status": "failure",
+  "trial": 2,
+  "variant": "candidate"
+}
