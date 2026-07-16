@@ -14,16 +14,18 @@ Implement frontend changes with existing-stack alignment, minimal DOM/CSS, clear
 1. Read effective repository guidance first, including `AGENTS.md`, `CLAUDE.md`, and host-provided instructions when present.
 2. Identify the frontend project class, app boundary, package manager, runtime pin, script contract, directory/naming standard, and documented exceptions.
 3. Identify the target page, route, screen, component, framework, UI type, visual source, and required states before editing.
-4. Consume a current `repo-map` inventory or perform the same targeted search for existing routes, pages, layouts, components, hooks or composables, services, stores, shared UI, tests, and analogous implementations.
-5. Decide in order: directly reuse, adapt the nearest reference, or create new. Record why existing candidates are insufficient before adding a file or abstraction.
-6. Inspect only the selected target and reference files needed for the requested change.
-7. Classify the existing UI system and layout model: product surface, framework, component library, state/data stack, styling system, shell/content/page boundaries, panels, and scroll regions.
-8. Select exactly one framework profile per edited boundary: **React**, **Vue Composition**, **Vue Options**, or **Repository-native Other**. Select only styling profiles actually present, such as **Tailwind**, **CSS Modules**, **Sass/Less**, **CSS-in-JS**, **Ant Design**, or **shadcn/ui**.
-9. Preserve typography, spacing, density, routing, state, API contracts, accessibility, and visual system unless the task explicitly asks to change them.
-10. Implement with the smallest component, DOM, CSS, and ownership surface that matches existing patterns.
-11. Update manifests, scripts, routes, tests, docs, indexes, generated route files, and stale references when adding, reusing, moving, renaming, or deleting structural frontend code.
-12. Remove stale wrappers, duplicate declarations, late overrides, and temporary layout patches made obsolete by the change.
-13. Run matching project-defined checks, then use `ops-browser` or `ops-client` when runtime UI evidence is required.
+4. Read the approved requirement/specification when one exists. Confirm acceptance criteria, non-goals, affected contracts/files, and validation seams; for complex work without a usable specification, stop and route planning to `code-planner`.
+5. Consume a current `repo-map` inventory or perform the same targeted search for existing routes, pages, layouts, components, hooks or composables, services, stores, shared UI, tests, and analogous implementations.
+6. Decide in order: directly reuse, adapt the nearest reference, or create new. Record why existing candidates are insufficient before adding a file or abstraction.
+7. Inspect only the selected target and reference files needed for the requested change.
+8. Classify the existing UI system and layout model: product surface, framework, component library, state/data stack, styling system, shell/content/page boundaries, panels, and scroll regions.
+9. Select exactly one framework profile per edited boundary: **React**, **Vue Composition**, **Vue Options**, or **Repository-native Other**. Select only styling profiles actually present, such as **Tailwind**, **CSS Modules**, **Sass/Less**, **CSS-in-JS**, **Ant Design**, or **shadcn/ui**.
+10. Preserve typography, spacing, density, routing, state, API contracts, accessibility, and visual system unless the task explicitly asks to change them.
+11. When behavior is stable enough to specify and a durable public seam exists, work in behavior-first vertical slices: one failing test or executable check, the minimum implementation, then the next slice. Do not force TDD onto exploratory visuals, generated code, or behavior without a reliable seam.
+12. Implement with the smallest component, DOM, CSS, and ownership surface that matches existing patterns.
+13. Update manifests, scripts, routes, tests, docs, indexes, generated route files, and stale references when adding, reusing, moving, renaming, or deleting structural frontend code.
+14. Remove stale wrappers, duplicate declarations, late overrides, and temporary layout patches made obsolete by the change.
+15. Run focused checks after each slice, then matching project-defined gates; use `ops-browser` or `ops-client` when runtime UI evidence is required.
 
 ## Modes
 
@@ -36,6 +38,7 @@ Implement frontend changes with existing-stack alignment, minimal DOM/CSS, clear
 
 - First-pass repository discovery, real commands, or entry points; use `repo-map`.
 - Future task decomposition or multi-agent implementation planning; use `code-planner`.
+- Business terminology, lifecycle, or invariant modeling; use `domain-modeling` before planning when those questions remain unresolved.
 - Dirty-tree ownership, mixed-hunk review, staging plans, or commit readiness; use `repo-review`.
 - Actual staging, commit creation, rebase/squash, push, or delivery; use `repo-delivery` after review.
 - Systematic frontend architecture, reuse, state/data, accessibility, performance, or Tauri-boundary audit without requested edits; use `audit-frontend`.
@@ -70,6 +73,7 @@ Report the branch, frontend project class, detected framework/profile and toolch
 
 - See [references/usage.md](references/usage.md) for trigger guidance and examples.
 - See [references/checklist.md](references/checklist.md) for implementation and review checks.
+- See [references/tdd.md](references/tdd.md) for behavior-first seam selection and vertical red-green slices.
 - See [references/framework-profiles.md](references/framework-profiles.md) for React, Vue Composition, Vue Options, and repository-native framework rules.
 - See [references/styling-systems.md](references/styling-systems.md) for Tailwind, CSS Modules, Sass/Less, CSS-in-JS, Ant Design, shadcn/ui, and mixed-stack rules.
 - See [references/stack-guidelines.md](references/stack-guidelines.md) for toolchain, routing, layout, and desktop-webview boundaries.

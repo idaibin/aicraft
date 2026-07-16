@@ -14,6 +14,7 @@ Use these cases when changing `code-planner` triggers, task contracts, owner mod
 | `Classify this one-file private helper change before planning it.` | Should select Small and keep a compact sequential plan. | One bounded owner with no useful split. |
 | `Plan this schema migration where API and client both depend on an unfrozen DTO.` | Should select Coupled and keep interface-changing work sequential. | Shared mutable contract. |
 | `Plan independent frontend copy, Rust docs, and CI fixture changes with disjoint files and checks.` | Should select Parallelizable and define audited subagent scopes. | Independent write ownership and validation. |
+| `Clarify the requirement, record decisions, then produce a spec with acceptance criteria and vertical task slices.` | Should trigger `code-planner`; use `domain-modeling` only if business concepts remain unresolved. | Specification and task planning. |
 
 ## Non-Trigger Eval
 
@@ -24,6 +25,7 @@ Use these cases when changing `code-planner` triggers, task contracts, owner mod
 | `Understand this repository's real commands and directory structure first.` | Should prefer `repo-map`. | Repository mapping. |
 | `Open the app in a browser and check console/network errors.` | Should prefer `ops-browser`. | Browser operation task. |
 | `Fix this button style directly.` | Should not require `code-planner` unless planning is requested. | Simple implementation. |
+| `Define the meaning, identity, lifecycle, and invariants of Alert and Observation, but do not design code.` | Should prefer `domain-modeling`. | Business model without technical planning. |
 
 ## Quality Eval
 
@@ -38,6 +40,10 @@ Use these cases when changing `code-planner` triggers, task contracts, owner mod
 | Contract-impact | Marks risk and routes final chain review to `repo-review`. | Pretends planning replaces commit review. |
 | Structure-impact | Identifies project class and includes manifest, export, command, test, CI/deploy, docs, index, stale-reference, and migration/rollback work. | Treats a directory move as source-only renaming. |
 | Publish readiness | Keeps the package self-contained, updates eval cases and metadata, and validates with `python3 scripts/validate-skills.py`. | Requires repository-local prompts or skips source validation. |
+| Requirements-to-spec | Separates requirements, constraints, decisions, assumptions, contradictions, and open questions; includes technical design, acceptance criteria, and validation. | Starts task splitting from an unresolved material requirement. |
+| Domain-model handoff | Uses `domain-modeling` for language, identity, lifecycle, rules, or bounded contexts, then consumes the bounded result. | Duplicates domain modeling or delegates ordinary technical design. |
+| Deep-module design | For a changed module boundary, evaluates interface knowledge, hidden complexity, seam placement, dependency direction, real variation, callers, and testability. | Adds forwarding layers, hypothetical abstractions, or file-count-driven modules. |
+| Vertical slices | Produces independently verifiable tracer bullets with real blocking edges, or uses expand-migrate-contract for a wide mechanical change. | Produces horizontal layer tickets or ceremonial dependencies. |
 
 ## Scoring
 

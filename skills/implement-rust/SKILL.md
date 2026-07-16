@@ -13,9 +13,10 @@ Implement Rust changes against the repository's real toolchain, project class, c
 
 1. Read effective repository guidance, including `AGENTS.md`, `CLAUDE.md`, and host-provided instructions when present, then run `git status --short` before edits.
 2. Identify the Rust project class: library workspace, application workspace, HTTP service, CLI, Tauri/native backend, or compact single package.
-3. Inspect the relevant `Cargo.toml`, lockfile, toolchain, formatter, lint, command source, modules, tests, architecture docs, and API/interface docs.
-4. Consume a current `repo-map` inventory or perform the same targeted search across route registration, handlers, services, repositories, traits/impls, types/DTOs, errors, migrations, callers, tests, and analogous features.
-5. Start with the **Baseline** validation contract, then select every applicable risk overlay. Overlays are composable, not severity levels:
+3. Read the approved requirement/specification when one exists. Confirm requested behavior, acceptance criteria, non-goals, affected crates/modules/files, compatibility, and validation seams; for complex work without a usable specification, stop and route planning to `code-planner`.
+4. Inspect the relevant `Cargo.toml`, lockfile, toolchain, formatter, lint, command source, modules, tests, architecture docs, and API/interface docs.
+5. Consume a current `repo-map` inventory or perform the same targeted search across route registration, handlers, services, repositories, traits/impls, types/DTOs, errors, migrations, callers, tests, and analogous features.
+6. Start with the **Baseline** validation contract, then select every applicable risk overlay. Overlays are composable, not severity levels:
    - **Contract:** public API, endpoint, DTO, error mapping, crate/module boundary, feature flag, or downstream consumer change.
    - **Concurrency/runtime:** Tokio tasks, channels, locks, cancellation, blocking work, overload, or shutdown.
    - **Persistence/SQLite:** migrations, transactions, schema/query changes, durable compatibility, backup, or recovery.
@@ -23,11 +24,12 @@ Implement Rust changes against the repository's real toolchain, project class, c
    - **Porting/parity:** language port or large rewrite that must preserve observable behavior and release semantics.
    - **Target/platform:** `cfg`, target-specific APIs, packaging, native linkage, or supported-platform behavior.
    A routine change uses Baseline with no overlays. A mixed FFI plus SQLite change selects both overlays; a target-only change selects Target/platform without inheriting unrelated heavy tools.
-6. Decide in order: directly reuse, extend an existing contract, adapt the nearest reference, or create new. Record why existing interfaces are insufficient before adding an endpoint, trait, type family, or module.
-7. Trace ownership, dependency direction, and the complete interface chain before adding or moving code.
-8. Implement the smallest idiomatic change that follows local ownership, borrowing, module, error, async, persistence, FFI, configuration, logging, documentation, and test patterns.
-9. Update manifests, module exports, tests, commands, docs, CI/deploy paths, migrations, generated files, and indexes when the structural or public boundary changes.
-10. Run the repository's baseline gates, then combine validation from every selected overlay. Use Miri, sanitizers, fuzzing, stress, or repeated-operation tools only when both supported by the target repository/environment and relevant to the changed invariant.
+7. Decide in order: directly reuse, extend an existing contract, adapt the nearest reference, or create new. Record why existing interfaces are insufficient before adding an endpoint, trait, type family, or module.
+8. Trace ownership, dependency direction, and the complete interface chain before adding or moving code.
+9. When behavior is stable enough to specify and a durable public seam exists, work in behavior-first vertical slices: one failing test or executable check, the minimum implementation, then the next slice. Do not force TDD onto exploratory work, generated code, or behavior without an honest seam.
+10. Implement the smallest idiomatic change that follows local ownership, borrowing, module, error, async, persistence, FFI, configuration, logging, documentation, and test patterns.
+11. Update manifests, module exports, tests, commands, docs, CI/deploy paths, migrations, generated files, and indexes when the structural or public boundary changes.
+12. Run focused checks after each slice, then the repository's baseline gates and every selected overlay. Use Miri, sanitizers, fuzzing, stress, or repeated-operation tools only when both supported by the target repository/environment and relevant to the changed invariant.
 
 ## Modes
 
@@ -41,6 +43,7 @@ Implement Rust changes against the repository's real toolchain, project class, c
 
 - First-pass repository discovery; use `repo-map`.
 - Future multi-step migration planning; use `code-planner`.
+- Business terminology, lifecycle, or invariant modeling; use `domain-modeling` before planning when those questions remain unresolved.
 - Unknown root-cause investigation; use `diagnose`.
 - Dirty-tree ownership, staging plans, or commit grouping; use `repo-review`. Use `repo-delivery` for actual staging or commits after review.
 - Systematic Rust architecture, performance, memory, concurrency, SQLite, unsafe, or FFI audit without requested edits; use `audit-rust`.
@@ -80,6 +83,7 @@ Report project class, Baseline evidence, selected risk overlays, toolchain and c
 
 - See [references/usage.md](references/usage.md) for trigger guidance and examples.
 - See [references/checklist.md](references/checklist.md) for implementation and review checks.
+- See [references/tdd.md](references/tdd.md) for behavior-first seam selection and vertical red-green slices.
 - See [references/best-practices.md](references/best-practices.md) for idiomatic Rust API, ownership, error, test, docs, performance, dispatch, and concurrency rules.
 - See [references/bun-production-patterns.md](references/bun-production-patterns.md) for source-backed migration, FFI, unsafe, resource-lifetime, lint, and validation patterns derived from Bun's production Rust rewrite.
 - See [references/eval-cases.md](references/eval-cases.md) for trigger and quality evals.

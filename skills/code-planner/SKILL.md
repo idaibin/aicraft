@@ -7,23 +7,26 @@ description: "Use when future code work needs an executable plan before implemen
 
 ## Overview
 
-Turn a codebase requirement into scoped work units with required reads, owned scope, validation, done criteria, and reject gates. Prefer the least complex owner model that preserves correctness; use subagents only when their outputs can be isolated and independently audited.
+Turn a codebase requirement into an evidence-backed specification and scoped work units with required reads, owned scope, acceptance criteria, validation, done criteria, and reject gates. Prefer the least complex owner model that preserves correctness; use subagents only when their outputs can be isolated and independently audited.
 
 ## Workflow
 
 1. Read effective repository guidance first, including `AGENTS.md`, `CLAUDE.md`, and host-provided instructions when present.
 2. Run `git status --short` before planning writes, assigning work, staging, or committing.
 3. Inspect only the docs, code, diffs, contracts, commands, logs, or runtime state needed to make the plan executable.
-4. Identify project class, repository standards, protected paths, and whether the work adds, reuses, moves, renames, or deletes a structural boundary.
-5. Classify complexity before splitting work:
+4. Separate confirmed requirements, constraints, decisions, assumptions, contradictions, and open questions. Ask only questions whose answers materially change scope, behavior, authority, architecture, or acceptance; otherwise proceed with explicit assumptions.
+5. When business language, identity, lifecycle, or rules are unresolved, hand that bounded question to `domain-modeling` before technical design. Consume its result without duplicating the modeling workflow.
+6. Identify project class, repository standards, protected paths, affected contracts/files, and whether the work adds, reuses, moves, renames, or deletes a structural boundary.
+7. Define the smallest technical design that satisfies the confirmed requirements, including interfaces, data flow, compatibility, failure behavior, and test seams that materially affect implementation.
+8. Classify complexity before splitting work:
    - **Small:** one owner, one bounded surface, no contract migration; use a compact sequential plan or proceed directly when the user did not request planning.
    - **Coupled:** several steps share mutable files, interfaces, or validation; keep execution sequential under one owner.
    - **Parallelizable:** at least two independent scopes with explicit interfaces, disjoint write ownership, and independently reviewable outputs.
-6. Split only where the boundary reduces integration risk. Do not create task packages merely to satisfy a preferred count.
-7. For every task package, name required reads, owned scope, do-not-touch boundaries, dependencies, implementation steps, validation, done criteria, and reject criteria.
-8. Choose the owner model using the gates below.
-9. Keep the main thread responsible for interface decisions, integration, returned-output inspection, final validation, and acceptance.
-10. Record assumptions that could change task order or scope; do not present estimates or dependencies as verified when the repository does not prove them.
+9. Split work into the smallest independently verifiable vertical slices. Declare real blocking edges; do not force wide mechanical migrations into fake end-to-end slices.
+10. For every task package, name required reads, owned scope, do-not-touch boundaries, dependencies, implementation steps, acceptance criteria, validation, done criteria, and reject criteria.
+11. Choose the owner model using the gates below.
+12. Keep the main thread responsible for interface decisions, integration, returned-output inspection, final validation, and acceptance.
+13. Record assumptions that could change task order or scope; do not present estimates or dependencies as verified when the repository does not prove them.
 
 ## Owner Model
 
@@ -42,13 +45,14 @@ Subagent mode must state:
 
 ## Task Contract
 
-Each task must include objective, required reads, owned scope, do-not-touch boundaries, dependencies, implementation steps, validation, done criteria, and reject criteria. Mark interface-heavy work as `contract-impact`; mark add/reuse/move/delete work as `structure-impact`. Route final chain and completeness review to `repo-review` before commit.
+Each task must include objective, user-visible or contract-level acceptance criteria, required reads, owned scope, do-not-touch boundaries, dependencies/blocking edges, implementation steps, validation, done criteria, and reject criteria. Prefer vertical tracer bullets that leave the repository verifiable after each slice. Mark interface-heavy work as `contract-impact`; mark add/reuse/move/delete work as `structure-impact`. Route final chain and completeness review to `repo-review` before commit.
 
 For a small task, these fields may be compressed into a single concise block. Completeness does not require verbose repetition.
 
 ## Do Not Use For
 
 - First-pass repository discovery, real commands, entry points, or docs alignment; use `repo-map`.
+- Business terminology, entity identity, lifecycle, invariants, or bounded-context modeling without technical planning; use `domain-modeling`.
 - Existing local diff review, commit grouping, staging plans, or commit messages; use `repo-review`. Actual staging, commits, or pushes belong to `repo-delivery` after review.
 - Direct implementation when the user asks for a small change and no plan.
 - Browser/client operation or runtime evidence collection; use `ops-browser` or `ops-client`.
@@ -70,10 +74,12 @@ For a small task, these fields may be compressed into a single concise block. Co
 
 ## Output Contract
 
-Start with verified current state, project class, standards, dirty-tree risks, complexity class, and selected owner model. Then provide task packages with dependencies, validation, done criteria, reject criteria, structure/contract integration gates, non-goals, assumptions, and `Not verified` items. When subagents are selected, include the delegation justification, write-conflict analysis, expected returned evidence, and main-thread integration checks.
+Start with verified current state, project class, standards, dirty-tree risks, complexity class, and selected owner model. Then provide `Requirements`, `Open Questions`, `Decisions`, `Domain Model` or domain-model handoff when applicable, `Technical Design`, `Acceptance Criteria`, and `Validation Plan`, followed by task packages with blocking edges, validation, done criteria, reject criteria, structure/contract integration gates, non-goals, assumptions, and `Not verified` items. When subagents are selected, include the delegation justification, write-conflict analysis, expected returned evidence, and main-thread integration checks.
 
 ## References
 
 - See [references/usage.md](references/usage.md) for summary, triggers, and examples.
 - See [references/checklist.md](references/checklist.md) for planning and subagent decision details.
+- See [references/requirements-and-spec.md](references/requirements-and-spec.md) for readiness, specification, vertical-slice, and acceptance guidance.
+- See [references/deep-module.md](references/deep-module.md) when a plan changes module interfaces, seams, or dependency direction.
 - See [references/eval-cases.md](references/eval-cases.md) for trigger and quality evals.

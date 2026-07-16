@@ -24,6 +24,15 @@ Use this checklist when applying `code-planner` to split codebase requirements i
 6. Verify runtime, logs, API behavior, browser state, database state, or build output when the task depends on real current behavior.
 7. Mark missing files, commands, tools, or runtime evidence as `Not found` or `Not verified`.
 
+## Requirement Readiness Checklist
+
+1. Separate requirements, constraints, decisions, assumptions, contradictions, and open questions.
+2. Ask only questions that materially change scope, behavior, authority, architecture, or acceptance.
+3. Route unresolved language, identity, lifecycle, invariants, business rules, and bounded contexts to `domain-modeling`.
+4. Identify affected owners, interfaces, consumers, files, compatibility, failure behavior, and test seams before task splitting.
+5. Write observable acceptance criteria and map each to a validation source.
+6. Prefer independently verifiable vertical slices with explicit blocking edges.
+
 ## Dirty Tree Ownership Checklist
 
 When local changes already exist:
@@ -62,6 +71,8 @@ Do not touch:
   - <unrelated-existing local changes, adjacent modules, generated files, broad refactors, other owner scopes>
 Dependencies:
   - <prior task, decision, data, runtime, schema, or contract needed first>
+Acceptance criteria:
+  - <observable behavior or contract that must pass>
 Implementation steps:
   1. <step>
   2. <step>
@@ -84,6 +95,7 @@ Each task should answer:
 - What exact files, modules, APIs, pages, docs, commands, or pre-existing related changes does it own?
 - What exact files, local changes, modules, generated outputs, or refactors are explicitly out of scope?
 - What prior task or decision must happen first?
+- What user-visible or contract-level acceptance criteria must pass?
 - What implementation steps are required?
 - What exact validation proves it works?
 - What evidence means the task is done?

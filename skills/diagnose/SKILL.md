@@ -19,7 +19,7 @@ Diagnose technical failures with a tight evidence loop. Reproduce the user's exa
    - **Regression/cross-boundary:** behavior changed across modules, interfaces, data, configuration, or runtime layers.
    - **Flaky/timing:** reproduction is intermittent or order-, load-, clock-, or concurrency-sensitive.
    - **Performance:** latency, throughput, CPU, allocation, I/O, or memory changed and needs a comparable baseline.
-5. Build the smallest red/green feedback loop that exercises the user's exact symptom.
+5. Build the smallest red/green feedback loop that exercises the user's exact symptom. The loop is ready only when one agent-runnable command or bounded operation has been executed, can fail on the reported symptom, and produces a specific verdict. If no such loop is possible, stop with the exact missing evidence or access.
 6. For deterministic/local failures, read the complete diagnostic, reproduce once, trace the smallest owning path, and test the most direct falsifiable cause before expanding.
 7. For regression, flaky, or performance failures, reproduce and minimize until the remaining inputs, steps, configuration, and state are load-bearing.
 8. Rank falsifiable hypotheses before probing. A deterministic compiler or test error may start with one strongly evidenced hypothesis; broader failures require credible alternatives with distinct predictions.
@@ -51,6 +51,7 @@ Diagnose technical failures with a tight evidence loop. Reproduce the user's exa
 - Do not modify tracked source, config, tests, manifests, lockfiles, generated files, documentation, the index, checkout, or Git refs under this skill.
 - Do not run `git bisect`, `checkout`, `switch`, `reset`, worktree creation, or another ref/checkout mutation in the target checkout. A separately authorized isolated bisection workflow must record initial/final refs and leave the target checkout untouched.
 - Do not recommend a fix until a feedback loop or explicit missing-evidence report exists.
+- Do not generate or rank root-cause hypotheses before establishing the red-capable loop, except to choose the next reproduction probe.
 - The loop must target the user's exact symptom, not a nearby crash or generic health check.
 - Read the complete failing diagnostic before drawing conclusions; do not react to the final line only.
 - If the issue is non-deterministic, improve reproduction rate before claiming a cause.
@@ -70,4 +71,5 @@ Report the failure class, exact red/green loop, reproduction evidence, minimized
 
 - See [references/usage.md](references/usage.md) for trigger guidance and examples.
 - See [references/checklist.md](references/checklist.md) for the diagnosis loop and handoff checklist.
+- See [references/feedback-loops.md](references/feedback-loops.md) for loop selection, minimization, and hypothesis discipline.
 - See [references/eval-cases.md](references/eval-cases.md) for trigger, non-trigger, and quality evals.

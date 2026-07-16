@@ -43,6 +43,8 @@ structure rules, validation expectations, or metadata.
 | Case | Expected evidence | Reject if |
 | --- | --- | --- |
 | Project grounding | Reads guidance, status, Cargo/toolchain/command sources, and identifies the project class. | Assumes versions, commands, or one universal layout. |
+| Specification readiness | Reads available requirements, acceptance criteria, non-goals, affected crates/modules/files, compatibility, and validation seams; routes unresolved complex planning to `code-planner`. | Implements a complex ambiguous request without a usable specification or explicit assumptions. |
+| Behavior-first slices | When a stable public seam exists, works one failing behavior test and minimal vertical slice at a time; skips TDD with a stated reason when only brittle internal assertions are possible. | Writes horizontal test batches, duplicates implementation logic in expectations, or claims TDD without observing red before green. |
 | Toolchain preservation | Uses repository-pinned edition, resolver, Rust version, formatter, lints, and dependencies unless alignment is explicit. | Performs incidental upgrades or dependency churn. |
 | Boundary ownership | Keeps entry, workflow, domain, persistence, and runtime responsibilities in documented owners. | Moves SQL or business rules into handlers/commands or creates empty layers. |
 | Error and async safety | Uses the local typed error model, avoids runtime panics and blocking async work, and preserves cleanup/cancellation behavior. | Adds `unwrap`, silent fallback, unbounded work, or hidden global state without contract evidence. |
