@@ -1392,7 +1392,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help=(
             "Dataset used for every bundle. If omitted, each bundle's "
             "repository-relative run_config.dataset_path is resolved from the "
-            "AICraft repository root."
+            "Skills catalog repository root."
         ),
     )
     parser.add_argument(

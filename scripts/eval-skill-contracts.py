@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate and score AICraft routing, authority, and workflow evidence."""
+"""Validate and score catalog routing, authority, and workflow evidence."""
 
 from __future__ import annotations
 

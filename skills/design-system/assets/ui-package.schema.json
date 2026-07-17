@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://aicraft.local/schemas/ui-package.v1.json",
-  "title": "AICraft UI design package",
+  "$id": "urn:idaibin:skills:schemas:design-system-package:v1",
+  "title": "Repository design-system package",
   "type": "object",
   "required": [
     "profile.yaml",

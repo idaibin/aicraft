@@ -34,4 +34,4 @@ Expect an updated repo-map path plus a compact summary of initial working scope,
 
 ## Maintenance
 
-Use `references/eval-cases.md` for trigger and quality checks. In AICraft, validate with `python3 scripts/validate-skills.py --skill repo-map`.
+Use `references/eval-cases.md` for trigger and quality checks. In this catalog, validate with `python3 scripts/validate-skills.py --skill repo-map`.

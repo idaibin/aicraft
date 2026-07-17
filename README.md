@@ -1,189 +1,125 @@
-# AICraft
+# Skills
 
-AICraft is the source repository for reusable AI workflow assets: skills, prompts, workflow templates, and shared automation standards.
+Independent Agent Skills for real software-engineering work.
 
-It defines reusable AI capabilities and execution rules. Downstream repositories such as `blog` and `feeds-hub` consume those standards, then keep their own repository-specific task specs locally.
+Each published Skill is a self-contained package with its own trigger, workflow,
+authority boundary, output contract, supporting references, and evaluation
+cases. Skills can be installed separately and composed when a task crosses
+owners; none requires another package or a repository-root runtime file to do
+its basic job.
 
-## Goal
+[![skills.sh](https://skills.sh/b/idaibin/skills)](https://skills.sh/idaibin/skills)
 
-AICraft turns repeated AI working habits into durable assets with clear boundaries. It prioritizes portable skill packages first, then supports them with reusable prompts, workflow templates, and shared standards.
+## Install
 
-The active content should help an agent start with real project context, preserve local changes, follow exact tool and command constraints, verify work, and report results clearly.
-
-AICraft is currently in a validation phase rather than a public-skill expansion
-phase. Quality claims are evidence-based: functional category describes
-ownership, release status describes availability, and validation status records
-structure, behavior, and workflow evidence separately. See
-[`docs/quality/status.md`](docs/quality/status.md) for the current record.
-The evidence roadmap is in
-[`docs/quality/validation-plan.md`](docs/quality/validation-plan.md).
-The current portable, OpenAI, and Claude source baseline is recorded in
-[`docs/quality/official-skill-alignment.md`](docs/quality/official-skill-alignment.md).
-
-## Repository Boundary
-
-```text
-aicraft = source capabilities and standards
-blog = long-form content publishing implementation
-feeds-hub = short-cycle information feed implementation
-```
-
-AICraft should not own generated blog posts, feed entries, repository-specific frontmatter, or production content files for downstream repositories.
-
-See:
-
-```text
-docs/repo-scope.md
-```
-
-## Active Structure
-
-- `skills/`
-  - publishable or reusable skill packages
-  - each skill keeps its own `SKILL.md`, `agents/`, and `references/` layout
-
-- `prompts/`
-  - reusable prompt assets
-  - grouped by use case, such as development workflows, automation, agent systems, design, and project-specific prompts
-  - each file should have a clear task boundary, scenario, prompt text, and usage constraints
-
-- `docs/`
-  - repository maintenance standards and contributor-facing references
-  - shared automation standards under `docs/standards/`
-  - verifiable Skill status under `docs/quality/`
-  - version-bound historical evidence under `docs/history/`
-  - reusable templates under `docs/templates/`
-  - concrete task index in `docs/task-registry.md`
-
-- `scripts/`, `protocols/`, and `contracts/`
-  - deterministic validation and synchronization tools
-  - canonical cross-skill protocol sources
-  - data-driven validation contracts
-
-## Shared Standards
-
-```text
-docs/standards/cron-automation.md
-docs/standards/github-branching.md
-docs/standards/ai-content-quality.md
-docs/standards/skill-routing.md
-```
-
-## Install Skills From GitHub
-
-Install all skills with the standard skills.sh CLI flow:
+Browse and select Skills interactively:
 
 ```bash
-npx skills add https://github.com/idaibin/aicraft
-npx skills update
+npx skills@latest add idaibin/skills
 ```
 
-Install globally for both OpenAI Codex and Anthropic Claude Code:
+List the catalog without installing:
 
 ```bash
-npx skills add https://github.com/idaibin/aicraft \
-  --global --agent codex claude-code
-npx skills update --global
+npx skills@latest add idaibin/skills --list
 ```
 
-The CLI records the source needed for later updates. Manually copied skill
-folders are not reliably updateable through `npx skills update`.
-
-Install selected skills:
+Install selected Skills globally for Codex:
 
 ```bash
-npx skills add https://github.com/idaibin/aicraft \
-  --skill repo-map domain-modeling code-planner diagnose repo-review repo-delivery design-ui audit-security chatgpt-review implement-frontend implement-rust audit-frontend audit-rust ops-browser ops-client human-writing
+npx skills@latest add idaibin/skills \
+  --skill repo-map domain-modeling code-planner diagnose repo-review \
+  --global --agent codex
 ```
 
-List available skills without installing:
+Install one Skill:
 
 ```bash
-npx skills add https://github.com/idaibin/aicraft --list
+npx skills@latest add idaibin/skills \
+  --skill design-system \
+  --global --agent codex
 ```
 
-For project/global scope, agent-specific installation, update limitations, and
-rename migration, see [`INSTALL.md`](INSTALL.md).
+See [INSTALL.md](INSTALL.md) for project/global scope, updates, removal, and the
+`design-ui` to `design-system` migration.
 
-## Skills
+## Catalog
+
+### Repository Engineering
 
 | Skill | Use when |
 | --- | --- |
-| `repo-map` | Maintaining the smallest useful semantic repository map of real boundaries, commands, task routes, and verified reusable components, functions, types, or APIs. |
-| `domain-modeling` | Clarifying business language, entities, relationships, lifecycle, invariants, scenarios, and bounded contexts before technical design. |
-| `code-planner` | Turning requirements into grounded specifications, technical design, acceptance criteria, vertical task slices, and validation gates. |
-| `design-ui` | Producing versioned UI profiles, scoped reference rules, task briefs, tokens, component maps, and evaluation contracts before implementation. |
-| `diagnose` | Reproducing technical failures, isolating variables, confirming root causes, and handing verified remediation to the matching implementation skill. |
-| `repo-review` | Read-only review of local worktrees, fixed commits/ranges, PRs, releases, or review packages, with basis-specific ownership/readiness or P0-P3 findings. |
-| `repo-delivery` | Delivering reviewed local changes with path-limited staging, commits, pushes, branch sync, squash-to-main, cleanup, and remote proof. |
-| `audit-security` | Auditing known code, API, auth, permission, token/session, upload, logging, dependency, config, or release surfaces for scoped security risks. |
-| `chatgpt-review` | Preparing or routing repository review material through standard ChatGPT chats or Projects, then capturing and locally verifying findings. |
-| `implement-frontend` | Implementing frontend UI reuse-first with detected React, Vue, Tailwind, CSS, design-system, state, layout, and API-contract profiles. |
-| `implement-rust` | Implementing or porting Rust reuse-first with explicit ownership, FFI/unsafe boundaries, behavior parity, idiomatic APIs, and risk-matched validation. |
-| `audit-frontend` | Auditing selected React, Vue, Tailwind/CSS, UI/design-system, state/data, accessibility, performance, and Tauri profiles without splitting by technology. |
-| `audit-rust` | Auditing selected Rust profiles for architecture, ownership, concurrency, performance, memory, SQLite, unsafe/FFI, quality gates, and documentation alignment. |
-| `ops-browser` | Operating browser pages and collecting screenshots, visual/responsive checks, form/upload/download evidence, console/network data, and session-safe verification. |
-| `ops-client` | Verifying or operating specified Tauri/Electron/native desktop clients with launch-command, runtime-source, CGWindowID, real-window, and Accessibility evidence. |
-| `human-writing` | Drafting, rewriting, diagnosing, and adapting source-grounded human-quality writing while preserving facts, technical meaning, disclosures, and voice. |
+| `repo-map` | Current repository boundaries, commands, task routes, or reusable owners need a verified map. |
+| `domain-modeling` | Business language, identity, lifecycle, invariants, scenarios, or bounded contexts are unresolved. |
+| `code-planner` | A complex requirement needs a grounded technical design, acceptance criteria, task slices, and validation gates. |
+| `diagnose` | A concrete failure must be reproduced, isolated, and traced to a confirmed cause before remediation. |
+| `repo-review` | Local changes or an immutable commit/range/PR/release basis need an independent read-only review. |
+| `repo-delivery` | Reviewed changes need authorized staging, commit, push, synchronization, or branch cleanup. |
 
-### Functional Categories
+### Design and Implementation
 
-- **Core Engineering:** `repo-map`, `domain-modeling`, `code-planner`, `diagnose`, `repo-review`, `repo-delivery`
-- **Implementation:** `implement-rust`, `implement-frontend`
-- **Specialist Audit:** `audit-rust`, `audit-frontend`, `audit-security`
-- **Runtime Operations:** `ops-browser`, `ops-client`
-- **External Review:** `chatgpt-review`
-- **Writing Extension:** `human-writing`
+| Skill | Use when |
+| --- | --- |
+| `design-system` | A repository-owned design system must be created, extracted, maintained, or evaluated before source implementation. |
+| `implement-frontend` | A requested frontend feature, component, page, or design-system contract must be implemented and validated. |
+| `implement-rust` | A requested Rust feature, refactor, or port must be implemented with ownership and behavior evidence. |
 
-These categories describe responsibility, not quality. Published skills use
-`available`, `hidden`, or `removed` as release states. Validation is recorded
-independently for structure, live behavior, and end-to-end workflow evidence.
+### Audit and Operations
 
-### Recommended Workflows
+| Skill | Use when |
+| --- | --- |
+| `audit-frontend` | A known frontend surface needs a bounded read-only architecture, accessibility, performance, state, or design audit. |
+| `audit-rust` | A Rust workspace or surface needs a bounded ownership, concurrency, SQLite, unsafe/FFI, performance, or memory audit. |
+| `audit-security` | A known security-sensitive code or configuration surface needs a bounded read-only assessment. |
+| `ops-browser` | A browser page must be operated or verified with screenshot, console, network, form, or download evidence. |
+| `ops-client` | A Tauri, Electron, or native desktop client must be verified against its real process and window. |
 
-```text
-simple change: implement-* -> repo-review -> repo-delivery
-unknown failure: diagnose -> implement-* -> repo-review -> repo-delivery
-complex product change: repo-map (if needed) -> domain-modeling (if needed) -> code-planner -> implement-* -> repo-review -> repo-delivery
-read-only review: repo-review -> audit-* only when needed
-external review: chatgpt-review only after an explicit request
-```
+### Review and Writing Extensions
 
-### Installation Bundles
+| Skill | Use when |
+| --- | --- |
+| `chatgpt-review` | A local review package or explicitly authorized external ChatGPT review round is required. |
+| `human-writing` | Source-grounded prose must be drafted or revised while preserving facts, voice, and disclosure boundaries. |
 
-- **Core Read-only:** `repo-map`, `domain-modeling`, `code-planner`, `diagnose`, `repo-review`
-- **Engineering:** Core Read-only plus `repo-delivery`, `implement-rust`, and `implement-frontend`
-- **Full:** all published skills
+## Composition
 
-Bundles are installation shortcuts, not validation claims. Full does not mean
-that every skill has behavior or workflow verification. Exact commands are in
-[`INSTALL.md`](INSTALL.md).
-
-### Repository Engineering Boundaries
+Skills are composable owners, not a mandatory framework:
 
 ```text
-repo-map      = what exists, where it lives, and what can be reused
-repo-review   = whether local or immutable repository changes are safe, using the matching review-basis mode
-repo-delivery = authorized staging, commits, pushes, synchronization, and cleanup
+unknown repository -> repo-map
+unclear domain      -> domain-modeling
+complex change      -> code-planner
+known failure       -> diagnose
+source work         -> implement-frontend / implement-rust
+design contract     -> design-system -> implement-frontend
+review              -> repo-review (with bounded audit-* specialists when needed)
+delivery            -> repo-delivery
 ```
 
-`repo-review` keeps Worktree and immutable review evidence separate internally while presenting one public review entrypoint.
+The nearest applicable owner may start directly. Cross-Skill handoffs transfer
+bounded evidence, never implicit authorization.
 
-`repo-map` normally maintains `<map-root>/docs/repo-map/README.md` as a compact semantic index, not a mirrored source tree. It first resolves a containing Git root; from a non-Git path it discovers child Git roots, or treats the path as an ordinary directory project when none exist. It records real ownership and runtime boundaries, shortest task routes, and verified reuse entries with canonical definitions, access/registration entries, representative consumers, and usage constraints. `repo-review` may use that map to navigate, but independently verifies every finding at its selected Worktree or immutable basis. Semantic drift is repaired as the smallest dependent consistency closure; missing paths are recovered from the nearest existing ancestor without rebuilding verified sections.
+## Package Contract
 
-### Implementation, Audit, Review, And Delivery Boundaries
+Every public package lives at `skills/<name>/` and contains:
 
-- `implement-frontend` and `implement-rust` own requested code changes, refactors, ports, and implementation self-checks.
-- `audit-frontend`, `audit-rust`, and `audit-security` are read-only domain specialists. They select only applicable profiles and return bounded findings.
-- `repo-review` owns local dirty-tree readiness and immutable snapshot/range/PR/release review through separate basis modes, and coordinates bounded specialists.
-- `diagnose` owns reproduction and root-cause confirmation; permanent fixes transition to the matching implementation skill.
-- `repo-delivery` is the sole owner of staging, commits, pushes, squash, cleanup, and other Git mutation after review acceptance.
+```text
+skills/<name>/
+├── SKILL.md
+├── agents/openai.yaml
+└── references/
+```
 
-See [`docs/standards/skill-routing.md`](docs/standards/skill-routing.md) for the design and split/merge criteria.
+Packages add `assets/` or `scripts/` only when the capability needs them. A
+published package may reference files inside its own directory; it must not
+require `docs/`, `contracts/`, `evals/`, `protocols/`, another Skill, or an
+absolute local path at runtime.
 
-## Validate Local Skills
+The repository-level `docs/`, `contracts/`, `evals/`, `protocols/`, and
+`scripts/` directories are maintainer-facing validation infrastructure. They
+do not ship as hidden runtime dependencies.
 
-For repository development, validate source skill packages before publishing changes:
+## Validate
 
 ```bash
 python3 scripts/sync-shared-protocols.py --check
@@ -194,48 +130,26 @@ python3 scripts/measure-skill-footprint.py --baseline-ref HEAD
 git diff --check
 ```
 
-The validator also checks the symmetric nearest-neighbor routing inventory in
-[`docs/skills/routing-graph.json`](docs/skills/routing-graph.json) and requires
-both endpoint skills to cover each other in routing evals.
-Package limits, behavior-eval minimums, score gates, result schemas, and the
-official-source review date are authoritative in
-[`contracts/skill-validation.json`](contracts/skill-validation.json); prose
-documentation does not maintain duplicate numeric thresholds. Dataset totals
-are coverage counts, not OpenAI or Claude scores. Structure validation likewise
-does not claim that a model routed correctly or completed a workflow.
+The validator checks package structure, local references, catalog consistency,
+nearest-neighbor routing coverage, and static evaluation contracts. Passing
+these checks proves repository structure, not live model behavior or end-to-end
+workflow success; current evidence is recorded in
+[docs/quality/status.md](docs/quality/status.md).
 
-Useful targeted package checks:
+## Design Principles
 
-```bash
-python3 scripts/validate-skills.py --skill repo-map
-python3 scripts/validate-skills.py --skill repo-review
-python3 scripts/validate-skills.py --skill diagnose
-python3 scripts/validate-skills.py --skill audit-frontend
-python3 scripts/validate-skills.py --skill audit-security
-```
+- Small, intent-based, and composable, following the useful catalog qualities
+  demonstrated by `mattpocock/skills`.
+- One public Skill per stable user intent and authority boundary; technology
+  variants remain profiles when their owner and output contract are the same.
+- Progressive disclosure: concise discovery metadata and `SKILL.md`, with
+  detailed workflows and examples in package-local references.
+- Repository truth and explicit authorization take priority over generic
+  conventions.
 
-End-user installation and updates should use the standard `npx skills add` and `npx skills update` flow.
+## Contributing and License
 
-## Principles
-
-- keep active root content reusable
-- keep prompt and skill assets directly accessible
-- keep publishable skills self-contained; repo-local prompts can supplement them but should not be required
-- let prompts capture task language, and let skills capture stable execution workflows
-- split a public skill only when user intent, authority, workflow, output contract, and non-trigger set are materially distinct
-- prefer internal profiles when framework or checklist variants share the same ownership and output contract
-- keep skill trigger/eval cases in `references/eval-cases.md` and validate packages before publishing
-- keep shared automation standards in `docs/standards/`
-- keep downstream repository task details out of AICraft except for the registry index
-- retire time-sensitive or old workflow material from the active root
-- avoid mixing transient notes and historical references into the active root
-
-## License
-
-Unless a file or directory states otherwise, AICraft source material is
-available under the [Apache License, Version 2.0](./LICENSE). Third-party
-materials remain under their original terms. The license does not grant rights
-to Rustzen or AICraft names, logos, official domains, package namespaces, or
-official distribution channels; see [NOTICE.md](./NOTICE.md),
-[TRADEMARKS.md](./TRADEMARKS.md), and
-[THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
+Read [AGENTS.md](AGENTS.md), [skills/AGENTS.md](skills/AGENTS.md), and
+[docs/skills/skill-standard.md](docs/skills/skill-standard.md) before changing a
+package. Unless a file states otherwise, the collection is available under the
+[Apache License, Version 2.0](LICENSE).

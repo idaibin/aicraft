@@ -1,21 +1,21 @@
-# AICraft v2 Method Integration
+# Skills Catalog Method Integration
 
 ## Difference Table
 
-| Matt capability | AICraft owner | Action |
+| Matt capability | Catalog owner | Action |
 | --- | --- | --- |
 | `grill-me` / `grill-with-docs` | `code-planner`, `domain-modeling` | absorb readiness and domain clarification; no duplicate interview skill |
 | `to-spec` | `code-planner` | add requirements, decisions, technical design, acceptance, and validation contract |
 | `to-tickets` | `code-planner` | add vertical slices and blocking edges |
-| `domain-modeling` | missing | add distinct public owner |
+| `domain-modeling` | `domain-modeling` | retain the distinct public owner |
 | `diagnosing-bugs` | `diagnose` | strengthen feedback-loop and hypothesis gates |
 | `tdd` | `implement-frontend`, `implement-rust` | add opt-in behavior-first vertical-slice references |
 | `implement` | `implement-*` | retain domain-specific implementation owners |
 | `code-review` | `repo-review` | add independent Standards and Spec axes under one severity owner |
 | `codebase-design` | `code-planner` and existing audit profiles | add internal deep-module design guidance; do not create another owner |
-| `handoff` | `repo-delivery` | borrow compact references and redaction; use the AICraft plan's Git Delivery Report |
+| `handoff` | `repo-delivery` | borrow compact references and redaction; use the catalog's Git Delivery Report |
 
-## AICraft v2 Lifecycle
+## Catalog Lifecycle
 
 ```text
 Discovery: repo-map when repository truth is unknown
@@ -38,7 +38,7 @@ The proposal's Rust, frontend, Tauri, and content profiles remain internal refer
 - TDD guidance: package-local implementation references.
 - Deep-module guidance: `code-planner` technical-design reference, with architecture review remaining inside existing audit and `repo-review` surfaces.
 
-No `.aicraft/skills` mirror is added. Published packages remain under `skills/`, with detailed guidance one level down in `references/`.
+No provider-specific mirror is added. Published packages remain under `skills/`, with detailed guidance one level down in `references/`.
 
 ## Acceptance Boundary
 

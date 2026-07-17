@@ -40,4 +40,4 @@ Report the delivery target, branch/upstream, staged scope, validation, commit ha
 
 ## Maintenance
 
-Use `references/eval-cases.md` for trigger and quality checks. In AICraft, validate with `python3 scripts/validate-skills.py`; end-user installs use `npx skills add https://github.com/idaibin/aicraft`, and end-user updates use `npx skills update`.
+Use `references/eval-cases.md` for trigger and quality checks. In this catalog, validate with `python3 scripts/validate-skills.py`; end-user installs use `npx skills add https://github.com/idaibin/skills`, and end-user updates use `npx skills update`.

@@ -1,9 +1,9 @@
 # Official Skill Alignment
 
-This record defines the external baseline used to review AICraft's Skill
+This record defines the external baseline used to review the catalog's Skill
 packages. It separates the portable Agent Skills core from provider-specific
 OpenAI and Claude features, then records which stricter repository policies
-AICraft applies locally.
+this catalog applies locally.
 
 ## Review Record
 
@@ -29,7 +29,7 @@ the due date. Validation must fail rather than silently treating an expired
 baseline as current.
 
 The evaluation sources define reusable experiment structure and evidence
-practices. They do not replace AICraft's repository-specific owner, handoff,
+practices. They do not replace the catalog's repository-specific owner, handoff,
 authority, or workflow assertions.
 
 ## Portable Core
@@ -41,11 +41,11 @@ loaded only when needed.
 
 Portable frontmatter may also carry optional `license`, `compatibility`, and
 string-map `metadata` fields, plus the experimental `allowed-tools` field.
-AICraft intentionally uses the stricter `name`/`description` subset, applies
+The catalog intentionally uses the stricter `name`/`description` subset, applies
 the repository-level `LICENSE` to the published collection, and does not
 duplicate license or host-specific capability metadata across every package.
 
-AICraft adopts this progressive-disclosure model. Its package limits, metadata
+The catalog adopts this progressive-disclosure model. Its package limits, metadata
 rules, reference navigation requirements, and validation thresholds may be
 stricter than the portable specification. Those local limits live in
 `contracts/skill-validation.json`; prose documents must not create competing
@@ -55,18 +55,18 @@ numeric authorities.
 
 OpenAI Codex uses the portable `SKILL.md` contract and may add
 `agents/openai.yaml` for Codex-facing display metadata and a starter prompt.
-AICraft requires this file for its published packages, keeps
+The catalog requires this file for its published packages, keeps
 `short_description` compact, and uses a short self-routing `default_prompt`
 that names the Skill as `$skill-name`.
 
 Codex builds its initial discovery list from each Skill's name, description,
 and path under a two-percent or 8,000-character context budget, shortening or
-omitting descriptions when necessary. AICraft's tighter per-description limit
+omitting descriptions when necessary. The catalog's tighter per-description limit
 and aggregate footprint measurement are local safeguards for that discovery
 budget, not portable schema requirements.
 
 `agents/openai.yaml` is an OpenAI integration surface, not part of the portable
-Agent Skills minimum. AICraft keeps skills.sh as its cross-provider install
+Agent Skills minimum. The catalog keeps skills.sh as its cross-provider install
 path. The current OpenAI plugin repository informs packaging and metadata
 quality, but this review does not replace portable distribution with an
 OpenAI-only plugin wrapper.
@@ -77,7 +77,7 @@ Claude Code follows the Agent Skills standard and adds optional host features
 such as invocation controls, tool restrictions, hooks, subagent execution, and
 dynamic context. These extensions are useful only when a package requires the
 corresponding Claude behavior; they must not be presented as portable fields or
-copied into every AICraft package by default.
+copied into every catalog package by default.
 
 Claude Code reads `CLAUDE.md`, not `AGENTS.md`. The repository therefore keeps
 small `CLAUDE.md` files that import the same-directory `AGENTS.md` with the
@@ -92,7 +92,7 @@ specific filename.
 - Keep startup metadata concise because every Skill description competes for
   discovery context before invocation.
 - Validate the portable package against current provider specifications with
-  AICraft's repository checks. Record a provider-owned validator and its exact
+  the catalog's repository checks. Record a provider-owned validator and its exact
   version separately when one is actually executed; none is implied here.
 - Keep provider-specific metadata in its provider lane.
 - Use held-out natural-language requests and repeated real runs for behavior
@@ -118,9 +118,9 @@ specific filename.
 - Portable experimental `allowed-tools`, or Claude-specific invocation
   controls, hooks, and forked context, when a package does not need those
   behaviors.
-- Provider example structure as proof that a package is correct for AICraft's
+- Provider example structure as proof that a package is correct for the catalog's
   authority and routing boundaries.
-- A provider's maximum file size as AICraft's working target when the local
+- A provider's maximum file size as the catalog's working target when the local
   contract intentionally sets a tighter limit.
 - Subjective maturity labels or claims based only on package count, Markdown
   eval tables, deterministic fixtures, or validator success.

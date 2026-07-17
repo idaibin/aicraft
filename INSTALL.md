@@ -1,230 +1,184 @@
 # Install Skills
 
-This file is for AI agents or users who want to install or update skills from this repository.
+Use the standard `skills` CLI. The public source is `idaibin/skills`.
 
-Install only these skill package directories:
+## Discover
+
+```bash
+npx skills@latest add idaibin/skills --list
+```
+
+The result must contain exactly these public packages:
+
+```text
+repo-map
+domain-modeling
+code-planner
+diagnose
+repo-review
+repo-delivery
+design-system
+implement-frontend
+implement-rust
+audit-frontend
+audit-rust
+audit-security
+ops-browser
+ops-client
+chatgpt-review
+human-writing
+```
+
+The publishable source directories are:
 
 - `skills/repo-map`
 - `skills/domain-modeling`
 - `skills/code-planner`
-- `skills/design-ui`
 - `skills/diagnose`
 - `skills/repo-review`
 - `skills/repo-delivery`
-- `skills/audit-security`
-- `skills/chatgpt-review`
+- `skills/design-system`
 - `skills/implement-frontend`
 - `skills/implement-rust`
 - `skills/audit-frontend`
 - `skills/audit-rust`
+- `skills/audit-security`
 - `skills/ops-browser`
 - `skills/ops-client`
+- `skills/chatgpt-review`
 - `skills/human-writing`
 
-Do not install the repository root, `prompts/`, `docs/`, or legacy skill names such as `repo-context`, `code-context`, `code-review`, `code-delivery`, `chatgpt-review-bridge`, `code-security`, `commit-reviewer`, `planner`, `frontend-implementation`, `frontend-governance`, or `rust-engineering-governance`.
+## Install
 
-## Recommended Install
-
-Use the standard `skills` npm CLI flow shown on skills.sh:
+Choose Skills and agents interactively:
 
 ```bash
-npx skills add https://github.com/idaibin/aicraft
+npx skills@latest add idaibin/skills
 ```
 
-This installs into the current project and lets the CLI detect compatible
-agents. To install globally for both OpenAI Codex and Anthropic Claude Code:
+Install selected Skills into the current project for Codex:
 
 ```bash
-npx skills add https://github.com/idaibin/aicraft \
+npx skills@latest add idaibin/skills \
+  --skill repo-map code-planner diagnose repo-review \
+  --agent codex
+```
+
+Install selected Skills globally for Codex and Claude Code:
+
+```bash
+npx skills@latest add idaibin/skills \
+  --skill repo-map domain-modeling code-planner diagnose repo-review repo-delivery \
   --global --agent codex claude-code
 ```
 
-Use the same `--global` and `--agent` selection when adding only a subset of
-skills. The current CLI agent identifiers are `codex` and `claude-code`.
-
-List available skills without installing:
+Install one Skill globally:
 
 ```bash
-npx skills add https://github.com/idaibin/aicraft --list
+npx skills@latest add idaibin/skills \
+  --skill audit-rust \
+  --global --agent codex
 ```
 
-Install selected skills:
+Install all published Skills non-interactively only when that broad scope is
+intentional:
 
 ```bash
-npx skills add https://github.com/idaibin/aicraft \
-  --skill repo-map domain-modeling code-planner diagnose repo-review repo-delivery design-ui audit-security chatgpt-review implement-frontend implement-rust audit-frontend audit-rust ops-browser ops-client human-writing
+npx skills@latest add idaibin/skills \
+  --skill '*' --global --agent codex --yes
 ```
 
-For multiple selected skills, pass the names after `--skill` as shown above.
+## Suggested Sets
 
-Install the repository-engineering workflow skills:
-
-```bash
-npx skills add https://github.com/idaibin/aicraft \
-  --skill repo-map domain-modeling code-planner diagnose repo-review repo-delivery
-```
-
-## Installation Bundles
-
-Install the Core Read-only bundle for mapping, planning, diagnosis, and review
-without implementation or Git delivery ownership:
+Core read-only repository work:
 
 ```bash
-npx skills add https://github.com/idaibin/aicraft \
+npx skills@latest add idaibin/skills \
   --skill repo-map domain-modeling code-planner diagnose repo-review
 ```
 
-Install the Engineering bundle for the normal implementation lifecycle:
+Frontend design and implementation:
 
 ```bash
-npx skills add https://github.com/idaibin/aicraft \
-  --skill repo-map domain-modeling code-planner diagnose repo-review repo-delivery implement-rust implement-frontend
+npx skills@latest add idaibin/skills \
+  --skill design-system implement-frontend audit-frontend ops-browser repo-review
 ```
 
-Install the Full bundle with the repository's normal all-skills command:
+Rust implementation and audit:
 
 ```bash
-npx skills add https://github.com/idaibin/aicraft
+npx skills@latest add idaibin/skills \
+  --skill implement-rust audit-rust repo-review
 ```
 
-Bundles describe install scope only. They do not imply behavior or workflow
-verification. Current evidence is recorded in
-[`docs/quality/status.md`](docs/quality/status.md).
+These are documentation shortcuts, not custom CLI bundles or quality claims.
 
-Add bounded domain-audit specialists when the repository work needs them:
+## Use Without Installing
 
 ```bash
-npx skills add https://github.com/idaibin/aicraft \
-  --skill audit-frontend audit-rust audit-security
+npx skills@latest use idaibin/skills@audit-rust
 ```
 
-Install only the operations skills:
-
-```bash
-npx skills add https://github.com/idaibin/aicraft --skill ops-browser ops-client
-```
-
-## Update
-
-`skills update` checks CLI-tracked source versions and updates changed skills.
-Update skills installed in the current project:
-
-```bash
-npx skills update --project
-```
-
-Update global skills, including global Codex and Claude Code installations:
-
-```bash
-npx skills update --global
-```
-
-Update only selected skills:
-
-```bash
-npx skills update repo-map repo-review audit-security
-```
-
-For updates, selected skill names are positional arguments. `update` supports
-project or global scope, but does not expose an `--agent` filter; it refreshes
-the tracked installation in the selected scope. Use `--yes` to accept the
-detected scope without an interactive prompt:
-
-```bash
-npx skills update --yes
-```
-
-Inspect installed skills before or after an update:
+## Inspect, Update, and Remove
 
 ```bash
 npx skills list
 npx skills list --global
-npx skills list --global --agent codex claude-code
+npx skills update --project
+npx skills update --global
+npx skills remove audit-rust --global --agent codex
 ```
 
-After installing or updating skills, restart any long-running agent app so updated skill metadata and descriptions are loaded.
+Updates depend on source metadata recorded by `skills add`. Manually copied
+folders, inaccessible sources, and renamed packages may require removal and a
+fresh installation. Restart long-running agent applications after an update so
+they reload discovery metadata.
 
-### Update Requirements And Limits
+## Rename Migration
 
-Automatic updates depend on installation metadata recorded by
-`npx skills add`. They are reliable when the source repository remains
-reachable and the skill keeps the same published name and path.
+### Repository source
 
-`npx skills update` is not a universal repair or migration command:
+The public source changed from `idaibin/aicraft` to `idaibin/skills`. GitHub may
+redirect the old repository URL, but installed source metadata should be moved
+explicitly by removing the old tracked installation and adding the new source.
 
-- manually copied or downloaded skill folders may not have a tracked source;
-- deleted local skill folders may need `npx skills add` again;
-- private, removed, or inaccessible source repositories cannot be refreshed;
-- renamed or moved skills require explicit remove-and-add migration;
-- local-path or other non-remote sources may not support remote version checks.
+### Design Skill
 
-Do not maintain separate OpenAI and Anthropic copies by hand. Install both
-through one CLI command so their agent directories point to the same tracked
-skill source and use the same update flow.
+`design-ui` was replaced by `design-system` to reflect creation, extraction,
+maintenance, task design, and evaluation of a repository-owned design system.
+The new Skill still routes frontend source mutation to `implement-frontend`
+and implementation auditing to `audit-frontend`.
 
-### Rename Migration
-
-The current suite includes these public-name migrations:
-
-| Retired name | Replacement | Change |
-| --- | --- | --- |
-| `repo-context` | `repo-map` | clearer semantic repository-map ownership |
-| `code-review` | `repo-review` | local and immutable review unified as review-basis modes |
-| `code-delivery` | `repo-delivery` | repository workflow naming aligned |
-| `chatgpt-review-bridge` | `chatgpt-review` | shorter intent-based review entrypoint |
-
-An update cannot remove retired names automatically. Existing project-scope
-users should remove the old packages and add the replacements:
+Project scope:
 
 ```bash
-npx skills remove repo-context code-review code-delivery chatgpt-review-bridge
-npx skills add https://github.com/idaibin/aicraft \
-  --skill repo-map repo-review repo-delivery chatgpt-review
+npx skills remove design-ui
+npx skills@latest add idaibin/skills --skill design-system
 ```
 
-For global Codex and Claude Code installations, preserve both scope and remove
-the retired names from each agent target:
+Global Codex scope:
 
 ```bash
-npx skills remove --global --agent codex \
-  repo-context code-review code-delivery chatgpt-review-bridge
-npx skills remove --global --agent claude-code \
-  repo-context code-review code-delivery chatgpt-review-bridge
-npx skills add https://github.com/idaibin/aicraft \
-  --global --agent codex claude-code \
-  --skill repo-map repo-review repo-delivery chatgpt-review
+npx skills remove design-ui --global --agent codex
+npx skills@latest add idaibin/skills \
+  --skill design-system --global --agent codex
 ```
 
-Restart long-running agent apps afterward and use `npx skills list` or
-`npx skills list --global` to confirm that only the replacement names remain.
+Other retired names remain mapped as follows:
 
-## Reproducible Project Installs
+| Retired | Current |
+| --- | --- |
+| `repo-context` | `repo-map` |
+| `code-review` | `repo-review` |
+| `code-delivery` | `repo-delivery` |
+| `chatgpt-review-bridge` | `chatgpt-review` |
 
-The `skills` CLI exposes `skills-lock.json` restore support through the command
-currently named `skills experimental_install`. This is an external CLI command
-name, not an AICraft maturity label. Use the standard `skills add` flow for
-normal installs; lockfile restore behavior is not verified by this repository.
+## Maintainer Check
 
-## Maintainer Validation
-
-Use this only when developing this repository:
+Before publishing, verify source discovery from the repository root:
 
 ```bash
-python3 scripts/sync-shared-protocols.py --check
-python3 scripts/validate-skills.py
-python3 scripts/test_validate_skills.py
-python3 scripts/eval-skill-contracts.py --validate-only
-git diff --check
+npx skills@latest add . --list
 ```
 
-Useful targeted checks:
-
-```bash
-python3 scripts/validate-skills.py --skill repo-map
-python3 scripts/validate-skills.py --skill repo-review
-python3 scripts/validate-skills.py --skill diagnose
-python3 scripts/validate-skills.py --skill audit-frontend
-python3 scripts/validate-skills.py --skill audit-security
-```
-
-This validates source packages without installing them. End-user installation and updates should use `npx skills add` and `npx skills update`.
+Then run the repository validation commands documented in [README.md](README.md).

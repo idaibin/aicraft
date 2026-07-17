@@ -5,7 +5,7 @@ This file defines how AI agents should work on this repository. It is not the pr
 ## Task Routing
 
 - For repository development, documentation edits, prompt edits, skill package edits, reviews, or commits, follow the repository work rules below.
-- Only when the user explicitly asks to install skills from `https://github.com/idaibin/aicraft`, read `INSTALL.md` and follow that installation flow.
+- Only when the user explicitly asks to install skills from `https://github.com/idaibin/skills`, read `INSTALL.md` and follow that installation flow.
 - Do not switch into installation mode just because this repository contains `skills/`.
 - Use `repo-map` for separate repository mapping, reuse inventory, or docs/code alignment.
 - Use `domain-modeling` for business language, entities, relationships, lifecycle, invariants, and bounded contexts before technical planning when those concepts are unresolved.
@@ -31,7 +31,6 @@ This file defines how AI agents should work on this repository. It is not the pr
 ## Project Structure
 
 - `skills/` contains publishable or reusable skill packages.
-- `prompts/` contains reusable prompt assets.
 - `scripts/validate-skills.py` validates source skill packages for repository development.
 - `scripts/test_*.py` contains validator, runner, and comparison regressions.
 - `scripts/run-skill-routing-eval.py` plans reproducible routing trials and

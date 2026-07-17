@@ -26,7 +26,7 @@ OWNER_ENUM = (
     "audit-security",
     "chatgpt-review",
     "code-planner",
-    "design-ui",
+    "design-system",
     "diagnose",
     "domain-modeling",
     "human-writing",

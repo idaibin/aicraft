@@ -1,24 +1,26 @@
-# UI Design Usage
+# Design System Usage
 
 ## Use this skill for
 
-- creating or revising a repository-owned UI profile;
+- creating a repository-owned design system for a new product or surface;
+- extracting durable rules from existing code, screenshots, tokens, and components;
+- maintaining an accepted profile without overwriting its history;
 - defining one page, window, tray, flow, or component redesign before code;
 - explaining what to use and ignore from one or more reference images;
-- extracting project-compatible tokens without creating a second design system;
+- deriving project-compatible tokens without creating a competing owner;
 - comparing variants with deterministic gates, a weighted rubric, cost, and a recorded decision;
 - preparing a complete design package for `implement-frontend`.
 
 ## Typical chain
 
 ```text
-repo evidence -> design-ui -> implement-frontend
-                           -> ops-browser or ops-client
-                           -> audit-frontend
-                           -> repo-review -> repo-delivery
+repo evidence -> design-system -> implement-frontend
+                              -> ops-browser or ops-client
+                              -> audit-frontend
+                              -> repo-review -> repo-delivery
 ```
 
-Use `code-planner` first only when the implementation itself needs a separate multi-package plan. A task can invoke `design-ui` directly when the requested output is the UI package.
+Use `code-planner` first only when implementation needs a separate multi-package plan. Invoke `design-system` directly when the requested output is the repository-owned design contract. The Skill remains independently usable: it performs its own bounded evidence collection when no `repo-map` output exists.
 
 ## Artifact location
 

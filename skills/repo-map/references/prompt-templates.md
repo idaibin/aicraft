@@ -1,6 +1,7 @@
 # Prompt Templates
 
-These templates are bundled with `repo-map` so the skill remains usable after publishing. Local `prompts/` files may supplement these templates, but they are never required.
+These templates are bundled with `repo-map` so the Skill remains usable after
+publishing. Do not resolve templates outside this package at runtime.
 
 ## Contents
 

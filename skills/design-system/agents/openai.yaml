@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design System"
+  short_description: "Create and maintain evidence-backed design systems"
+  default_prompt: "Use $design-system to create, extract, maintain, or evaluate a versioned design system from project evidence and scoped references."

@@ -4,16 +4,18 @@
 
 | Prompt | Expected |
 | --- | --- |
-| `Create a UI profile and reference registry for this existing desktop app before implementation.` | Trigger `design-ui` Profile mode. |
-| `Use image A only for material and B only for layout; produce tokens and a task brief.` | Trigger Reference mode with explicit use/ignore and rights fields. |
+| `Create the first design system for this product from verified routes, components, and user jobs.` | Trigger `design-system` Create mode. |
+| `Extract the durable tokens and component rules already used across these representative screens.` | Trigger Extract mode without claiming screenshots prove runtime behavior. |
+| `Update the accepted design profile for the new dense-data surface and preserve the rollback revision.` | Trigger Maintain mode. |
+| `Use image A only for material and B only for layout; produce tokens and a task brief.` | Trigger Task mode with explicit use/ignore and rights fields. |
 | `Design a new operations page from real routes and DTOs, but do not edit source yet.` | Trigger Task mode and preserve fact boundaries. |
-| `Compare these three UI variants with deterministic gates, cost, and a 100-point rubric.` | Trigger Evaluation mode. |
+| `Compare these three UI variants with deterministic gates, cost, and a 100-point rubric.` | Trigger Evaluate mode. |
 
 ## Non-Trigger Eval
 
 | Prompt | Expected |
 | --- | --- |
-| `Implement the accepted UI package in this React app.` | Prefer `implement-frontend`; consume `design-ui` assets. |
+| `Implement the accepted UI package in this React app.` | Prefer `implement-frontend`; consume `design-system` assets. |
 | `Audit the changed frontend for accessibility and token drift.` | Prefer `audit-frontend`. |
 | `Plan a backend, frontend, migration, and CI rollout.` | Prefer `code-planner`. |
 | `Open the page and capture console, network, and screenshots.` | Prefer `ops-browser`. |
@@ -25,6 +27,7 @@
 | Case | Pass evidence | Reject if |
 | --- | --- | --- |
 | Grounding | records product, audience, job, data/actions/states, components, tokens, and gaps from source evidence | invents a generic dashboard brief |
+| Mode | selects create, extract, maintain, task, or evaluate and applies its evidence baseline | blends modes until ownership and acceptance are unclear |
 | Reference scope | every reference has source, rights, use, and ignore | says only `make it look like this` |
 | Direction | defines palette, type roles, layout, material, density, and one product-rooted signature | defaults to unrelated neon, glass, hero, or KPI cards |
 | Project isolation | durable style lives in the project profile, not the reusable Skill | hardcodes one product's colors or geometry in the Skill |

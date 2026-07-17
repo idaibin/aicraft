@@ -1,3 +1,5 @@
 .DS_Store
 archive.zip
 eval-results/
+__pycache__/
+*.py[cod]

@@ -1,15 +1,24 @@
-# UI Design Workflow
+# Design System Workflow
 
 ## Contents
 
 1. Evidence boundary
-2. Direction pass
-3. Artifact pass
-4. Evaluation and promotion
+2. Mode-specific baseline
+3. Direction pass
+4. Artifact pass
+5. Evaluation and promotion
 
 ## Evidence boundary
 
 Record confirmed requirements, available data/actions/states, current components and tokens, explicit exclusions, and unresolved questions. Screenshots prove appearance only. DOM, source, API, console, network, accessibility, and native-window claims require their own evidence.
+
+## Mode-specific baseline
+
+- **Create:** prove that no accepted owner exists, then define the minimum durable profile and token/component vocabulary the project needs.
+- **Extract:** inventory representative real surfaces and distinguish repeated design rules from one-off implementation details.
+- **Maintain:** resolve the accepted revision, identify the evidence that changed, and preserve a rollback target before editing artifacts.
+- **Task:** keep durable profile changes separate from one-surface tokens, component decisions, states, and acceptance rules.
+- **Evaluate:** resolve the accepted contract first; if implementation evidence is required, request it from the runtime or audit owner instead of inventing it.
 
 ## Direction pass
 

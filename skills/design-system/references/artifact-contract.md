@@ -1,4 +1,4 @@
-# UI Artifact Contract
+# Design System Artifact Contract
 
 `assets/ui-package.schema.json` is the single machine-readable source for required package files and top-level fields. Templates are examples of that contract; the validator reads the schema instead of carrying a second required-field list.
 

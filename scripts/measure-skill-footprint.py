@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare deterministic AICraft Skill discovery and entrypoint footprint."""
+"""Compare deterministic catalog Skill discovery and entrypoint footprint."""
 
 from __future__ import annotations
 

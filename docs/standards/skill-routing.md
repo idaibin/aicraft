@@ -1,6 +1,6 @@
 # Skill Routing And Design Standard
 
-This standard defines when AICraft should keep capabilities together, split them into public skills, or model them as internal profiles.
+This standard defines when the catalog should keep capabilities together, split them into public Skills, or model them as internal profiles.
 
 Portable and provider-specific package surfaces are defined separately in
 [`../quality/official-skill-alignment.md`](../quality/official-skill-alignment.md).

@@ -1,4 +1,4 @@
-# AICraft Validation Plan
+# Skills Catalog Validation Plan
 
 Status: active evidence plan
 
@@ -6,7 +6,7 @@ Date: 2026-07-16
 
 ## Objective
 
-AICraft validates existing Skill contracts before expanding the public suite.
+The catalog validates existing Skill contracts before expanding the public suite.
 The plan must answer four different questions without collapsing them into one
 score:
 
@@ -25,7 +25,7 @@ set of numeric thresholds.
 
 ## Evaluation Architecture
 
-AICraft retains its domain-specific owner, authority, and handoff contract
+The catalog retains its domain-specific owner, authority, and handoff contract
 rather than replacing it with a generic benchmark. Its evaluation surfaces use
 the separation established by mature agent-evaluation systems:
 
@@ -43,7 +43,7 @@ and the dataset/solver/scorer separation in
 workflow verification should adopt the end-to-end trace and grader separation
 described by
 [OpenAI Agent Evals](https://developers.openai.com/api/docs/guides/agent-evals).
-These references guide execution and evidence design; AICraft's
+These references guide execution and evidence design; the catalog's
 machine-readable contract remains authoritative for its Skill boundaries.
 
 ## Evidence Layers

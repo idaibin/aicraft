@@ -6,7 +6,7 @@ Read `../standards/skill-routing.md` together with this document when adding, sp
 
 ## Package Shape
 
-Each AICraft skill package must use this structure:
+Each published Skill package must use this structure:
 
 ```text
 skills/<skill-name>/
@@ -18,14 +18,15 @@ skills/<skill-name>/
 
 Optional `scripts/` or `assets/` are allowed only when they directly support the skill. Do not add package-local `README.md`, changelogs, install notes, or narrative process docs.
 
-The portable Agent Skills minimum is `SKILL.md`; `agents/openai.yaml` is an
-AICraft-required OpenAI integration surface, not a portable requirement. See
+The portable Agent Skills minimum is `SKILL.md`. This catalog also requires
+`agents/openai.yaml` as an OpenAI integration surface; it is not a portable
+requirement. See
 [`../quality/official-skill-alignment.md`](../quality/official-skill-alignment.md)
 for provider lanes and pinned sources.
 
 The portable specification permits optional `license`, `compatibility`,
-`metadata`, and experimental `allowed-tools` frontmatter. AICraft deliberately
-uses only `name` and `description`; the collection license is the root
+`metadata`, and experimental `allowed-tools` frontmatter. This catalog
+deliberately uses only `name` and `description`; the collection license is the root
 `LICENSE`, while host capabilities and tool authority remain in runtime
 instructions and provider metadata.
 
@@ -104,9 +105,10 @@ Use references for:
 - trigger, non-trigger, scenario, and quality eval cases;
 - bundled prompt or document templates.
 
-References must be self-contained when the published skill needs them. Local `prompts/` files may supplement a skill, but a published skill must not require them to run.
-
-When a skill needs prompt-derived templates, maintain those templates inside that skill package before publishing. Do not make published skills depend on repository-level `prompts/`.
+References must be self-contained when the published Skill needs them. When a
+Skill needs prompt-derived templates, maintain those templates inside that
+package before publishing; the catalog has no repository-level runtime prompt
+library.
 
 When multiple published skills require an identical protocol, keep one
 repository source under `protocols/` and generate the self-contained package
@@ -115,7 +117,7 @@ of each published package; they are not independent authoring surfaces.
 
 ## Agent Metadata
 
-Each AICraft skill must include `agents/openai.yaml` with:
+Each published Skill must include `agents/openai.yaml` with:
 
 - `display_name`
 - `short_description`
@@ -232,7 +234,7 @@ not imply behavior or workflow verification.
 
 End-user installs and updates should use the standard skills.sh CLI flow:
 
-- `npx skills add https://github.com/idaibin/aicraft`
+- `npx skills add https://github.com/idaibin/skills`
 - `npx skills update --project` for current-project installations;
 - `npx skills update --global` for global installations, including shared Codex and Claude Code installs.
 
@@ -274,7 +276,7 @@ The `Triggers include` command must return no results. Also verify:
   `docs/quality/official-skill-alignment.md`;
 - `git diff --check` passes.
 
-After publishing, users install with `npx skills add https://github.com/idaibin/aicraft` and update installed copies with `npx skills update --project` or `npx skills update --global`. Use `--list` only to inspect source discoverability and `npx skills list` to inspect installed skills.
+After publishing, users install with `npx skills add https://github.com/idaibin/skills` and update installed copies with `npx skills update --project` or `npx skills update --global`. Use `--list` only to inspect source discoverability and `npx skills list` to inspect installed skills.
 
 For skills.sh repository pages, use root-level `skills.sh.json` only for display grouping. It does not change CLI install behavior or any `SKILL.md` content.
 

@@ -23,9 +23,9 @@
     },
     {
       "title": "Design",
-      "description": "Skill for evidence-grounded UI profiles, references, task assets, tokens, and evaluation contracts before implementation.",
+      "description": "Skill for creating, extracting, maintaining, and evaluating repository-owned design systems before source implementation.",
       "skills": [
-        "design-ui"
+        "design-system"
       ]
     },
     {

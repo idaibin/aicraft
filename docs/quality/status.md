@@ -1,4 +1,4 @@
-# AICraft Quality Status
+# Skills Catalog Quality Status
 
 This page records verifiable repository evidence. It does not assign subjective
 maturity labels or treat format validation as proof of model behavior.
@@ -32,7 +32,7 @@ end-to-end task completion.
 | `diagnose` | Core Engineering | available | verified | not_verified | not_verified |
 | `repo-review` | Core Engineering | available | verified | not_verified | not_verified |
 | `repo-delivery` | Core Engineering | available | verified | not_verified | not_verified |
-| `design-ui` | Design | available | verified | not_verified | not_verified |
+| `design-system` | Design | available | verified | not_verified | not_verified |
 | `implement-rust` | Implementation | available | verified | not_verified | not_verified |
 | `implement-frontend` | Implementation | available | verified | not_verified | not_verified |
 | `audit-rust` | Specialist Audit | available | verified | not_verified | not_verified |

@@ -1,4 +1,4 @@
-# AICraft Behavior Evaluation Data
+# Skills Catalog Behavior Evaluation Data
 
 These datasets evaluate declared Skill contracts directly. Candidate-only
 results can verify contract correctness. A claim that a changed Skill improves

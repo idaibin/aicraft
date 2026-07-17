@@ -1,4 +1,4 @@
-# UI Evaluation Rubric
+# Design System Evaluation Rubric
 
 ## Hard blockers
 

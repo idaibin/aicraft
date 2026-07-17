@@ -1,33 +1,34 @@
 ---
-name: design-ui
-description: "Use when a project needs evidence-grounded UI direction, a project UI profile, scoped reference analysis, task briefs, design tokens, component maps, versioned design assets, or an evaluation contract before frontend source implementation."
+name: design-system
+description: "Use when a project needs an evidence-grounded design system created, extracted, maintained, or evaluated as versioned profiles, references, tokens, component maps, task briefs, and acceptance contracts before frontend source implementation."
 ---
 
-# UI Design
+# Design System
 
 ## Overview
 
-Turn product facts, existing UI evidence, and explicitly scoped references into a versioned UI design package. Own design decisions and task-local assets only; route source edits to `implement-frontend`, runtime evidence to `ops-browser` or `ops-client`, and read-only implementation audits to `audit-frontend`.
+Turn product facts, existing UI evidence, and explicitly scoped references into a versioned, repository-owned design system. Own creation, extraction, maintenance, task design, and design evaluation; route product-source edits to `implement-frontend`, runtime evidence to `ops-browser` or `ops-client`, and read-only implementation audits to `audit-frontend`.
 
 ## Workflow
 
 1. Read effective repository guidance and run `git status --short` before planning artifacts.
 2. Identify product, audience, platform, primary user job, target surface, current component system, available states, data facts, and forbidden inventions.
 3. Inspect the smallest useful set of current screenshots, routes, components, tokens, DTOs, and analogous surfaces. Say `Not found` or `Not verified` for missing evidence.
-4. Select one primary mode: **profile**, **task**, **reference**, or **evaluation**. Supporting outputs may be included only when needed by that mode.
+4. Select one primary mode: **create**, **extract**, **maintain**, **task**, or **evaluate**. Supporting outputs may be included only when needed by that mode.
 5. Assign each reference an explicit `use` and `ignore` list plus source and rights status. Never treat a reference as authorization to copy brand, content, or functionality.
 6. Create one coherent visual direction: named palette, typography roles, layout concept, density, material, interaction tone, and one justified signature element. Preserve product truth over decoration.
 7. Treat `assets/ui-package.schema.json` as the package contract, then produce or update the project profile, task brief, reference registry, design tokens, component map, evaluation, and manifest from `assets/templates/`.
 8. Separate deterministic acceptance checks from visual or experience judgment. Apply hard blockers before weighted scoring.
 9. Version every input and output in the manifest. Never overwrite the last accepted revision without preserving rollback.
-10. Validate the package with `scripts/validate_ui_artifacts.py`, then hand off source work and runtime proof to their owning skills.
+10. When Python and PyYAML are available, validate the package with `scripts/validate_ui_artifacts.py`; otherwise report artifact validation as `Not verified` without installing dependencies implicitly. Then hand off source work and runtime proof to their owning Skills.
 
 ## Modes
 
-- **Profile:** establish durable project-specific visual and product constraints.
-- **Task:** define one surface, scope, states, facts, tokens, component map, and acceptance contract.
-- **Reference:** extract selected layout, material, typography, interaction, or component principles with rights and ignore boundaries.
-- **Evaluation:** score a design or rendered implementation using deterministic gates plus calibrated human/model judgment.
+- **Create:** establish a new repository-owned profile, token vocabulary, component principles, states, and acceptance rules from verified product context.
+- **Extract:** derive reusable design rules from existing screenshots, routes, components, tokens, and scoped references without treating appearance as runtime proof.
+- **Maintain:** revise an existing design system, preserve accepted history, and record why durable rules changed.
+- **Task:** define one surface, scope, states, facts, tokens, component map, and acceptance contract for later implementation.
+- **Evaluate:** judge a design proposal or rendered result against the accepted system using deterministic gates plus calibrated human/model judgment; implementation-code findings remain owned by `audit-frontend`.
 
 ## Do Not Use For
 
