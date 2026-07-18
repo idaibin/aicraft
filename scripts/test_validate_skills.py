@@ -158,7 +158,7 @@ class ValidateSkillsTests(unittest.TestCase):
         raw_path = root / "raw" / f"{result_id}.json"
         raw_path.parent.mkdir(parents=True)
         model_output = json.dumps(
-            {"actual_owner": "diagnose", "handoffs": []}
+            {"actual_owner": "repo-map", "handoffs": []}
         )
         stdout = json.dumps(
             {"usage": {"input_tokens": 1, "output_tokens": 1}}
@@ -189,7 +189,7 @@ class ValidateSkillsTests(unittest.TestCase):
             "retryable": False,
             "backoff_seconds_before_next": 0,
             "observations": {
-                "actual_owner": "diagnose",
+                "actual_owner": "repo-map",
                 "handoffs": [],
             },
             "metrics": {
@@ -222,7 +222,7 @@ class ValidateSkillsTests(unittest.TestCase):
                     "host_attempts": [host_attempt],
                     "exit_code": 0,
                     "observations": {
-                        "actual_owner": "diagnose",
+                        "actual_owner": "repo-map",
                         "handoffs": [],
                     },
                     "metrics": metrics,
@@ -1030,8 +1030,8 @@ class ValidateSkillsTests(unittest.TestCase):
 
     def test_package_policy_limits_are_enforced_by_validate_package(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
-            source = VALIDATOR_PATH.parents[1] / "skills" / "diagnose"
-            package_path = Path(temp_dir) / "diagnose"
+            source = VALIDATOR_PATH.parents[1] / "skills" / "repo-map"
+            package_path = Path(temp_dir) / "repo-map"
             shutil.copytree(source, package_path)
 
             skill_path = package_path / "SKILL.md"
@@ -1061,7 +1061,7 @@ class ValidateSkillsTests(unittest.TestCase):
             )
             metadata = re.sub(
                 r'^  default_prompt:.*$',
-                f'  default_prompt: "Use $diagnose to {"x" * 230}"',
+                f'  default_prompt: "Use $repo-map to {"x" * 230}"',
                 metadata,
                 count=1,
                 flags=re.MULTILINE,
@@ -1077,7 +1077,7 @@ class ValidateSkillsTests(unittest.TestCase):
             )
 
             errors, _ = VALIDATOR.validate_package(
-                VALIDATOR.SkillPackage(name="diagnose", path=package_path),
+                VALIDATOR.SkillPackage(name="repo-map", path=package_path),
                 label="test",
             )
 
@@ -1316,7 +1316,7 @@ class ValidateSkillsTests(unittest.TestCase):
         self.assertFalse(expected_routes_to_skill("Should not use `repo-map`.", "repo-map"))
         self.assertFalse(
             expected_routes_to_skill(
-                "Prefer `diagnose`, not `repo-map`.",
+                "Prefer `audit-rust`, not `repo-map`.",
                 "repo-map",
             )
         )
@@ -1567,8 +1567,8 @@ class ValidateSkillsTests(unittest.TestCase):
     ) -> None:
         case = {
             "id": "assessment",
-            "expected_owner": "diagnose",
-            "allowed_owners": ["diagnose", "audit-rust"],
+            "expected_owner": "repo-map",
+            "allowed_owners": ["repo-map", "audit-rust"],
             "required_handoffs": ["implement-rust"],
             "required_handoff_groups": [["repo-review", "audit-security"]],
             "allowed_handoffs": [
@@ -1589,7 +1589,7 @@ class ValidateSkillsTests(unittest.TestCase):
 
         missing_group = CONTRACT_EVAL.assess_routing_case(
             case,
-            {"actual_owner": "diagnose", "handoffs": ["implement-rust"]},
+            {"actual_owner": "repo-map", "handoffs": ["implement-rust"]},
         )
         self.assertFalse(missing_group["full_case_success"])
         self.assertEqual(
@@ -1600,7 +1600,7 @@ class ValidateSkillsTests(unittest.TestCase):
         overselected_group = CONTRACT_EVAL.assess_routing_case(
             case,
             {
-                "actual_owner": "diagnose",
+                "actual_owner": "repo-map",
                 "handoffs": [
                     "implement-rust",
                     "repo-review",
@@ -1617,7 +1617,7 @@ class ValidateSkillsTests(unittest.TestCase):
         unauthorized = CONTRACT_EVAL.assess_routing_case(
             case,
             {
-                "actual_owner": "diagnose",
+                "actual_owner": "repo-map",
                 "handoffs": ["implement-rust", "repo-review", "repo-delivery"],
             },
         )
@@ -1795,7 +1795,7 @@ class ValidateSkillsTests(unittest.TestCase):
             dataset = root / "dataset.jsonl"
             dataset.write_text(
                 '{"id":"case-001","prompt":"fixture prompt","kind":"trigger",'
-                '"expected_owner":"diagnose","forbidden_owners":[]}\n',
+                '"expected_owner":"repo-map","forbidden_owners":[]}\n',
                 encoding="utf-8",
             )
             bundle_path, payload = self.write_result_bundle_fixture(root, dataset)
@@ -1811,7 +1811,7 @@ class ValidateSkillsTests(unittest.TestCase):
             dataset = root / "dataset.jsonl"
             dataset.write_text(
                 '{"id":"case-001","prompt":"fixture prompt","kind":"trigger",'
-                '"expected_owner":"diagnose","forbidden_owners":[]}\n',
+                '"expected_owner":"repo-map","forbidden_owners":[]}\n',
                 encoding="utf-8",
             )
             bundle_path, payload = self.write_result_bundle_fixture(root, dataset)
@@ -1827,7 +1827,7 @@ class ValidateSkillsTests(unittest.TestCase):
             dataset = root / "dataset.jsonl"
             dataset.write_text(
                 '{"id":"case-001","prompt":"fixture prompt","kind":"trigger",'
-                '"expected_owner":"diagnose","forbidden_owners":[]}\n',
+                '"expected_owner":"repo-map","forbidden_owners":[]}\n',
                 encoding="utf-8",
             )
             bundle_path, payload = self.write_result_bundle_fixture(root, dataset)
@@ -1847,7 +1847,7 @@ class ValidateSkillsTests(unittest.TestCase):
                 dataset = root / "dataset.jsonl"
                 dataset.write_text(
                     '{"id":"case-001","prompt":"fixture prompt","kind":"trigger",'
-                    '"expected_owner":"diagnose","forbidden_owners":[]}\n',
+                    '"expected_owner":"repo-map","forbidden_owners":[]}\n',
                     encoding="utf-8",
                 )
                 bundle_path, payload = self.write_result_bundle_fixture(root, dataset)
@@ -1873,7 +1873,7 @@ class ValidateSkillsTests(unittest.TestCase):
                 dataset = root / "dataset.jsonl"
                 dataset.write_text(
                     '{"id":"case-001","prompt":"fixture prompt","kind":"trigger",'
-                    '"expected_owner":"diagnose","forbidden_owners":[]}\n',
+                    '"expected_owner":"repo-map","forbidden_owners":[]}\n',
                     encoding="utf-8",
                 )
                 bundle_path, payload = self.write_result_bundle_fixture(root, dataset)
@@ -2015,7 +2015,7 @@ class ValidateSkillsTests(unittest.TestCase):
                 dataset = root / "dataset.jsonl"
                 dataset.write_text(
                     '{"id":"case-001","prompt":"fixture prompt","kind":"trigger",'
-                    '"expected_owner":"diagnose","forbidden_owners":[]}\n',
+                    '"expected_owner":"repo-map","forbidden_owners":[]}\n',
                     encoding="utf-8",
                 )
                 bundle_path, payload = self.write_result_bundle_fixture(root, dataset)
@@ -2037,7 +2037,7 @@ class ValidateSkillsTests(unittest.TestCase):
             dataset = root / "dataset.jsonl"
             dataset.write_text(
                 '{"id":"case-001","prompt":"fixture prompt","kind":"trigger",'
-                '"expected_owner":"diagnose","forbidden_owners":[]}\n',
+                '"expected_owner":"repo-map","forbidden_owners":[]}\n',
                 encoding="utf-8",
             )
             bundle_path, payload = self.write_result_bundle_fixture(root, dataset)
@@ -2065,7 +2065,7 @@ class ValidateSkillsTests(unittest.TestCase):
             dataset = root / "dataset.jsonl"
             dataset.write_text(
                 '{"id":"case-001","prompt":"fixture prompt","kind":"trigger",'
-                '"expected_owner":"diagnose","forbidden_owners":[]}\n',
+                '"expected_owner":"repo-map","forbidden_owners":[]}\n',
                 encoding="utf-8",
             )
             bundle_path, payload = self.write_result_bundle_fixture(root, dataset)
@@ -2092,7 +2092,7 @@ class ValidateSkillsTests(unittest.TestCase):
             dataset = root / "dataset.jsonl"
             dataset.write_text(
                 '{"id":"case-001","prompt":"fixture prompt","kind":"trigger",'
-                '"expected_owner":"diagnose","forbidden_owners":[]}\n',
+                '"expected_owner":"repo-map","forbidden_owners":[]}\n',
                 encoding="utf-8",
             )
             bundle_path, payload = self.write_result_bundle_fixture(root, dataset)
@@ -2173,7 +2173,7 @@ class ValidateSkillsTests(unittest.TestCase):
                     changed = copy.deepcopy(raw)
                     if mode == "hidden-valid-result":
                         valid_route = json.dumps(
-                            {"actual_owner": "diagnose", "handoffs": []}
+                            {"actual_owner": "repo-map", "handoffs": []}
                         )
                         changed["host_attempts"][0]["response"] = valid_route
                         changed["host_attempts"][0]["model_output"] = valid_route
@@ -2197,7 +2197,7 @@ class ValidateSkillsTests(unittest.TestCase):
             dataset = root / "dataset.jsonl"
             dataset.write_text(
                 '{"id":"case-001","prompt":"fixture prompt","kind":"trigger",'
-                '"expected_owner":"diagnose","forbidden_owners":[]}\n',
+                '"expected_owner":"repo-map","forbidden_owners":[]}\n',
                 encoding="utf-8",
             )
             bundle_path, payload = self.write_result_bundle_fixture(root, dataset)
@@ -2222,7 +2222,7 @@ class ValidateSkillsTests(unittest.TestCase):
             dataset = root / "dataset.jsonl"
             dataset.write_text(
                 '{"id":"case-001","prompt":"fixture prompt","kind":"trigger",'
-                '"expected_owner":"diagnose","forbidden_owners":[]}\n',
+                '"expected_owner":"repo-map","forbidden_owners":[]}\n',
                 encoding="utf-8",
             )
             bundle_path, payload = self.write_result_bundle_fixture(root, dataset)
@@ -2249,7 +2249,7 @@ class ValidateSkillsTests(unittest.TestCase):
             dataset = root / "dataset.jsonl"
             dataset.write_text(
                 '{"id":"case-001","prompt":"fixture prompt","kind":"trigger",'
-                '"expected_owner":"diagnose","forbidden_owners":[]}\n',
+                '"expected_owner":"repo-map","forbidden_owners":[]}\n',
                 encoding="utf-8",
             )
             bundle_path, payload = self.write_result_bundle_fixture(root, dataset)
@@ -2317,7 +2317,7 @@ class ValidateSkillsTests(unittest.TestCase):
             dataset = root / "dataset.jsonl"
             dataset.write_text(
                 '{"id":"case-001","prompt":"fixture prompt","kind":"trigger",'
-                '"expected_owner":"diagnose","forbidden_owners":[]}\n',
+                '"expected_owner":"repo-map","forbidden_owners":[]}\n',
                 encoding="utf-8",
             )
             bundle_path, payload = self.write_result_bundle_fixture(root, dataset)
@@ -2441,7 +2441,7 @@ class ValidateSkillsTests(unittest.TestCase):
             provenance_relative = provenance.relative_to(
                 CONTRACT_EVAL.ROOT
             ).as_posix()
-            skill_eval_path = "skills/diagnose/references/eval-cases.md"
+            skill_eval_path = "skills/repo-map/references/eval-cases.md"
 
             def git_result(command: list[str], **kwargs: object):
                 if "merge-base" in command:
@@ -2967,7 +2967,7 @@ class ValidateSkillsTests(unittest.TestCase):
             "references/eval-cases.md": (package / "references" / "eval-cases.md").read_text(encoding="utf-8"),
         }
         surfaces["references/eval-cases.md"] = surfaces["references/eval-cases.md"].replace(
-            "Should prefer `diagnose`, which may delegate Browser Debug Evidence to `ops-browser`.",
+            "Should not trigger this Skill as the primary owner; host diagnosis may delegate Browser Debug Evidence to `ops-browser`.",
             "Should trigger `ops-browser` directly.",
             1,
         )
@@ -3004,7 +3004,7 @@ class ValidateSkillsTests(unittest.TestCase):
             "references/eval-cases.md": (package / "references" / "eval-cases.md").read_text(encoding="utf-8"),
         }
         surfaces["references/eval-cases.md"] += (
-            "\nContradiction: direct operation takes precedence over `diagnose`.\n"
+            "\nContradiction: trigger `ops-browser` directly and may later coordinate diagnosis.\n"
         )
         errors = validate_cross_artifact_contracts("ops-browser", surfaces, label="test")
         self.assertTrue(any("contradictory contract phrase" in error for error in errors))

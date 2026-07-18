@@ -41,7 +41,7 @@ Audit known code and configuration surfaces for concrete security risks. Use thi
 - Actual staging, commit creation, rebase/squash, push, or delivery; use `repo-delivery` after review.
 - Whole-system threat modeling when a dedicated threat-model workflow is available and the user requests that scope.
 - Repository-wide, deep, exhaustive, or multi-pass vulnerability scanning.
-- First-pass repository discovery or future implementation planning; use `repo-map` or `code-planner`.
+- First-pass repository discovery or future implementation planning; use `repo-map` or the host's built-in planning.
 - Browser/client operation evidence; use `ops-browser` or `ops-client`.
 
 ## Hard Rules

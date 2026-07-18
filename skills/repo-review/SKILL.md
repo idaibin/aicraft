@@ -55,9 +55,9 @@ Do not mix evidence between bases. Current-worktree content is contamination whe
 ## Do Not Use For
 
 - Repository mapping or repo-map maintenance; use `repo-map`.
-- Future implementation planning; use `code-planner`.
+- Future implementation planning; use the host's built-in planning.
 - Business-domain modeling without a change basis; use `domain-modeling`.
-- Root-cause diagnosis of a concrete failure; use `diagnose`.
+- Root-cause diagnosis of a concrete failure; use the host's built-in diagnosis under effective instructions.
 - A bounded security-only audit when the target surface is already known; use `audit-security`.
 - Implementing accepted fixes; use the matching `implement-*` skill.
 - Staging, commits, pushes, squash, cleanup, or other Git mutation; use `repo-delivery` after explicit authorization.

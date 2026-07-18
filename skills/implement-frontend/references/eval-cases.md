@@ -34,8 +34,8 @@ Use these cases when changing `implement-frontend` triggers, stack guidance, lay
 | User prompt | Expected result | Why |
 | --- | --- | --- |
 | `Understand this repository's real commands and directory structure first.` | Should prefer `repo-map`. | Repository mapping. |
-| `Plan the frontend rewrite across three apps before anyone edits code.` | Should prefer `code-planner`. | Future cross-scope planning. |
-| `Find the root cause before changing any code.` | Should prefer `diagnose`. | Diagnosis before implementation. |
+| `Plan the frontend rewrite across three apps before anyone edits code.` | Should not trigger this Skill; use the host's built-in planning. | Future cross-scope planning. |
+| `Find the root cause before changing any code.` | Should not trigger this Skill; use the host's built-in diagnosis under effective instructions. | Diagnosis before implementation. |
 | `Review all dirty changes and propose commit groups.` | Should prefer `repo-review`. | Dirty-tree review and staging plan. |
 | `Audit this frontend architecture for duplicated components, state boundaries, accessibility, and performance.` | Should prefer `audit-frontend`. | Read-only domain audit. |
 | `Verify this page in the browser and check console/network.` | Should prefer `ops-browser`. | Runtime browser evidence. |
@@ -55,7 +55,7 @@ Use these cases when changing `implement-frontend` triggers, stack guidance, lay
 | Vue component and injection contracts | Preserves read-only props, explicit emits, `v-model` arguments/modifiers, slots, fallthrough behavior, and typed provide/inject keys, defaults, reactive ownership, and mutation authority. | Mutates props/injected state implicitly, changes payload/slot contracts, or creates an unowned injected singleton. |
 | Vue store, Router, and lifetime | Keeps local state local, uses Pinia for established shared ownership, registers global/component guards at the correct owner, unregisters temporary guards, and cleans watchers/listeners/requests for scope, route, and keep-alive activation lifetimes. | Globalizes component state, duplicates guard/listener registration, relies on unmount for keep-alive cleanup, or lets stale requests win after navigation/deactivation. |
 | Project-class alignment | Preserves framework-native routing and applies repository-defined toolchain, script, directory, and naming rules without incidental upgrades. | Forces one SPA layout across Next.js, Astro, Vue, Tauri, and other project classes. |
-| Specification readiness | Reads available requirements, acceptance criteria, non-goals, affected contracts/files, and validation seams; routes unresolved complex planning to `code-planner`. | Implements a complex ambiguous request without a usable specification or explicit assumptions. |
+| Specification readiness | Reads available requirements, acceptance criteria, non-goals, affected contracts/files, and validation seams; uses host planning for unresolved complex work before editing. | Implements a complex ambiguous request without a usable specification or explicit assumptions. |
 | Behavior-first slices | When a stable public seam exists, works one failing behavior check and minimal vertical slice at a time; skips TDD with a stated reason when only brittle implementation assertions are possible. | Writes horizontal test batches, tests private DOM/state details, or claims TDD without observing red before green. |
 | Reuse and lifecycle | Reuses locally first and updates manifests, exports, routes, scripts, tests, CI/build/deploy paths, docs, indexes, and stale references for structural changes. | Extracts speculative shared packages or moves/deletes source paths without closing ownership records. |
 | Layout preservation | Keeps layout, spacing, routes, copy, and visual system unchanged unless requested. | Redesigns or restyles adjacent UI. |

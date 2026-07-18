@@ -13,7 +13,7 @@ Implement Rust changes against the repository's real toolchain, project class, c
 
 1. Read effective repository guidance, including `AGENTS.md`, `CLAUDE.md`, and host-provided instructions when present, then run `git status --short` before edits.
 2. Identify the Rust project class: library workspace, application workspace, HTTP service, CLI, Tauri/native backend, or compact single package.
-3. Read the approved requirement/specification when one exists. Confirm requested behavior, acceptance criteria, non-goals, affected crates/modules/files, compatibility, and validation seams; for complex work without a usable specification, stop and route planning to `code-planner`.
+3. Read the approved requirement/specification when one exists. Confirm requested behavior, acceptance criteria, non-goals, affected crates/modules/files, compatibility, and validation seams; for complex work without a usable specification, use the host's built-in planning and effective repository instructions before editing.
 4. Inspect the relevant `Cargo.toml`, lockfile, toolchain, formatter, lint, command source, modules, tests, architecture docs, and API/interface docs.
 5. Consume a current `repo-map` inventory or perform the same targeted search across route registration, handlers, services, repositories, traits/impls, types/DTOs, errors, migrations, callers, tests, and analogous features.
 6. Start with the **Baseline** validation contract, then select every applicable risk overlay. Overlays are composable, not severity levels:
@@ -42,9 +42,9 @@ Implement Rust changes against the repository's real toolchain, project class, c
 ## Do Not Use For
 
 - First-pass repository discovery; use `repo-map`.
-- Future multi-step migration planning; use `code-planner`.
+- Planning-only requests without authorized Rust source changes; use the host's built-in planning.
 - Business terminology, lifecycle, or invariant modeling; use `domain-modeling` before planning when those questions remain unresolved.
-- Unknown root-cause investigation; use `diagnose`.
+- Diagnosis-only requests without authorized Rust source changes; use the host's built-in diagnosis under effective instructions.
 - Dirty-tree ownership, staging plans, or commit grouping; use `repo-review`. Use `repo-delivery` for actual staging or commits after review.
 - Systematic Rust architecture, performance, memory, concurrency, SQLite, unsafe, or FFI audit without requested edits; use `audit-rust`.
 - Security-only audit after the Rust surface is mapped; use `audit-security`.

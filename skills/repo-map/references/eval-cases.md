@@ -23,8 +23,8 @@
 | `Implement this Rust API now.` | Prefer `implement-rust`. | No separate map deliverable. |
 | `Review all local changes before commit.` | Prefer `repo-review`. | Dirty-tree readiness. |
 | `Review main..feature for P0-P3 findings.` | Prefer `repo-review`. | Immutable range review. |
-| `Find why the build fails.` | Prefer `diagnose`. | Concrete failure. |
-| `Split this migration into tasks.` | Prefer `code-planner`. | Future work planning. |
+| `Find why the build fails.` | Do not trigger this Skill; use the host's built-in diagnosis under effective instructions. | Concrete failure. |
+| `Split this migration into tasks.` | Do not trigger this Skill; use the host's built-in planning. | Future work planning. |
 | `Define the entities, relationships, lifecycle, invariants, and bounded contexts for this product domain.` | Prefer `domain-modeling`. | Business model, not repository semantics. |
 | `Audit this endpoint for authorization risk.` | Prefer `audit-security`. | Bounded security audit. |
 | `Turn these verified project notes into a technical article.` | Prefer `human-writing`. | Source-grounded writing, not repository mapping. |

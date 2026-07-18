@@ -16,7 +16,7 @@
 | Map directories, architecture, commands, conventions, and reuse entries | `repo-map` |
 | Review any local or immutable repository change basis | `repo-review` |
 | Audit only a known security surface | `audit-security` |
-| Diagnose a concrete failure | `diagnose` |
+| Diagnose a concrete failure | Host diagnosis under effective instructions |
 | Apply accepted fixes | matching `implement-*` |
 | Stage, commit, push, squash, or clean branches | `repo-delivery` |
 

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Diagnose"
-  short_description: "Confirm root causes before implementation"
-  default_prompt: "Use $diagnose to reproduce a concrete failure, test falsifiable hypotheses, and confirm the root cause or exact unverified gap without applying a permanent fix."

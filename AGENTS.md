@@ -9,8 +9,8 @@ This file defines how AI agents should work on this repository. It is not the pr
 - Do not switch into installation mode just because this repository contains `skills/`.
 - Use `repo-map` for separate repository mapping, reuse inventory, or docs/code alignment.
 - Use `domain-modeling` for business language, entities, relationships, lifecycle, invariants, and bounded contexts before technical planning when those concepts are unresolved.
-- Use `code-planner` for requirement readiness, technical design, acceptance criteria, and executable task slices before complex implementation.
-- Use `diagnose` for concrete failures; permanent remediation transitions to the matching implementation skill.
+- Use the host's built-in planning for requirement readiness, technical design, task decomposition, acceptance criteria, and validation gates.
+- For concrete failures, follow the effective personal or repository diagnosis rules before permanent remediation; use the matching implementation skill only when a source change is requested.
 - Use `implement-frontend` or `implement-rust` for requested code changes.
 - Use `audit-frontend`, `audit-rust`, or `audit-security` for bounded read-only domain audits.
 - Use `repo-review` for read-only review of local Git changes or immutable repository snapshots, ranges, pull requests, release candidates, and review packages; select the matching basis mode first.

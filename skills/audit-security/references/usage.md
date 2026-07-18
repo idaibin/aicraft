@@ -52,7 +52,7 @@ Use for prompts like:
 - `Under repo-review, audit only the selected auth and release configuration paths.`
 - `use audit-security`
 
-Do not use for general repository onboarding, future task planning, API contract alignment, local commit grouping, whole-repository review coordination, system-wide threat modeling, or repository-wide/deep vulnerability scanning; prefer `repo-map`, `code-planner`, `repo-review`, threat-model, or security-scan workflows as applicable.
+Do not use for general repository onboarding, future task planning, API contract alignment, local commit grouping, whole-repository review coordination, system-wide threat modeling, or repository-wide/deep vulnerability scanning; prefer `repo-map`, host planning, `repo-review`, threat-model, or security-scan workflows as applicable.
 
 ## Output
 

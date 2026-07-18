@@ -13,8 +13,6 @@ The result must contain exactly these public packages:
 ```text
 repo-map
 domain-modeling
-code-planner
-diagnose
 repo-review
 repo-delivery
 design-system
@@ -33,8 +31,6 @@ The publishable source directories are:
 
 - `skills/repo-map`
 - `skills/domain-modeling`
-- `skills/code-planner`
-- `skills/diagnose`
 - `skills/repo-review`
 - `skills/repo-delivery`
 - `skills/design-system`
@@ -60,7 +56,7 @@ Install selected Skills into the current project for Codex:
 
 ```bash
 npx skills@latest add idaibin/skills \
-  --skill repo-map code-planner diagnose repo-review \
+  --skill repo-map repo-review \
   --agent codex
 ```
 
@@ -68,7 +64,7 @@ Install selected Skills globally for Codex and Claude Code:
 
 ```bash
 npx skills@latest add idaibin/skills \
-  --skill repo-map domain-modeling code-planner diagnose repo-review repo-delivery \
+  --skill repo-map domain-modeling repo-review repo-delivery \
   --global --agent codex claude-code
 ```
 
@@ -94,7 +90,7 @@ Core read-only repository work:
 
 ```bash
 npx skills@latest add idaibin/skills \
-  --skill repo-map domain-modeling code-planner diagnose repo-review
+  --skill repo-map domain-modeling repo-review
 ```
 
 Frontend design and implementation:
@@ -172,6 +168,8 @@ Other retired names remain mapped as follows:
 | `code-review` | `repo-review` |
 | `code-delivery` | `repo-delivery` |
 | `chatgpt-review-bridge` | `chatgpt-review` |
+| `code-planner` | Codex or host built-in planning plus effective `AGENTS.md` rules |
+| `diagnose` | Codex or host built-in diagnosis plus effective `AGENTS.md` rules |
 
 ## Maintainer Check
 

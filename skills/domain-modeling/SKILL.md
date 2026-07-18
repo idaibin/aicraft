@@ -33,8 +33,8 @@ Build an evidence-backed domain model that gives users, specifications, code, an
 ## Do Not Use For
 
 - Repository roots, commands, runtime boundaries, or reuse inventory; use `repo-map`.
-- Technical design, implementation tasks, dependencies, or validation gates; use `code-planner` after the domain is sufficiently clear.
-- Root-cause investigation of a failure; use `diagnose`.
+- Technical design, implementation tasks, dependencies, or validation gates; use the host's built-in planning after the domain is sufficiently clear.
+- Root-cause investigation of a failure; use the host's built-in diagnosis under effective instructions.
 - Source implementation or refactoring; use the matching `implement-*` skill.
 - Review findings or Git delivery; use `repo-review` or `repo-delivery`.
 

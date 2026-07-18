@@ -15,8 +15,8 @@ Use `domain-modeling` to make business language, identity, lifecycle, rules, and
 ## Non-Triggers
 
 - Map repository roots, startup commands, or reusable code: use `repo-map`.
-- Produce technical design, tasks, owners, and validation: use `code-planner`.
-- Diagnose a failing transition in current code: use `diagnose`.
+- Produce technical design, tasks, owners, and validation: use the host's built-in planning.
+- Diagnose a failing transition in current code: use the host's built-in diagnosis under effective instructions.
 - Implement the modeled behavior: use the matching `implement-*` skill.
 
 ## Composition
@@ -26,7 +26,7 @@ For complex product work, use the smallest necessary chain:
 ```text
 repo-map (only when repository truth is unknown)
   -> domain-modeling (when business language or lifecycle is unclear)
-  -> code-planner
+  -> host planning
   -> implement-*
   -> repo-review
   -> repo-delivery

@@ -20,8 +20,8 @@ structure rules, validation expectations, or metadata.
 | User prompt | Expected result | Why |
 | --- | --- | --- |
 | `Understand this repository's real commands and structure first.` | Should prefer `repo-map`. | Repository mapping. |
-| `Plan the Rust migration across six repositories before editing.` | Should prefer `code-planner`. | Future cross-repository planning. |
-| `Find why cargo test is failing before making changes.` | Should prefer `diagnose`. | Root cause unknown. |
+| `Plan the Rust migration across six repositories before editing.` | Should not trigger this Skill; use the host's built-in planning. | Future cross-repository planning. |
+| `Find why cargo test is failing before making changes.` | Should not trigger this Skill; use the host's built-in diagnosis under effective instructions. | Root cause unknown. |
 | `Review all dirty changes and split commits.` | Should prefer `repo-review`. | Dirty-tree review. |
 | `Audit this Tokio and SQLite architecture for task leaks, contention, WAL growth, and query-plan risks.` | Should prefer `audit-rust`. | Read-only domain audit. |
 | `Audit this mapped Axum endpoint for authorization and token exposure.` | Should prefer `audit-security`. | Security-only audit. |
@@ -43,7 +43,7 @@ structure rules, validation expectations, or metadata.
 | Case | Expected evidence | Reject if |
 | --- | --- | --- |
 | Project grounding | Reads guidance, status, Cargo/toolchain/command sources, and identifies the project class. | Assumes versions, commands, or one universal layout. |
-| Specification readiness | Reads available requirements, acceptance criteria, non-goals, affected crates/modules/files, compatibility, and validation seams; routes unresolved complex planning to `code-planner`. | Implements a complex ambiguous request without a usable specification or explicit assumptions. |
+| Specification readiness | Reads available requirements, acceptance criteria, non-goals, affected crates/modules/files, compatibility, and validation seams; uses host planning for unresolved complex work before editing. | Implements a complex ambiguous request without a usable specification or explicit assumptions. |
 | Behavior-first slices | When a stable public seam exists, works one failing behavior test and minimal vertical slice at a time; skips TDD with a stated reason when only brittle internal assertions are possible. | Writes horizontal test batches, duplicates implementation logic in expectations, or claims TDD without observing red before green. |
 | Toolchain preservation | Uses repository-pinned edition, resolver, Rust version, formatter, lints, and dependencies unless alignment is explicit. | Performs incidental upgrades or dependency churn. |
 | Boundary ownership | Keeps entry, workflow, domain, persistence, and runtime responsibilities in documented owners. | Moves SQL or business rules into handlers/commands or creates empty layers. |

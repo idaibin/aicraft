@@ -1,4 +1,0 @@
-interface:
-  display_name: "Code Planner"
-  short_description: "Turn requirements into specs and executable task slices"
-  default_prompt: "Use $code-planner to turn future codebase work into a grounded specification and executable vertical task slices with acceptance and validation gates."

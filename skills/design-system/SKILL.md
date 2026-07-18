@@ -33,7 +33,7 @@ Turn product facts, existing UI evidence, and explicitly scoped references into 
 ## Do Not Use For
 
 - Frontend source changes or refactors; use `implement-frontend` with the accepted design package.
-- General future implementation decomposition without UI asset ownership; use `code-planner`.
+- General future implementation decomposition without UI asset ownership; use the host's built-in planning.
 - Read-only frontend implementation audits; use `audit-frontend`.
 - Browser screenshots, console/network evidence, or desktop-window operation; use `ops-browser` or `ops-client`.
 - Git staging, commits, pushes, or branch cleanup; use `repo-delivery` after review.

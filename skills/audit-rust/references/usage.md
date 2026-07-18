@@ -20,7 +20,7 @@
   no Rust target is known.
 - Use `implement-rust` for a change whose module,
   contracts, and validation are already established.
-- Use `diagnose` when the root cause of a failure or regression is unknown.
+- Use the host's built-in diagnosis under effective instructions when the root cause of a failure or regression is unknown.
 - Use `audit-security` for a security-only audit after the relevant Rust boundary
   is mapped.
 - Use `repo-review` for local dirty-tree review, full-diff and contract-chain

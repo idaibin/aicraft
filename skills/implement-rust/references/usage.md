@@ -38,8 +38,8 @@ project class and repository standard instead of forcing one layout everywhere.
 ## Non-Triggers
 
 - Repository orientation before the Rust surface is known; use `repo-map`.
-- Planning a cross-repository migration before implementation; use `code-planner`.
-- Diagnosing an unknown failing test or performance regression; use `diagnose`.
+- Planning a cross-repository migration before implementation; use the host's built-in planning.
+- Diagnosis-only work for an unknown failing test or performance regression; use the host's built-in diagnosis under effective instructions.
 - Reviewing staged ownership or producing commit groups; use `repo-review`. Use `repo-delivery` for actual staging or commits after review.
 - Systematic read-only Rust architecture, performance, memory, concurrency,
   SQLite, unsafe, or FFI audit; use `audit-rust`.

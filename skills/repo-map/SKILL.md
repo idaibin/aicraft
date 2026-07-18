@@ -60,8 +60,8 @@ Map stable workspace or repository semantics into a concise navigation layer roo
 
 - Ordinary implementation when no separate repo-map deliverable was requested; implementation skills perform their own bounded discovery and live reuse search.
 - Local diff readiness or immutable snapshot/range/PR/release review; use the matching `repo-review` basis mode.
-- Future implementation planning; use `code-planner`.
-- Root-cause investigation of a concrete failure; use `diagnose`.
+- Future implementation planning; use the host's built-in planning.
+- Root-cause investigation of a concrete failure; use the host's built-in diagnosis under effective instructions.
 
 ## Hard Rules
 

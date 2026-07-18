@@ -27,7 +27,7 @@ Use `repo-delivery` when the user wants reviewed repository changes moved to a f
 ## Non-Triggers
 
 - Repository onboarding, command discovery, or docs/code alignment; use `repo-map`.
-- Future implementation planning; use `code-planner`.
+- Future implementation planning; use the host's built-in planning.
 - Dirty-tree ownership, mixed-hunk review, or commit grouping before delivery scope is clear; use `repo-review`.
 - Review-only requests with no staging, commit, push, sync, or cleanup authorization; use `repo-review`.
 - Security-only audit; use `audit-security`.

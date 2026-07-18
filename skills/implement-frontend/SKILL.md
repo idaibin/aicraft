@@ -14,7 +14,7 @@ Implement frontend changes with existing-stack alignment, minimal DOM/CSS, clear
 1. Read effective repository guidance first, including `AGENTS.md`, `CLAUDE.md`, and host-provided instructions when present.
 2. Identify the frontend project class, app boundary, package manager, runtime pin, script contract, directory/naming standard, and documented exceptions.
 3. Identify the target page, route, screen, component, framework, UI type, visual source, and required states before editing. When an accepted `design-system` package exists, verify its revisions and consume its fact boundary, tokens, component map, and acceptance contract.
-4. Read the approved requirement/specification when one exists. Confirm acceptance criteria, non-goals, affected contracts/files, and validation seams; for complex work without a usable specification, stop and route planning to `code-planner`.
+4. Read the approved requirement/specification when one exists. Confirm acceptance criteria, non-goals, affected contracts/files, and validation seams; for complex work without a usable specification, use the host's built-in planning and effective repository instructions before editing.
 5. Consume a current `repo-map` inventory or perform the same targeted search for existing routes, pages, layouts, components, hooks or composables, services, stores, shared UI, tests, and analogous implementations.
 6. Decide in order: directly reuse, adapt the nearest reference, or create new. Record why existing candidates are insufficient before adding a file or abstraction.
 7. Inspect only the selected target and reference files needed for the requested change.
@@ -37,7 +37,7 @@ Implement frontend changes with existing-stack alignment, minimal DOM/CSS, clear
 ## Do Not Use For
 
 - First-pass repository discovery, real commands, or entry points; use `repo-map`.
-- Future task decomposition or multi-agent implementation planning; use `code-planner`.
+- Planning-only requests without authorized frontend source changes; use the host's built-in planning.
 - Business terminology, lifecycle, or invariant modeling; use `domain-modeling` before planning when those questions remain unresolved.
 - UI direction, project profiles, reference responsibilities, task briefs, tokens, or evaluation contracts without source edits; use `design-system`.
 - Dirty-tree ownership, mixed-hunk review, staging plans, or commit readiness; use `repo-review`.
@@ -45,7 +45,7 @@ Implement frontend changes with existing-stack alignment, minimal DOM/CSS, clear
 - Systematic frontend architecture, reuse, state/data, accessibility, performance, or Tauri-boundary audit without requested edits; use `audit-frontend`.
 - Browser operation, screenshots, console, network, downloads, uploads, or runtime evidence collection; use `ops-browser`.
 - Desktop-client launch review, CGWindowID proof, real-window screenshots, or native runtime operation; use `ops-client`.
-- Root-cause diagnosis before a frontend fix is known; use `diagnose`.
+- Diagnosis-only requests without authorized frontend source changes; use the host's built-in diagnosis under effective instructions.
 
 ## Hard Rules
 

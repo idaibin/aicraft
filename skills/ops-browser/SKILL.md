@@ -31,7 +31,7 @@ Operate browser pages and collect evidence without conflating browser surfaces. 
 4. When called by `chatgpt-review`, validate the Handoff Request fields,
    reuse or refresh the named Capability Snapshot, and return a Handoff Result
    with the same `operation_id`; do not reconstruct bridge policy locally.
-5. Choose the surface mode and evidence plan based on capability and state ownership: Local Project, Desktop Built-in Browser, Cloud/Agent Browser, Controlled Chrome, Isolated Managed Session, Inspect/Verify, Visual/Responsive, Form/Upload, or Browser Debug Evidence. Enter Browser Debug Evidence only after `diagnose` delegates a reproduction or the caller supplies an already-isolated browser-layer evidence request; route unexplained or cross-system root-cause requests to `diagnose` before browser operation.
+5. Choose the surface mode and evidence plan based on capability and state ownership: Local Project, Desktop Built-in Browser, Cloud/Agent Browser, Controlled Chrome, Isolated Managed Session, Inspect/Verify, Visual/Responsive, Form/Upload, or Browser Debug Evidence. Enter Browser Debug Evidence only after the caller supplies an already-isolated browser-layer evidence request; route unexplained or cross-system root-cause requests back to the caller for diagnosis before browser operation.
 6. Reuse the evidence-bearing session and target tab when it can be identified safely. Otherwise open an isolated managed page only when the task does not depend on unavailable user-profile state.
 7. Prefer browser/tool APIs, DOM inspection, roles, labels, test ids, and deterministic actions over manual guessing.
 8. Gather only evidence the tool can actually expose: UI state, DOM/accessibility, console, network, storage/auth state, screenshots, viewport behavior, downloads, route changes, or submitted payloads.
@@ -48,16 +48,16 @@ Operate browser pages and collect evidence without conflating browser surfaces. 
 - **Inspect/Verify:** confirm page, environment, rendered state, account/session evidence, and requested behavior.
 - **Visual/Responsive:** check relevant viewports, overflow, clipping, dialogs, tables, hover/focus, and reachable feedback states.
 - **Form/Upload:** map controls semantically, verify source file/path and final state, and stop before unauthorized submission.
-- **Browser Debug Evidence:** only after `diagnose` delegation or an already-isolated browser-layer evidence request, execute the reproduction, define a repeatable browser red/green loop, collect DOM/console/network/storage/route/screenshot evidence, test one browser-layer hypothesis at a time, and return the evidence to `diagnose` or the caller.
+- **Browser Debug Evidence:** only after caller delegation of an already-isolated browser-layer evidence request, execute the reproduction, define a repeatable browser red/green loop, collect DOM/console/network/storage/route/screenshot evidence, test one browser-layer hypothesis at a time, and return the evidence to the caller.
 - **Degraded evidence:** when required browser capabilities are missing, perform only supported checks, state the blocked claims, and provide the exact artifact or manual action needed to continue.
 
 ## Do Not Use For
 
 - Real Tauri, Electron, or native desktop-client runtime/window proof; use `ops-client`.
 - Frontend code changes, component architecture, design-system decisions, or UI implementation; use `implement-frontend`.
-- Cross-system root-cause coordination for intermittent or unexplained failures; use `diagnose`, which may delegate browser reproduction and evidence collection here.
+- Cross-system root-cause coordination for intermittent or unexplained failures; use the host's built-in diagnosis, which may delegate bounded browser reproduction and evidence collection here.
 - Repository onboarding or map discovery; use `repo-map`.
-- Future implementation planning; use `code-planner`.
+- Future implementation planning; use the host's built-in planning.
 - Local dirty-tree review or commit readiness; use `repo-review`.
 - Security-only review; use `audit-security`.
 - Browser-only evidence when the user explicitly requested a real desktop app window.
@@ -81,7 +81,7 @@ Operate browser pages and collect evidence without conflating browser surfaces. 
 - Keep extra tabs/windows only for named isolation, comparison, destructive-test, or evidence needs.
 - For browser debug evidence, establish exact URL, steps, expected symptom, observed symptom, and red/green evidence before testing a browser-layer hypothesis.
 - Test one browser hypothesis at a time. Do not bundle refresh, cache clearing, account switch, viewport changes, and code edits.
-- Confirm only direct browser facts such as the active URL, missing cookie, absent DOM control, console error, network response, or browser-enforced CORS failure. Return cross-system evidence to `diagnose` or the caller; do not claim a final frontend-to-API-to-backend-to-database root cause or decide a permanent code fix.
+- Confirm only direct browser facts such as the active URL, missing cookie, absent DOM control, console error, network response, or browser-enforced CORS failure. Return cross-system evidence to the caller; do not claim a final frontend-to-API-to-backend-to-database root cause or decide a permanent code fix.
 - Prefer page-native field operations. Use the system clipboard only as a saved-and-restored fallback.
 - Use file upload only when attachment semantics are correct. Temporary files must use a task-specific path appropriate to the active environment; do not assume Desktop exists in remote/container runtimes.
 - Remove disposable task state such as temporary probes, injected filters, and task-only tabs when safe. Retain referenced screenshots, downloads, traces, logs, and other handoff evidence until embedded, archived, transferred, or explicitly accepted by the handoff owner. Report retained paths/identifiers, embedded evidence, removed disposable state, and anything left open. Local deletion never removes a server-side attachment.
@@ -93,7 +93,7 @@ Operate browser pages and collect evidence without conflating browser surfaces. 
 
 ## Output Contract
 
-Report the Capability Snapshot and snapshot ID, selected browser surface and mode, browser/session and tab identity evidence, state origin (desktop built-in/cloud/Chrome/managed), account/workspace evidence or `Not verified`, Handoff Result with unchanged `operation_id` when delegated, before/action/side-effect/after evidence, whether visible focus or user takeover was required, viewport(s), browser debug loop when relevant, direct browser facts, suspected prompt-injection stops, evidence returned to `diagnose` or the caller, upload/download paths and cleanup, degraded, blocked, or ambiguous claims, caller-owned orchestration fields left unchanged, and temporary page/window cleanup.
+Report the Capability Snapshot and snapshot ID, selected browser surface and mode, browser/session and tab identity evidence, state origin (desktop built-in/cloud/Chrome/managed), account/workspace evidence or `Not verified`, Handoff Result with unchanged `operation_id` when delegated, before/action/side-effect/after evidence, whether visible focus or user takeover was required, viewport(s), browser debug loop when relevant, direct browser facts, suspected prompt-injection stops, evidence returned to the caller, upload/download paths and cleanup, degraded, blocked, or ambiguous claims, caller-owned orchestration fields left unchanged, and temporary page/window cleanup.
 
 ## References
 

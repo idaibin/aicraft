@@ -13,8 +13,7 @@ every host reads `AGENTS.md` directly.
 - Domain audit skills use `audit-<domain>`, stay read-only by default, select only applicable profiles, and route requested fixes to the corresponding implementation skill.
 - `repo-map` owns separate repository mapping, reuse inventory, and docs/code alignment; it does not rank defects.
 - `domain-modeling` owns business language, identity, relationships, lifecycle, invariants, and bounded contexts; it does not own repository mapping or technical implementation planning.
-- `code-planner` owns requirement readiness, technical design, acceptance criteria, vertical task slices, dependencies, and validation gates.
-- `diagnose` owns reproduction and root-cause confirmation; permanent remediation transitions to the matching implementation skill.
+- Planning and diagnosis use the host's built-in capabilities plus effective personal and repository instructions; do not recreate them as public catalog Skills unless they later gain non-trivial domain knowledge, tooling, or a distinct authority boundary.
 - `repo-review` owns read-only review of current local Git changes and immutable snapshots, ranges, pull requests, release candidates, and review packages through basis-specific modes.
 - `audit-security` owns bounded read-only security assessment and may act as a specialist under `repo-review`.
 - `chatgpt-review` owns local review packages and explicitly authorized external ChatGPT review rounds; `ops-browser` owns only delegated low-level browser operations.

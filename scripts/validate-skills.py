@@ -1882,14 +1882,14 @@ def validate_cross_artifact_contracts(
         "ops-browser": (
             ("## Trigger Eval", "Reproduce this known browser-only CORS failure and collect console/network evidence.", ((1, ("browser debug evidence", "directly")), (2, ("browser fact",)))),
             ("## Trigger Eval", "Diagnose delegated this exact browser reproduction; collect DOM, console, and network evidence.", ((1, ("browser debug evidence",)), (2, ("delegation",)))),
-            ("## Non-Trigger Eval", "Why does this form intermittently fail after submit? Find the root cause.", ((1, ("diagnose", "browser debug evidence")), (2, ("cross-system",)))),
-            ("## Quality Eval", "Browser debug handoff", ((1, ("diagnose", "already-isolated", "retains referenced evidence")), (2, ("final cause/fix", "deletes evidence before transfer")))),
+            ("## Non-Trigger Eval", "Why does this form intermittently fail after submit? Find the root cause.", ((1, ("host diagnosis", "browser debug evidence")), (2, ("cross-system",)))),
+            ("## Quality Eval", "Browser debug handoff", ((1, ("caller", "already-isolated", "retains referenced evidence")), (2, ("final cause/fix", "deletes evidence before transfer")))),
         ),
         "ops-client": (
             ("## Trigger Eval", "Diagnose delegated this exact release-window reproduction; collect process and window evidence.", ((1, ("client debug evidence",)), (2, ("delegation",)))),
             ("## Trigger Eval", "On the verified release app, reproduce this already-isolated Accessibility action failure and return client evidence only.", ((1, ("client debug evidence",)), (2, ("bounded", "without cross-system")))),
-            ("## Non-Trigger Eval", "Why does the release app button not respond? Find the root cause.", ((1, ("diagnose", "client debug evidence")), (2, ("cross", "boundaries")))),
-            ("## Quality Eval", "Client debug handoff", ((1, ("diagnose", "already-isolated", "retains referenced evidence")), (2, ("final cause/fix", "deletes evidence before transfer")))),
+            ("## Non-Trigger Eval", "Why does the release app button not respond? Find the root cause.", ((1, ("host diagnosis", "client debug evidence")), (2, ("cross", "boundaries")))),
+            ("## Quality Eval", "Client debug handoff", ((1, ("caller", "already-isolated", "retains referenced evidence")), (2, ("final cause/fix", "deletes evidence before transfer")))),
         ),
     }
     for section, key, columns in semantic_rows.get(skill_name, ()):
@@ -1898,18 +1898,14 @@ def validate_cross_artifact_contracts(
         )
     forbidden_by_skill = {
         "ops-browser": (
-            "not prefer `diagnose`",
             "trigger `ops-browser` directly and may later",
             "permits final cause/fix",
             "deletes evidence before transfer after reporting",
-            "direct operation takes precedence over `diagnose`",
         ),
         "ops-client": (
-            "not prefer `diagnose`",
             "trigger `ops-client` directly and may later",
             "permits final cause/fix",
             "deletes evidence before transfer after reporting",
-            "direct operation takes precedence over `diagnose`",
         ),
     }
     combined_contract_text = "\n".join(surfaces.values()).casefold()

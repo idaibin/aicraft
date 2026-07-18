@@ -46,7 +46,7 @@ Select only styling profiles present in the audited boundary. A styling technolo
 ## Non-Triggers
 
 - `Change this button label in the known component.` — use `implement-frontend`.
-- `Find why this page crashes.` — use `diagnose` until the cause is confirmed.
+- `Find why this page crashes.` — use the host's built-in diagnosis under effective instructions until the cause is confirmed.
 - `Verify the page in a browser.` — use `ops-browser`.
 - `Review all local dirty files, split commits, and prepare staging.` — use `repo-review`.
 - `Review the whole repository or a commit range and coordinate all domains.` — use `repo-review`, which may delegate a bounded frontend surface here.

@@ -5,7 +5,7 @@ maturity labels or treat format validation as proof of model behavior.
 
 ## Evidence Basis
 
-- Recorded: `2026-07-16`
+- Recorded: `2026-07-18`
 - Evidence revision: the commit containing this file; resolve with
   `git log -1 --format=%H -- docs/quality/status.md`
 - Structure host: local repository validator on macOS
@@ -28,8 +28,6 @@ end-to-end task completion.
 | --- | --- | --- | --- | --- | --- |
 | `repo-map` | Core Engineering | available | verified | not_verified | not_verified |
 | `domain-modeling` | Core Engineering | available | verified | not_verified | not_verified |
-| `code-planner` | Core Engineering | available | verified | not_verified | not_verified |
-| `diagnose` | Core Engineering | available | verified | not_verified | not_verified |
 | `repo-review` | Core Engineering | available | verified | not_verified | not_verified |
 | `repo-delivery` | Core Engineering | available | verified | not_verified | not_verified |
 | `design-system` | Design | available | verified | not_verified | not_verified |
@@ -45,6 +43,11 @@ end-to-end task completion.
 
 Functional category states what a skill owns. Release states whether it is
 offered for installation. Validation states only what current evidence proves.
+
+`code-planner` and `diagnose` were retired from the public catalog on
+`2026-07-18`. Their concise planning and diagnosis guardrails moved to personal
+or repository instructions because they did not provide enough specialized
+knowledge, tooling, or authority separation to justify permanent Skill routing.
 
 ## Structure Evidence
 

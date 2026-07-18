@@ -29,8 +29,8 @@ Use these cases when changing `ops-client` triggers, modes, platform adapters, w
 | `Review current git changes and split commits.` | Should prefer `repo-review`. | Dirty-tree review. |
 | `Understand this repository's directories and commands first.` | Should prefer `repo-map`. | Repository map task. |
 | `Audit only this Tauri IPC path for authorization risk.` | Should prefer `audit-security`; `ops-client` may supply runtime evidence only when delegated. | Security review is not client-operation ownership. |
-| `Why does the release app button not respond? Find the root cause.` | Should prefer `diagnose`, which may delegate Client Debug Evidence to `ops-client`. | The cause may cross UI, IPC, Rust, or platform boundaries. |
-| `Why does dev work while the release client freezes or shows the old UI?` | Should prefer `diagnose` with bounded `ops-client` evidence. | Build-source proof is evidence, not final root-cause ownership. |
+| `Why does the release app button not respond? Find the root cause.` | Should not trigger this Skill as the primary owner; host diagnosis may delegate Client Debug Evidence to `ops-client`. | The cause may cross UI, IPC, Rust, or platform boundaries. |
+| `Why does dev work while the release client freezes or shows the old UI?` | Should use host diagnosis with bounded `ops-client` evidence. | Build-source proof is evidence, not final root-cause ownership. |
 
 ## Quality Eval
 
@@ -50,7 +50,7 @@ Use these cases when changing `ops-client` triggers, modes, platform adapters, w
 | Restart/rebuild | Re-verifies process, runtime source, window identity, and UI after relevant changes. | Claims a fix against a stale client instance. |
 | Unsupported versus unverified | Uses `Not supported` for missing adapters and `Not verified` for available but incomplete checks. | Conflates unavailable capability with unchecked work. |
 | Missing adapter | On Windows or Linux without the required UI Automation/AT-SPI and capture adapter, reports window and interaction proof as `Not supported` while preserving any separately proven repository/process evidence. | Runs macOS commands, substitutes a browser/region screenshot, or claims equivalent proof. |
-| Client debug handoff | Enters only after `diagnose` delegation or an already-isolated client evidence request, verifies the real process/window/build, returns direct evidence, removes disposable state, and retains referenced evidence until embedded, archived, or accepted by the handoff owner. | Starts from an unexplained root-cause request, claims the final cause/fix, deletes evidence before transfer, or leaves temporary client state unexplained. |
+| Client debug handoff | Enters only after caller delegation of an already-isolated client evidence request, verifies the real process/window/build, returns direct evidence, removes disposable state, and retains referenced evidence until embedded, archived, or accepted by the handoff owner. | Starts from an unexplained root-cause request, claims the final cause/fix, deletes evidence before transfer, or leaves temporary client state unexplained. |
 
 ## Scoring
 

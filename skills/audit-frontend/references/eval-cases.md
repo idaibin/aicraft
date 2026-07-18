@@ -20,7 +20,7 @@
 | Prompt | Expected |
 | --- | --- |
 | `Change one known component's copy and keep everything else unchanged.` | Prefer `implement-frontend`. |
-| `Find the unknown cause of this failing frontend test.` | Prefer `diagnose`. |
+| `Find the unknown cause of this failing frontend test.` | Do not trigger this Skill; use the host's built-in diagnosis under effective instructions. |
 | `Operate the real Tauri window and capture evidence.` | Prefer `ops-client`. |
 | `Review the whole local dirty tree and prepare exact staging.` | Prefer `repo-review`. |
 | `Review this entire repository range and coordinate frontend, Rust, security, CI, and docs.` | Prefer `repo-review`, which may delegate bounded frontend paths. |

@@ -50,8 +50,8 @@ Use `implement-frontend` as the first frontend coding skill after repository con
 ## Non-Triggers
 
 - Repository onboarding or command discovery; use `repo-map`.
-- Large future planning before implementation; use `code-planner`.
-- Root-cause diagnosis before a fix is known; use `diagnose`.
+- Large future planning before implementation; use the host's built-in planning.
+- Diagnosis-only work before any frontend source change is requested; use the host's built-in diagnosis under effective instructions.
 - Git diff ownership, staging plans, or commit readiness; use `repo-review`. Use `repo-delivery` for actual staging, commit, push, or delivery.
 - Systematic read-only frontend architecture, reuse, state/data, layout, accessibility, performance, or Tauri-boundary review; use `audit-frontend`.
 - Browser screenshots, console, network, uploads, downloads, account state, or runtime checks; use `ops-browser`.

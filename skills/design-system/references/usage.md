@@ -20,7 +20,7 @@ repo evidence -> design-system -> implement-frontend
                               -> repo-review -> repo-delivery
 ```
 
-Use `code-planner` first only when implementation needs a separate multi-package plan. Invoke `design-system` directly when the requested output is the repository-owned design contract. The Skill remains independently usable: it performs its own bounded evidence collection when no `repo-map` output exists.
+Use the host's built-in planning first only when implementation needs a separate multi-package plan. Invoke `design-system` directly when the requested output is the repository-owned design contract. The Skill remains independently usable: it performs its own bounded evidence collection when no `repo-map` output exists.
 
 ## Artifact location
 

@@ -30,7 +30,7 @@ Operate and verify real desktop client windows. Treat platform automation as ada
 8. Within the explicitly authorized action scope, prefer background-safe Accessibility/control-tree actions on named controls over coordinate clicks. Verification or capture alone never authorizes pressing a control.
 9. Rebuild/restart the intended client instance after relevant UI, bundle, native, or Accessibility changes before re-verifying.
 10. Report unsupported platform claims explicitly rather than emulating them with a browser page or cropped screenshot.
-11. Use Client Debug Evidence only when delegated by `diagnose` or when the caller supplies an already-isolated client-layer reproduction whose requested output is direct client evidence. Otherwise route unexplained or cross-system root-cause requests to `diagnose` before operating the client. For an accepted evidence task, verify the real process/window/build source, collect direct client evidence, clean disposable task state, and return the evidence to `diagnose` or the caller.
+11. Use Client Debug Evidence only when the caller supplies an already-isolated client-layer reproduction whose requested output is direct client evidence. Otherwise route unexplained or cross-system root-cause requests back to the caller for diagnosis before operating the client. For an accepted evidence task, verify the real process/window/build source, collect direct client evidence, clean disposable task state, and return the evidence to the caller.
 
 ## Modes
 
@@ -39,7 +39,7 @@ Operate and verify real desktop client windows. Treat platform automation as ada
 - **Window Evidence:** prove process, runtime, real-window identity, platform adapter, and screenshot source.
 - **Interaction:** use Accessibility/control-tree paths before coordinate clicks.
 - **AI-Operable UI Evidence:** verify semantic controls and stable names so agents can identify critical actions reliably.
-- **Client Debug Evidence:** only after `diagnose` delegation or an already-isolated client-layer evidence request, reproduce on the verified real client instance, capture process/window/build/control evidence, test one client-layer hypothesis at a time, and return evidence to `diagnose` or the caller without owning the final cross-system root cause.
+- **Client Debug Evidence:** only after caller delegation of an already-isolated client-layer evidence request, reproduce on the verified real client instance, capture process/window/build/control evidence, test one client-layer hypothesis at a time, and return evidence to the caller without owning the final cross-system root cause.
 - **Degraded Evidence:** when the required platform adapter or permission is missing, report only process/repository evidence that can be proven and list exact blocked claims.
 
 ## Do Not Use For
@@ -49,10 +49,10 @@ Operate and verify real desktop client windows. Treat platform automation as ada
 - Ordinary repository discovery unless the user asks for client launch review, real-window verification, or browser-preview invalidation.
 - Browser preview evidence when the task requires proof from a Tauri, Electron, or native desktop runtime.
 - Repository onboarding or map discovery; use `repo-map`.
-- Future implementation planning; use `code-planner`.
+- Future implementation planning; use the host's built-in planning.
 - Local dirty-tree review or commit readiness; use `repo-review`.
 - Security-only review; use `audit-security`.
-- Cross-system root-cause coordination for a frozen, stale, non-responsive, or dev-versus-release failure; use `diagnose`, which may delegate real-client evidence collection here.
+- Cross-system root-cause coordination for a frozen, stale, non-responsive, or dev-versus-release failure; use the host's built-in diagnosis, which may delegate real-client evidence collection here.
 
 ## Hard Rules
 
@@ -69,7 +69,7 @@ Operate and verify real desktop client windows. Treat platform automation as ada
 - If only a process can be proven, do not infer that the requested window is visible, current, or running the new build.
 - For code changes that add accessibility or automation surfaces, use `implement-frontend` or the relevant native implementation skill; return here for runtime verification.
 - Re-verify the target process, runtime source, and window after rebuild/restart; stale windows do not prove current code.
-- Confirm only direct client facts. Do not claim a final cause across frontend, IPC, Rust, database, packaging, or platform layers, and do not decide a permanent fix; return the evidence to `diagnose` or the caller.
+- Confirm only direct client facts. Do not claim a final cause across frontend, IPC, Rust, database, packaging, or platform layers, and do not decide a permanent fix; return the evidence to the caller.
 - Remove disposable task state such as temporary probes, injected instrumentation, test windows, and launched test instances when safe. Retain screenshots, logs, traces, and other handoff evidence until they are embedded, archived, or explicitly accepted by the handoff owner; report retained artifact paths/identifiers, embedded evidence, removed disposable state, and anything left running.
 - Say `Not supported` when no adapter exists for the requested platform capability and `Not verified` when the adapter exists but the check was not completed.
 

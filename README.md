@@ -28,7 +28,7 @@ Install selected Skills globally for Codex:
 
 ```bash
 npx skills@latest add idaibin/skills \
-  --skill repo-map domain-modeling code-planner diagnose repo-review \
+  --skill repo-map domain-modeling repo-review \
   --global --agent codex
 ```
 
@@ -51,8 +51,6 @@ See [INSTALL.md](INSTALL.md) for project/global scope, updates, removal, and the
 | --- | --- |
 | `repo-map` | Current repository boundaries, commands, task routes, or reusable owners need a verified map. |
 | `domain-modeling` | Business language, identity, lifecycle, invariants, scenarios, or bounded contexts are unresolved. |
-| `code-planner` | A complex requirement needs a grounded technical design, acceptance criteria, task slices, and validation gates. |
-| `diagnose` | A concrete failure must be reproduced, isolated, and traced to a confirmed cause before remediation. |
 | `repo-review` | Local changes or an immutable commit/range/PR/release basis need an independent read-only review. |
 | `repo-delivery` | Reviewed changes need authorized staging, commit, push, synchronization, or branch cleanup. |
 
@@ -88,8 +86,8 @@ Skills are composable owners, not a mandatory framework:
 ```text
 unknown repository -> repo-map
 unclear domain      -> domain-modeling
-complex change      -> code-planner
-known failure       -> diagnose
+complex change      -> host planning and repository instructions
+known failure       -> evidence-driven diagnosis under effective instructions
 source work         -> implement-frontend / implement-rust
 design contract     -> design-system -> implement-frontend
 review              -> repo-review (with bounded audit-* specialists when needed)

@@ -28,7 +28,7 @@ Use these cases when changing `audit-security` triggers, profiles, scope, output
 | `Review the whole repository and coordinate frontend, Rust, security, CI, and docs findings.` | Should prefer `repo-review`, which may delegate security paths here. | Whole-review coordination is broader than a security specialist. |
 | `Create a full threat model for this system.` | Should prefer a dedicated threat-model workflow when available. | Whole-system modeling is broader than this skill. |
 | `Run a deep repository-wide vulnerability scan with multiple passes.` | Should prefer a dedicated deep security scan workflow. | Repository-wide scanning is outside scoped audit. |
-| `Split this requirement into executable tasks.` | Should prefer `code-planner`. | Future implementation planning. |
+| `Split this requirement into executable tasks.` | Should not trigger this Skill; use the host's built-in planning. | Future implementation planning. |
 | `Understand this repository's real commands and directory structure first.` | Should prefer `repo-map`. | Repository mapping. |
 | `Review all local changes and generate commit groups.` | Should prefer `repo-review`. | Dirty-tree review and commit planning. |
 

@@ -34,7 +34,7 @@ Deliver reviewed repository changes from a local worktree to the requested Git s
 ## Do Not Use For
 
 - First-pass repository discovery, real commands, or docs alignment; use `repo-map`.
-- Future implementation planning or subagent task splitting; use `code-planner`.
+- Future implementation planning or subagent task splitting; use the host's built-in planning.
 - Existing local diff review, ownership classification, mixed-hunk analysis, or commit grouping before delivery scope is clear; use `repo-review`.
 - Review-only requests that do not authorize Git mutation; use `repo-review`.
 - Security-only audit; use `audit-security`.

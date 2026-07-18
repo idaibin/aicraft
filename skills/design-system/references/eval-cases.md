@@ -17,7 +17,7 @@
 | --- | --- |
 | `Implement the accepted UI package in this React app.` | Prefer `implement-frontend`; consume `design-system` assets. |
 | `Audit the changed frontend for accessibility and token drift.` | Prefer `audit-frontend`. |
-| `Plan a backend, frontend, migration, and CI rollout.` | Prefer `code-planner`. |
+| `Plan a backend, frontend, migration, and CI rollout.` | Do not trigger this Skill; use the host's built-in planning. |
 | `Open the page and capture console, network, and screenshots.` | Prefer `ops-browser`. |
 | `Launch the Tauri app and prove the real window.` | Prefer `ops-client`. |
 | `Commit and push the accepted UI changes.` | Prefer `repo-delivery`. |

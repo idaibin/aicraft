@@ -39,8 +39,7 @@ instructions and provider metadata.
 - Domain audit skills use `audit-<domain>`, such as `audit-frontend`, `audit-rust`, or `audit-security`. They are read-only, select only applicable profiles, lead with evidence-backed findings, and route fixes to the corresponding implementation skill.
 - `repo-map` owns semantic repository-map maintenance, real boundaries/commands/task routes, verified reuse inventories, and docs/code alignment. It does not mirror source trees, rank defects, or declare review readiness.
 - `domain-modeling` owns ubiquitous language, domain concepts, relationships, lifecycle, invariants, scenarios, and bounded contexts. It may write only an explicitly authorized domain artifact and does not own repository mapping, technical design, or source changes.
-- `code-planner` owns requirement readiness, technical design, acceptance criteria, vertical task slices, blocking edges, and validation gates before complex implementation.
-- `diagnose` owns failure reproduction, minimization, hypothesis testing, and root-cause confirmation. Permanent remediation transitions to the matching implementation skill.
+- General planning and diagnosis belong to the host's built-in capabilities plus effective personal and repository instructions. Do not publish a Skill for a workflow that can be expressed reliably as concise guidance without specialized knowledge, tooling, bundled resources, or a distinct authority boundary.
 - `repo-review` owns read-only review across basis-specific modes: local worktree/index changes, immutable snapshots, branch comparisons, commit ranges, pull requests, release candidates, and verified review packages. It owns dirty-tree readiness in Worktree mode and consolidated P0-P3 findings in immutable modes.
 - `audit-security` owns bounded security assessment and may act as a specialist under `repo-review`; it does not replace the coordinator.
 - `chatgpt-review` owns local review-package artifacts and explicitly authorized external ChatGPT review rounds. It defaults authorized transport to the desktop built-in browser; Current Chrome or standalone browser use requires an explicit request for that route.
@@ -148,8 +147,7 @@ Every repository-facing skill must:
 
 Authority boundaries:
 
-- context, planning, diagnosis, review, audit, and security skills are read-only unless their own documented artifact boundary explicitly permits a local output file;
-- `diagnose` does not apply permanent fixes;
+- context, review, audit, and security skills are read-only unless their own documented artifact boundary explicitly permits a local output file;
 - `implement-*` may edit task-owned source but must not stage, commit, push, or create PRs;
 - `repo-review` does not edit or mutate Git/GitHub state;
 - `audit-security` does not expand beyond its bounded surface or take over review coordination;
@@ -185,7 +183,6 @@ When a skill boundary changes, add pairwise trigger/non-trigger cases against ev
 
 - `repo-map` versus `repo-review` and `audit-security`;
 - `repo-review` versus `audit-security` and `repo-delivery`;
-- `diagnose` versus matching `implement-*` skills;
 - `audit-frontend` versus `repo-review` and `implement-frontend`.
 
 Every published package must satisfy its documented quality acceptance rules

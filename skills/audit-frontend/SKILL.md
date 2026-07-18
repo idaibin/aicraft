@@ -70,7 +70,7 @@ Never rewrite a working local structure merely to match this skill or an externa
 - Repository orientation, commands, reuse inventory, or docs/code alignment without an audit request; use `repo-map`.
 - Frontend implementation, modification, or refactoring; use `implement-frontend`.
 - Creating UI direction, project profiles, reference registries, tokens, or task design assets; use `design-system`.
-- Root-cause diagnosis before a fix is known; use `diagnose`.
+- Root-cause diagnosis of a concrete failure; use the host's built-in diagnosis under effective instructions.
 - Owning Worktree readiness or immutable repository/range/PR/release coordination; use `repo-review`, which may delegate a bounded frontend surface here.
 - Actual staging, commit, rebase/squash, push, or delivery; use `repo-delivery`.
 - Browser or real desktop runtime operation; use `ops-browser` or `ops-client`.

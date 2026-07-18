@@ -72,7 +72,7 @@ Do not rewrite a working local design merely to resemble an external project.
 
 - Repository orientation without a Rust task; use `repo-map`.
 - Rust implementation, modification, refactoring, or porting; use `implement-rust`.
-- Root-cause diagnosis before a fix is known; use `diagnose`.
+- Root-cause diagnosis of a concrete failure; use the host's built-in diagnosis under effective instructions.
 - Owning Worktree readiness or immutable repository/range/PR/release coordination; use `repo-review`, which may delegate a bounded Rust surface here.
 - Commit, push, squash, branch cleanup, or remote proof; use `repo-delivery` only when the user explicitly requests delivery.
 - Security-only audit after the Rust surface is mapped; use `audit-security`.

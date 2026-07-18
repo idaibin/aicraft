@@ -17,8 +17,8 @@ Use these cases when changing `domain-modeling` triggers, authority, artifact be
 | User prompt | Expected result | Why |
 | --- | --- | --- |
 | `Map the real repository roots, startup commands, and reusable modules.` | Should prefer `repo-map`. | Repository semantics, not business modeling. |
-| `Turn this approved model into technical tasks, dependencies, validation, and reject gates.` | Should prefer `code-planner`. | Executable planning. |
-| `Find why the order gets stuck in processing.` | Should prefer `diagnose`. | Concrete failure investigation. |
+| `Turn this approved model into technical tasks, dependencies, validation, and reject gates.` | Should not trigger this Skill; use the host's built-in planning. | Executable planning. |
+| `Find why the order gets stuck in processing.` | Should not trigger this Skill; use the host's built-in diagnosis under effective instructions. | Concrete failure investigation. |
 | `Implement the approved order transition in Rust.` | Should prefer `implement-rust`. | Source mutation. |
 | `Review this branch for missing requirements and regressions.` | Should prefer `repo-review`. | Change review. |
 
@@ -34,7 +34,7 @@ Use these cases when changing `domain-modeling` triggers, authority, artifact be
 | Boundaries | Creates contexts only from language, ownership, consistency, authority, or source-of-truth differences. | Splits contexts by folder or team name alone. |
 | Scenario testing | Probes relevant normal, edge, failure, retry, cancellation, or historical cases. | Produces a tidy model without stress-testing it. |
 | Artifact authority | Writes only an explicitly authorized domain artifact and preserves source/Git state. | Edits product code, stages, commits, or writes docs without authorization. |
-| Planner boundary | Stops at the domain model and routes technical design/tasks to `code-planner`. | Claims implementation planning ownership. |
+| Planning boundary | Stops at the domain model and leaves technical design/tasks to host planning. | Claims implementation planning ownership. |
 | Repository-map boundary | Uses source truth as evidence but routes repository mapping to `repo-map`. | Turns domain modeling into repository onboarding. |
 
 ## Scoring

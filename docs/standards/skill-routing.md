@@ -27,8 +27,6 @@ Framework-specific or domain-specific checks should stay as profiles when these 
 | --- | --- | --- | --- |
 | `repo-map` | workspace/repository semantics and reuse map | read-only by default; repo-map write only after explicit request | real boundaries, task routes, verified reuse entries, alignment gaps |
 | `domain-modeling` | business language, concepts, lifecycle, rules, and contexts | read-only by default; domain-artifact write only after explicit request | evidence-backed domain model, decisions, contradictions, and open questions |
-| `code-planner` | future implementation requirement | read-only | grounded spec, technical design, acceptance criteria, executable slices, dependencies, and validation gates |
-| `diagnose` | concrete failure symptom | read-only for tracked repository and Git state | reproduction loop, confirmed cause, regression seam, implementation handoff |
 | `repo-review` | local worktree/index or immutable snapshot/range/PR/release/package | read-only | basis-specific readiness, staging guidance, or consolidated P0-P3 findings |
 | `implement-frontend` | requested frontend source change | source mutation | implemented and validated frontend change |
 | `implement-rust` | requested Rust source change | source mutation | implemented and validated Rust change |
@@ -46,7 +44,7 @@ Framework-specific or domain-specific checks should stay as profiles when these 
 ```text
 repo-map (repository truth unknown)
   -> domain-modeling (business language or lifecycle unclear)
-  -> code-planner (technical design and task slices needed)
+  -> host planning (technical design and task slices needed)
   -> implement-* (source mutation requested)
   -> repo-review (Standards and Spec axes)
   -> repo-delivery (authorized Git mutation)
@@ -54,7 +52,7 @@ repo-map (repository truth unknown)
 
 This chain is composable, not mandatory ceremony. Start at the earliest unresolved owner and stop at the last outcome the user requested.
 
-`domain-modeling` and `code-planner` remain separate: the former defines business meaning and rules independent of implementation, while the latter converts confirmed requirements into technical design, acceptance criteria, task ownership, dependencies, and validation.
+`domain-modeling` remains separate from general planning: it defines business meaning and rules independent of implementation. Technical design, task ownership, dependencies, acceptance criteria, and validation use the host's built-in planning plus effective repository instructions.
 
 ## `repo-map` And `repo-review`
 
@@ -94,20 +92,7 @@ It selects one review basis first. Worktree mode owns ownership, mixed hunks, co
 
 ## Diagnosis And Implementation
 
-`diagnose` owns uncertainty reduction, not permanent remediation.
-
-For a combined request such as `diagnose and fix`:
-
-```text
-diagnose
-  -> confirm exact cause and regression seam
-  -> explicit implementation handoff
-  -> matching implement-* skill applies the change
-  -> repo-review checks the resulting local diff
-  -> repo-delivery performs authorized Git mutation
-```
-
-This preserves continuous execution without merging investigation and implementation permissions.
+General diagnosis uses the host's built-in reasoning plus effective personal and repository instructions. Confirm the failure, evidence, cause, and regression seam before applying a permanent fix. When the user requests remediation, the matching `implement-*` Skill owns the source change, `repo-review` checks the resulting local diff, and `repo-delivery` performs authorized Git mutation.
 
 ## Cross-Skill Handoff Contracts
 

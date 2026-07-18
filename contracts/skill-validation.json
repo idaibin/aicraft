@@ -282,14 +282,13 @@
     },
     "comparative": {
       "minimum_trials_per_variant": 3,
-      "minimum_held_out_cases": 35,
+      "minimum_held_out_cases": 34,
       "minimum_held_out_cases_per_skill": 2,
-      "minimum_held_out_required_handoff_cases": 7,
+      "minimum_held_out_required_handoff_cases": 6,
       "minimum_held_out_no_required_handoff_cases": 28,
       "minimum_held_out_required_handoff_owners": 5,
       "required_held_out_handoff_primary_owners": [
         "repo-map",
-        "diagnose",
         "repo-review",
         "chatgpt-review",
         "implement-frontend",
@@ -333,8 +332,6 @@
       "core_skills": [
         "repo-map",
         "domain-modeling",
-        "code-planner",
-        "diagnose",
         "repo-review",
         "repo-delivery"
       ],
@@ -352,7 +349,6 @@
       "minimum_required_handoff_owners": 5,
       "required_handoff_primary_owners": [
         "repo-map",
-        "diagnose",
         "repo-review",
         "chatgpt-review",
         "implement-frontend",
@@ -404,12 +400,12 @@
     {"skill": "repo-map", "surface": "references/usage.md", "section": "## Triggers", "terms": ["immutable repository/range/PR review", "repo-review"]},
     {"skill": "audit-security", "surface": "SKILL.md", "section": "## Modes", "terms": ["Scoped specialist subreview", "coordinator retains", "severity"]},
     {"skill": "audit-security", "surface": "references/usage.md", "section": "## Output", "terms": ["delegated path/diff boundary", "without editing", "coordinator"]},
-    {"skill": "ops-browser", "surface": "SKILL.md", "section": "## Modes", "terms": ["diagnose", "already-isolated", "browser-layer"]},
-    {"skill": "ops-browser", "surface": "references/usage.md", "section": "## Browser Debug Evidence", "terms": ["diagnose", "before browser operation", "retain referenced"]},
+    {"skill": "ops-browser", "surface": "SKILL.md", "section": "## Modes", "terms": ["caller", "already-isolated", "browser-layer"]},
+    {"skill": "ops-browser", "surface": "references/usage.md", "section": "## Browser Debug Evidence", "terms": ["caller", "before browser operation", "retain referenced"]},
     {"skill": "ops-browser", "surface": "SKILL.md", "section": "## Hard Rules", "terms": ["operation_id", "ambiguous", "prior evidence"]},
     {"skill": "chatgpt-review", "surface": "SKILL.md", "section": "## Browser Handoff", "terms": ["operation_id", "operation ledger", "ambiguous"]},
-    {"skill": "ops-client", "surface": "SKILL.md", "section": "## Modes", "terms": ["diagnose", "already-isolated", "client-layer"]},
+    {"skill": "ops-client", "surface": "SKILL.md", "section": "## Modes", "terms": ["caller", "already-isolated", "client-layer"]},
     {"skill": "ops-client", "surface": "SKILL.md", "section": "## Hard Rules", "terms": ["Retain screenshots", "handoff owner", "removed disposable state"]},
-    {"skill": "ops-client", "surface": "references/usage.md", "section": "## Operation Notes", "terms": ["diagnose", "already-isolated", "retain referenced"]}
+    {"skill": "ops-client", "surface": "references/usage.md", "section": "## Operation Notes", "terms": ["caller", "already-isolated", "retain referenced"]}
   ]
 }

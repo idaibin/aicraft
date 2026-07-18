@@ -250,7 +250,7 @@ class EvaluationProtocolTests(unittest.TestCase):
         self.assertEqual([], claude["retryable_errors"])
 
     def test_routing_result_extraction_is_shared_and_strict(self) -> None:
-        route = {"actual_owner": "diagnose", "handoffs": []}
+        route = {"actual_owner": "repo-map", "handoffs": []}
         response = json.dumps(route, ensure_ascii=False)
         self.assertEqual(
             (response, route), PROTOCOL.extract_routing_result("", response)
@@ -264,7 +264,7 @@ class EvaluationProtocolTests(unittest.TestCase):
         )
         self.assertIsNone(
             PROTOCOL.extract_routing_result(
-                '{"actual_owner":"diagnose","actual_owner":"repo-map",'
+                '{"actual_owner":"repo-map","actual_owner":"repo-map",'
                 '"handoffs":[]}',
                 "",
             )

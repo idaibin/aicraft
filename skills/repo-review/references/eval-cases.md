@@ -20,13 +20,13 @@
 | Prompt | Expected |
 | --- | --- |
 | `Map the repository architecture and reusable contracts into docs/repo-map/README.md.` | Prefer `repo-map`. |
-| `Find why this test fails.` | Prefer `diagnose`. |
+| `Find why this test fails.` | Do not trigger this Skill; use the host's built-in diagnosis under effective instructions. |
 | `Audit only this endpoint for token leakage.` | Prefer `audit-security`. |
 | `Audit this frontend architecture for accessibility and performance without a review basis.` | Prefer `audit-frontend`. |
 | `Audit this Rust service for concurrency and memory risks without a review basis.` | Prefer `audit-rust`. |
 | `Apply the accepted frontend findings.` | Prefer `implement-frontend`. |
 | `Stage, commit, and push the reviewed files.` | Prefer `repo-delivery`. |
-| `Split this future migration into tasks.` | Prefer `code-planner`. |
+| `Split this future migration into tasks.` | Do not trigger this Skill; use the host's built-in planning. |
 | `Send the review package to ChatGPT.` | Prefer `chatgpt-review`. |
 
 ## Scenario Eval
