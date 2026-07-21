@@ -21,14 +21,14 @@ Create or maintain a durable semantic repo map from current source truth. It sho
 
 ## Triggers
 
-- `梳理当前项目的目录结构和技术架构，写到项目地图。`
-- `把真实命令、规范、组件和接口入口整理成后续开发导航。`
-- `找出开发这个页面最短要读哪些目录和组件。`
-- `更新项目地图里的 API 和可复用组件。`
-- `核查并记录这个服务唯一的 OpenAPI authority、生成链、前端消费者和重复 DTO 边界。`
-- `文档里的目录找不到了，从最近存在的父目录局部扫描并修复。`
+- `Map the current project's directory structure and technical architecture into the repo map.`
+- `Organize the real commands, standards, components, and interface entry points into navigation for later development.`
+- `Identify the shortest set of directories and components to read before developing this page.`
+- `Update the APIs and reusable components in the repo map.`
+- `Verify and record this service's single OpenAPI authority, generation chain, frontend consumers, and duplicate-DTO boundary.`
+- `The documented directory is missing; scan locally from the nearest existing ancestor and repair the map.`
 - `Create or update docs/repo-map/README.md from current repository truth.`
-- `当前目录不是 Git；检查里面是否有子仓库，没有的话也按普通项目结构生成 repo map。`
+- `The current directory is not a Git repository; check for child repositories, or map it as an ordinary project if none exist.`
 
 Do not use for generic implementation, local dirty-tree review, immutable repository/range/PR review, or defect diagnosis. Use the matching Worktree or immutable basis mode in `repo-review` for review.
 

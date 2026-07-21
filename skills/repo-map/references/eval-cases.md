@@ -4,19 +4,19 @@
 
 | User prompt | Expected result | Why |
 | --- | --- | --- |
-| `梳理当前项目目录结构和技术架构，落到文档里。` | Trigger Repo Map mode. | Durable current-truth navigation is requested. |
-| `把真实启动、测试和构建命令补进项目地图。` | Trigger Targeted Update mode. | Command navigation update. |
-| `列出做页面开发最短要读的目录、组件和接口。` | Trigger Reuse Inventory mode. | Shortest development path and reuse entries. |
-| `更新项目地图里的 Rust API、DTO 和调用链。` | Trigger Targeted Update mode. | Bounded interface-map update. |
-| `文档指向的目录和父目录都没了，逐级向上找并局部修复。` | Trigger Navigation Repair mode. | Explicit incremental recovery. |
+| `Map the current project's directory structure and technical architecture into durable documentation.` | Trigger Repo Map mode. | Durable current-truth navigation is requested. |
+| `Add the real startup, test, and build commands to the repo map.` | Trigger Targeted Update mode. | Command navigation update. |
+| `List the shortest set of directories, components, and interfaces to read before developing this page.` | Trigger Reuse Inventory mode. | Shortest development path and reuse entries. |
+| `Update the Rust APIs, DTOs, and call chain in the repo map.` | Trigger Targeted Update mode. | Bounded interface-map update. |
+| `The documented directory and its parent are gone; ascend to the nearest existing ancestor and repair only the affected map entries.` | Trigger Navigation Repair mode. | Explicit incremental recovery. |
 | `Create docs/repo-map/README.md from the repository's current truth.` | Trigger Repo Map mode. | Initial durable map. |
-| `梳理公用组件、函数和 API，后续新增前先判断复用、扩展还是包装。` | Trigger Reuse Inventory mode. | Duplicate-declaration prevention needs verified reuse entries. |
-| `当前目录不是 Git；检查里面有没有子 Git 仓库，没有也按普通目录项目梳理。` | Trigger Repo Map mode. | Root classification must support multi-repo and non-Git directory projects. |
-| `路径还在，但导出和路由注册已经换了，局部修复 repo map。` | Trigger Navigation Repair mode. | Semantic staleness must be repaired even when paths resolve. |
+| `Map the shared components, functions, and APIs, then decide whether to reuse, extend, or wrap them before adding anything new.` | Trigger Reuse Inventory mode. | Duplicate-declaration prevention needs verified reuse entries. |
+| `The current directory is not a Git repository; check for child Git repositories, or map it as an ordinary project if none exist.` | Trigger Repo Map mode. | Root classification must support multi-repo and non-Git directory projects. |
+| `The path still exists, but its exports and route registration changed; repair only the affected repo-map entries.` | Trigger Navigation Repair mode. | Semantic staleness must be repaired even when paths resolve. |
 | `Map the repository sources that define the Order domain, but do not decide its business vocabulary or lifecycle.` | Trigger `repo-map`; domain decisions remain with `domain-modeling`. | Repository evidence mapping only. |
 | `Map PageHeader and MetricCard by design term, visual job, definition, export, owner root, consumers, variants, and current evidence.` | Trigger Reuse Inventory mode. | Durable design-to-component navigation is requested. |
-| `核查并记录 Admin 创建用户接口的唯一 authority、OpenAPI 生成命令、generated client、真实 React consumer 和重复 DTO 边界。` | Trigger Targeted Update with the API Contract Map profile. | Durable current-source contract navigation is requested. |
-| `记录这个原生 REST operation 的 route、DTO、client、真实 consumer 和测试入口；仓库没有 schema 生成链。` | Trigger a bounded API Contract Map and record generated artifacts as `Not applicable`. | Native contract navigation is still valuable without OpenAPI. |
+| `Verify and record the single authority, OpenAPI generation command, generated client, real React consumer, and duplicate-DTO boundary for the Admin create-user operation.` | Trigger Targeted Update with the API Contract Map profile. | Durable current-source contract navigation is requested. |
+| `Record this native REST operation's route, DTO, client, real consumer, and test entry point; the repository has no schema-generation pipeline.` | Trigger a bounded API Contract Map and record generated artifacts as `Not applicable`. | Native contract navigation is still valuable without OpenAPI. |
 
 ## Non-Trigger Eval
 
