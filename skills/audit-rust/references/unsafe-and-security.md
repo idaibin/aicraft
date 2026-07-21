@@ -13,7 +13,7 @@ pointer boundary:
    invalid state.
 5. Check every exit path for ownership transfer, double free, use after free,
    forgotten drop, or leaked native resource.
-6. Identify focused test gaps; route requested test additions to `implement-rust`,
+6. Identify focused test gaps; route requested test additions to `dev-rust`,
    and run existing Miri coverage when the code and dependencies are supported.
    Use sanitizers or platform tools only when the project already supports them.
 

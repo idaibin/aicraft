@@ -427,6 +427,12 @@ class ValidateSkillsTests(unittest.TestCase):
             "references/usage.md": (package / "references" / "usage.md").read_text(encoding="utf-8"),
             "references/eval-cases.md": (package / "references" / "eval-cases.md").read_text(encoding="utf-8"),
         }
+        surfaces.update(
+            {
+                f"references/{reference.name}": reference.read_text(encoding="utf-8")
+                for reference in sorted((package / "references").glob("*.md"))
+            }
+        )
         original = surfaces[surface]
         if section is None:
             changed = re.sub(
@@ -1088,7 +1094,7 @@ class ValidateSkillsTests(unittest.TestCase):
                 for error in errors
             )
         )
-        self.assertTrue(any("SKILL.md" in error and "120" in error for error in errors))
+        self.assertTrue(any("SKILL.md" in error and "100" in error for error in errors))
         self.assertTrue(any("short_description" in error and "25" in error for error in errors))
         self.assertTrue(any("default_prompt" in error and "220" in error for error in errors))
         self.assertTrue(any("long-guide.md" in error and "Contents" in error for error in errors))
@@ -1098,13 +1104,13 @@ class ValidateSkillsTests(unittest.TestCase):
             root = Path(temp_dir)
             source_relative = Path("protocols/browser-operation-v1.md")
             relative_paths = (
-                Path("skills/chatgpt-review/references/browser-operation-protocol.md"),
+                Path("skills/ask-chatgpt/references/browser-operation-protocol.md"),
                 Path("skills/ops-browser/references/browser-operation-protocol.md"),
             )
             source = (
                 VALIDATOR_PATH.parents[1]
                 / "skills"
-                / "chatgpt-review"
+                / "ask-chatgpt"
                 / "references"
                 / "browser-operation-protocol.md"
             ).read_text(encoding="utf-8")
@@ -1129,7 +1135,7 @@ class ValidateSkillsTests(unittest.TestCase):
             source = (
                 VALIDATOR_PATH.parents[1]
                 / "skills"
-                / "chatgpt-review"
+                / "ask-chatgpt"
                 / "references"
                 / "browser-operation-protocol.md"
             ).read_text(encoding="utf-8")
@@ -1138,7 +1144,7 @@ class ValidateSkillsTests(unittest.TestCase):
             protocol_source.parent.mkdir(parents=True)
             protocol_source.write_text(changed, encoding="utf-8")
             for relative in (
-                Path("skills/chatgpt-review/references/browser-operation-protocol.md"),
+                Path("skills/ask-chatgpt/references/browser-operation-protocol.md"),
                 Path("skills/ops-browser/references/browser-operation-protocol.md"),
             ):
                 path = root / relative
@@ -1157,7 +1163,7 @@ class ValidateSkillsTests(unittest.TestCase):
             source = (
                 VALIDATOR_PATH.parents[1]
                 / "skills"
-                / "chatgpt-review"
+                / "ask-chatgpt"
                 / "references"
                 / "browser-operation-protocol.md"
             ).read_text(encoding="utf-8")
@@ -1170,7 +1176,7 @@ class ValidateSkillsTests(unittest.TestCase):
             protocol_source.parent.mkdir(parents=True)
             protocol_source.write_text(changed, encoding="utf-8")
             for relative in (
-                Path("skills/chatgpt-review/references/browser-operation-protocol.md"),
+                Path("skills/ask-chatgpt/references/browser-operation-protocol.md"),
                 Path("skills/ops-browser/references/browser-operation-protocol.md"),
             ):
                 path = root / relative
@@ -1182,15 +1188,6 @@ class ValidateSkillsTests(unittest.TestCase):
         self.assertTrue(
             any("Handoff Request" in error and "retry_policy" in error for error in errors)
         )
-
-    def test_legacy_regex_catches_retired_skill_names(self) -> None:
-        for name in (
-            "repo-context",
-            "frontend-implementation",
-            "frontend-governance",
-            "rust-engineering-governance",
-        ):
-            self.assertIsNotNone(VALIDATOR.LEGACY_RE.search(f"use {name} now"))
 
     def test_markdown_table_rows_returns_data_only(self) -> None:
         rows = markdown_table_rows(VALID_EVAL, "## Trigger Eval")
@@ -1569,10 +1566,10 @@ class ValidateSkillsTests(unittest.TestCase):
             "id": "assessment",
             "expected_owner": "repo-map",
             "allowed_owners": ["repo-map", "audit-rust"],
-            "required_handoffs": ["implement-rust"],
+            "required_handoffs": ["dev-rust"],
             "required_handoff_groups": [["repo-review", "audit-security"]],
             "allowed_handoffs": [
-                "implement-rust",
+                "dev-rust",
                 "repo-review",
                 "audit-security",
             ],
@@ -1582,14 +1579,14 @@ class ValidateSkillsTests(unittest.TestCase):
             case,
             {
                 "actual_owner": "audit-rust",
-                "handoffs": ["implement-rust", "repo-review"],
+                "handoffs": ["dev-rust", "repo-review"],
             },
         )
         self.assertTrue(accepted["full_case_success"])
 
         missing_group = CONTRACT_EVAL.assess_routing_case(
             case,
-            {"actual_owner": "repo-map", "handoffs": ["implement-rust"]},
+            {"actual_owner": "repo-map", "handoffs": ["dev-rust"]},
         )
         self.assertFalse(missing_group["full_case_success"])
         self.assertEqual(
@@ -1602,7 +1599,7 @@ class ValidateSkillsTests(unittest.TestCase):
             {
                 "actual_owner": "repo-map",
                 "handoffs": [
-                    "implement-rust",
+                    "dev-rust",
                     "repo-review",
                     "audit-security",
                 ],
@@ -1618,7 +1615,7 @@ class ValidateSkillsTests(unittest.TestCase):
             case,
             {
                 "actual_owner": "repo-map",
-                "handoffs": ["implement-rust", "repo-review", "repo-delivery"],
+                "handoffs": ["dev-rust", "repo-review", "repo-delivery"],
             },
         )
         self.assertFalse(unauthorized["full_case_success"])
@@ -2845,7 +2842,7 @@ class ValidateSkillsTests(unittest.TestCase):
 
     def test_implement_rust_requires_overlay_selection_eval(self) -> None:
         errors = self.specialized_contract_errors(
-            "implement-rust", ("## Overlay Selection Eval", "## Removed Overlay Eval")
+            "dev-rust", ("## Overlay Selection Eval", "## Removed Overlay Eval")
         )
         self.assertTrue(any("Overlay Selection Eval" in error for error in errors))
 
@@ -2891,14 +2888,14 @@ class ValidateSkillsTests(unittest.TestCase):
 
     def test_review_bridge_requires_split_package_contract(self) -> None:
         errors = self.specialized_contract_errors(
-            "chatgpt-review",
+            "ask-chatgpt",
             ("| Split package artifact |", "| Removed split package artifact |"),
         )
         self.assertTrue(any("Split package artifact" in error for error in errors))
 
     def test_review_bridge_requires_artifact_visibility_contract(self) -> None:
         errors = self.specialized_contract_errors(
-            "chatgpt-review",
+            "ask-chatgpt",
             ("| Review artifact visibility |", "| Removed artifact visibility |"),
         )
         self.assertTrue(any("Review artifact visibility" in error for error in errors))

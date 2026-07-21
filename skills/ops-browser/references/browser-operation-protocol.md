@@ -1,6 +1,6 @@
 # Browser Operation Protocol
 
-This protocol is shared by `chatgpt-review` and `ops-browser`. Repository authors
+This protocol is shared by `ask-chatgpt` and `ops-browser`. Repository authors
 maintain its canonical source at `protocols/browser-operation-v1.md` and use the
 synchronization script to copy it into each published package, so installed
 skills remain self-contained. Repository validation rejects stale or modified
@@ -108,7 +108,7 @@ schema_version: browser-operation/v1
 operation_id: <task>:<round>:<action>
 round_id: <stable external-review round id>
 attempt: <positive integer; starts at 1>
-caller: chatgpt-review
+caller: ask-chatgpt
 intent: <inspect|navigate|create-conversation|compose|attach|submit|capture-response|cleanup>
 authorization:
   external_send: <authorized|not-authorized>
@@ -118,6 +118,11 @@ route:
   project_or_chat_id: <stable id or Not verified>
   account_workspace: <personal|organization|Not verified>
   browser_mode: <verified mode>
+  chatgpt_interface: <chat|work|not-applicable|Not verified>
+  chatgpt_model: <requested label or stable id|not-applicable|Not verified>
+  reasoning_mode: <preferred label|not-applicable|Not verified>
+  reasoning_fallbacks:
+    - <ordered authorized fallback label or none>
 target:
   conversation_id: <stable id|create-one-authorized|Not verified>
   expected_url: <exact URL or Not verified>
@@ -134,6 +139,11 @@ retry_policy: <never|only-if-no-side-effect-proven>
 prior_evidence:
   - <evidence from an earlier attempt or none>
 ```
+
+The bridge owns these ChatGPT selection preferences and their fallback order;
+`ops-browser` verifies the rendered controls and returns direct selection evidence.
+Stored labels are not capability proof. If the preferred selection is unavailable,
+use only the first verified configured fallback or return `blocked`.
 
 ## Handoff Result
 

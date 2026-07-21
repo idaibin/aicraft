@@ -3,83 +3,54 @@
 ## Contents
 
 - [Evidence](#evidence)
-- [Term and Concept Tests](#term-and-concept-tests)
-- [State and Rule Tests](#state-and-rule-tests)
-- [Boundary Tests](#boundary-tests)
-- [Scenario Stress Test](#scenario-stress-test)
+- [Default Terminology And Rules Pass](#default-terminology-and-rules-pass)
+- [Lifecycle Profile](#lifecycle-profile)
+- [Bounded Context Profile](#bounded-context-profile)
+- [Artifact Gate](#artifact-gate)
 - [Output Template](#output-template)
 
 ## Evidence
 
-Prefer, in order, explicit user decisions, accepted requirements, current business contracts, domain documentation, representative tests, and current code behavior. Code proves what the system does, not automatically what the business intends.
+Prefer explicit user decisions, accepted requirements, current business contracts, established domain documentation, representative tests, and then current code behavior. Code proves current behavior, not automatically business intent. Label each material statement `Confirmed`, `Inferred`, `Conflict`, or `Not verified`.
 
-Label each material statement:
+## Default Terminology And Rules Pass
 
-- **Confirmed:** directly supported by an authoritative source.
-- **Inferred:** best explanation of available evidence, awaiting confirmation.
-- **Conflict:** authoritative sources disagree.
-- **Not verified:** required evidence was not inspected or is unavailable.
+- Give one canonical business term one meaning inside the relevant scope.
+- Resolve synonyms and overloaded words that can change behavior or acceptance.
+- Separate actors, resources, observations, decisions, and actions only when business evidence needs the distinction.
+- Write rules as observable statements independent of framework, storage, transport, or UI.
+- Test the rules against only relevant normal, edge, failure, retry, cancellation, permission, or historical-data scenarios.
+- Stop when the shared ambiguity is resolved; do not expand into a complete domain catalog.
 
-## Term and Concept Tests
+## Lifecycle Profile
 
-- Give one canonical term one meaning inside a bounded context.
-- Separate identity-bearing entities from descriptive value objects.
-- Name commands as requested intent and events as completed facts.
-- Distinguish observations from alerts, reports, and policies.
-- Reject concepts that exist only because of one screen, table, endpoint, or framework.
-- Ask whether two concepts have different identity, lifecycle, invariants, ownership, or permissions before merging them.
+Load only when state or transition order changes business meaning. Record applicable initial/active/terminal states, allowed and forbidden transitions, guards, retry/idempotency, cancellation/expiry, and relevant concurrency or historical-rule behavior. Do not load this profile for a terminology-only question.
 
-## State and Rule Tests
+## Bounded Context Profile
 
-For each stateful entity, identify:
+Load only when canonical language, business owner, consistency rule, permission authority, source of truth, or external contract differs materially. Use repository-native boundary terms where available; do not impose technical DDD patterns or split contexts by folder/team names.
 
-- initial, active, suspended, failed, cancelled, expired, and terminal states when applicable;
-- allowed transitions and the command or event that causes each;
-- guards, permissions, invariants, side effects, idempotency, retries, and compensation;
-- whether concurrent commands can race and which outcome wins;
-- what historical facts must remain true after later transitions.
+## Artifact Gate
 
-Write rules as observable statements, for example: `An acknowledged Alert cannot return to New; a new Observation may create a new Alert.`
+An artifact update requires all three:
 
-## Boundary Tests
+1. an existing authoritative fact-source location;
+2. a confirmed decision intended for durable cross-functional reuse;
+3. explicit user authorization for the named write scope.
 
-Create separate bounded contexts only when at least one differs materially:
-
-- canonical language;
-- identity or lifecycle owner;
-- consistency and transaction rules;
-- permission authority;
-- source of truth;
-- change cadence or external integration contract.
-
-Record context relationships as upstream/downstream, shared kernel, published language, anti-corruption layer, or an equivalent repository-native relationship only when the distinction changes design decisions.
-
-## Scenario Stress Test
-
-Probe only relevant cases:
-
-1. normal creation and completion;
-2. invalid transition or missing prerequisite;
-3. retry, duplicate command, or out-of-order event;
-4. cancellation, expiry, rollback, or compensation;
-5. concurrent owners or conflicting updates;
-6. partial failure across context boundaries;
-7. permission or tenant change during the lifecycle;
-8. historical data created under an older rule.
+Otherwise return the decision in chat and leave repository files unchanged.
 
 ## Output Template
 
 ```markdown
-# Domain Model
+# Domain Decision
 
 ## Scope and Evidence
-## Ubiquitous Language
-## Entities and Value Objects
-## Relationships
-## State Machine
-## Business Rules and Invariants
-## Bounded Contexts
-## Scenarios Tested
+## Resolved Language
+## Business Rules
+## Relevant Scenarios
+## Lifecycle (only when selected)
+## Bounded Contexts (only when selected)
 ## Contradictions and Decisions
 ## Open Questions
 ## Not Verified

@@ -35,16 +35,17 @@ instructions and provider metadata.
 - Directory name and `SKILL.md` frontmatter `name` must match.
 - Skill names must use lowercase letters, numbers, and hyphens only.
 - Prefer short verb-led names.
-- Implementation skills use `implement-<domain>`, such as `implement-frontend` or `implement-rust`, and own requested source changes only.
+- Implementation skills use `dev-<domain>`, such as `dev-frontend` or `dev-rust`, and own requested source changes only.
 - Domain audit skills use `audit-<domain>`, such as `audit-frontend`, `audit-rust`, or `audit-security`. They are read-only, select only applicable profiles, lead with evidence-backed findings, and route fixes to the corresponding implementation skill.
-- `repo-map` owns semantic repository-map maintenance, real boundaries/commands/task routes, verified reuse inventories, and docs/code alignment. It does not mirror source trees, rank defects, or declare review readiness.
-- `domain-modeling` owns ubiquitous language, domain concepts, relationships, lifecycle, invariants, scenarios, and bounded contexts. It may write only an explicitly authorized domain artifact and does not own repository mapping, technical design, or source changes.
+- `repo-map` owns semantic repository-map maintenance, real boundaries/commands/task routes, verified reuse inventories, bounded protocol-authority/consumer maps, and docs/code alignment. It does not mirror source trees, copy executable schemas, rank defects, declare review readiness, or infer runtime/compatibility results from topology alone.
+- `domain-modeling` owns shared business language, ambiguity, rules, and relevant boundary scenarios. Lifecycle and bounded contexts are conditional depth, not default output; technical DDD, APIs, databases, frontend/backend structure, and source changes remain outside its boundary. It may update only an existing durable fact source with explicit authorization.
+- `ui-design` owns concrete Feature UI by default: visual and interaction design for one page or flow plus a `dev-frontend` handoff. Its conditional Design System profile owns shared tokens, component semantics, variants, and overall visual-language changes. Host image tools render images; `ui-design` constrains and evaluates them without claiming runtime execution.
 - General planning and diagnosis belong to the host's built-in capabilities plus effective personal and repository instructions. Do not publish a Skill for a workflow that can be expressed reliably as concise guidance without specialized knowledge, tooling, bundled resources, or a distinct authority boundary.
-- `repo-review` owns read-only review across basis-specific modes: local worktree/index changes, immutable snapshots, branch comparisons, commit ranges, pull requests, release candidates, and verified review packages. It owns dirty-tree readiness in Worktree mode and consolidated P0-P3 findings in immutable modes.
+- `repo-review` owns three read-only bases: current Worktree/index, fixed immutable SHA/range, and verified review package. Pull requests resolve to fixed base/head SHAs; Release is a conditional profile over a fixed basis, not a separate basis. It owns dirty-tree readiness in Worktree mode and consolidated P0-P3 findings in fixed modes.
 - `audit-security` owns bounded security assessment and may act as a specialist under `repo-review`; it does not replace the coordinator.
-- `chatgpt-review` owns local review-package artifacts and explicitly authorized external ChatGPT review rounds. It defaults authorized transport to the desktop built-in browser; Current Chrome or standalone browser use requires an explicit request for that route.
-- `repo-delivery` is the sole owner of staging, commits, pushes, squash, cleanup, and other Git mutation after review acceptance.
-- Do not use unclear abbreviations such as `imp-*` or mix `<domain>-implementation` with `implement-<domain>`.
+- `ask-chatgpt` owns local ChatGPT request packages and explicitly authorized ChatGPT web collaboration after a Codex-first gate. Content themes remain separate from verified Standard Chat, Search, Deep Research, Images, or reviewer-browser capabilities. It defaults authorized transport to the desktop built-in browser; Current Chrome or standalone browser use requires an explicit request for that route.
+- `repo-delivery` is the sole owner of staging, categorized commits by default, explicit single commits, pushes, evidence-based branch integration, cleanup, and other Git mutation after review acceptance.
+- Do not use unclear abbreviations such as `imp-*` or mix `<domain>-implementation` with `dev-<domain>`.
 - `description` must start with `Use when`.
 - `description` must describe trigger conditions, not the full workflow.
 - Quote frontmatter string values when they contain YAML-significant punctuation such as `: `.
@@ -52,7 +53,7 @@ instructions and provider metadata.
   [`../../contracts/skill-validation.json`](../../contracts/skill-validation.json).
 - Do not use long `Triggers include ...` lists in frontmatter. Put rich trigger examples in `references/usage.md` and `references/eval-cases.md`.
 - Use English trigger phrases and realistic user wording by default for public, reusable skills. Add localized triggers only when the skill is explicitly audience-specific.
-- Do not keep obsolete skill names inside a skill package. Put migration or rejection notes in root documentation, where package-level stale-name checks do not treat them as active routing instructions.
+- Use only the current catalog names in packages, metadata, routing examples, and installation documentation.
 
 ## Public Skill Or Internal Profile
 
@@ -69,7 +70,7 @@ Use an internal mode or profile when technology or checklist variants share the 
 
 Examples:
 
-- React, Vue Composition, Vue Options, UI/design-system, accessibility, performance, and Tauri checks remain profiles inside `audit-frontend`.
+- React, Vue Composition, Vue Options, UI/Design System implementation checks, accessibility, performance, and Tauri checks remain profiles inside `audit-frontend`.
 - Architecture, ownership/errors, concurrency, performance/memory, SQLite, and unsafe/FFI remain profiles inside `audit-rust`.
 - Do not create `audit-react`, `audit-vue`, or `audit-ui` solely to divide checklists.
 
@@ -87,6 +88,33 @@ Examples:
 Keep detailed examples, checklists, templates, and evals in `references/`.
 Keep package-maintenance instructions in `skills/AGENTS.md` and repository
 standards rather than loading them during every Skill invocation.
+
+## Execution Economy
+
+- Start with one primary owner and no handoff. Add one only when another Skill must
+  act now to complete the requested outcome.
+- Load `SKILL.md` first and only references selected by the active mode, profile,
+  risk, or artifact. Do not read every reference as initialization.
+- Use the smallest evidence set that can change the decision. Do not scan the full
+  repository, generate a full map, run every profile, or repeat unchanged checks.
+- Run focused validation for the changed slice first. Expand to repository baseline
+  or risk overlays only when the boundary requires it.
+- Reuse current task evidence until files, basis, environment, or requirements
+  change. Do not rerun discovery, generation, or review for ceremony.
+- Do not create tasks, threads, subagents, documents, or review rounds without a
+  required independent result or explicit orchestration request.
+- Continue non-blocked work and collect approval-dependent actions at the end. Stop
+  early only when every safe in-scope path depends on approval.
+- Keep output proportional: report decisions, evidence, changes, validation, and
+  gaps; omit exhaustive inventories and repeated process narration.
+
+## Predictable Instruction Design
+
+- Treat every public description as context load and every extra public Skill as user cognitive load. Keep one owner/leading phrase per distinct intent; use profiles for branches that share authority and output.
+- End each ordered step with a checkable completion condition. Prefer evidence such as a resolved basis, exhausted owned file set, observed red/green result, or explicit stop state over vague completion language.
+- Keep each behavior in one authoritative source. Generate identical installed copies from a shared protocol instead of maintaining parallel references.
+- Use branch-driven progressive disclosure: inline what every invocation needs and link only the references selected by the active mode, profile, risk, or artifact.
+- During edits, remove no-op guidance, duplicated meaning, and stale sediment before adding prose. Use compact leading words such as `basis`, `seam`, `red`, `vertical slice`, and `fixed scope` when they make a gate more observable.
 
 ## References
 
@@ -148,7 +176,7 @@ Every repository-facing skill must:
 Authority boundaries:
 
 - context, review, audit, and security skills are read-only unless their own documented artifact boundary explicitly permits a local output file;
-- `implement-*` may edit task-owned source but must not stage, commit, push, or create PRs;
+- `dev-*` may edit task-owned source but must not stage, commit, push, or create PRs;
 - `repo-review` does not edit or mutate Git/GitHub state;
 - `audit-security` does not expand beyond its bounded surface or take over review coordination;
 - `repo-delivery` alone owns Git mutation;
@@ -183,7 +211,7 @@ When a skill boundary changes, add pairwise trigger/non-trigger cases against ev
 
 - `repo-map` versus `repo-review` and `audit-security`;
 - `repo-review` versus `audit-security` and `repo-delivery`;
-- `audit-frontend` versus `repo-review` and `implement-frontend`.
+- `audit-frontend` versus `repo-review` and `dev-frontend`.
 
 Every published package must satisfy its documented quality acceptance rules
 and the repository validator. Authorization, mutation, external-action, and
@@ -245,21 +273,9 @@ maintain provider-specific update instructions inside individual packages.
 
 ## Validation Checklist
 
-Before considering a skill package ready:
-
-```bash
-python3 scripts/sync-shared-protocols.py --check
-python3 scripts/validate-skills.py
-python3 -m unittest discover -s scripts -p 'test_*.py'
-python3 scripts/eval-skill-contracts.py --validate-only
-python3 scripts/measure-skill-footprint.py --baseline-ref HEAD
-rg -n "^name:|^description: Use when" skills/<skill-name>/SKILL.md
-find skills/<skill-name> -maxdepth 3 -type f | sort
-rg -n "Triggers include" skills/<skill-name>/SKILL.md
-git diff --check -- skills/<skill-name>
-```
-
-The `Triggers include` command must return no results. Also verify:
+Use the targeted/full validation matrix in `skills/AGENTS.md`; it is the single
+command authority. Also inspect the changed package's metadata, file inventory,
+local links, and stale trigger phrases. `Triggers include` must not appear. Verify:
 
 - source package set, README table, INSTALL list, and `skills.sh.json` contain the same skill names;
 - every `references/*.md` file is linked from `SKILL.md`;

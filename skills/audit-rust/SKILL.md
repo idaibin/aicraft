@@ -7,7 +7,7 @@ description: "Use when a Rust workspace or known Rust surface needs a scoped, re
 
 ## Overview
 
-Audit Rust engineering from repository evidence. Select only the audit profiles required by the task; do not load architecture, performance, memory, SQLite, concurrency, and FFI review into every audit. This workflow is read-only by default; use `implement-rust` for requested changes. `repo-review` may invoke this skill for a bounded Rust specialist subreview under either a Worktree or immutable review basis.
+Audit Rust engineering from repository evidence. Select only the audit profiles required by the task; do not load architecture, performance, memory, SQLite, concurrency, and FFI review into every audit. This workflow is read-only by default; use `dev-rust` for requested changes. `repo-review` may invoke this skill for a bounded Rust specialist subreview under either a Worktree or immutable review basis.
 
 ## Rule Priority
 
@@ -46,7 +46,7 @@ Do not rewrite a working local design merely to resemble an external project.
 - **Focused profile audit:** one or two selected risk surfaces with bounded evidence and commands.
 - **Combined risk audit:** multiple interacting profiles, such as Tokio plus SQLite or unsafe plus performance, with explicit integration risks.
 - **Baseline audit:** compare toolchain, workspace, directory, naming, validation, documentation, and legacy-exception policy against real project evidence.
-- **Performance experiment review:** define workload, baseline, measurement, one-factor experiment, and comparable before/after evidence; route experiment edits to `implement-rust`.
+- **Performance experiment review:** define workload, baseline, measurement, one-factor experiment, and comparable before/after evidence; route experiment edits to `dev-rust`.
 - **Scoped specialist subreview:** inspect only the Rust paths or diff delegated by `repo-review`; return domain findings without taking review coordination or Git/GitHub ownership.
 
 ## Hard Rules
@@ -65,13 +65,13 @@ Do not rewrite a working local design merely to resemble an external project.
 - Choose `rusqlite` or SQLx from actual runtime, connection, transaction, checking, and deployment needs; never migrate because one is newer or marketed as async.
 - Keep every unsafe block minimal and document its safety invariant. Verify FFI ownership, length, alignment, lifetime, ABI, callback/re-entry, panic, thread, allocator, and cleanup behavior.
 - Apply stricter templates to new projects only when adopted. Migrate established projects incrementally at real change boundaries; never rename mechanically for visual consistency.
-- Do not edit, stage, commit, post review comments, or deliver code in audit mode. Route approved remediation to `implement-rust`. `repo-review` owns Worktree and immutable review coordination; `repo-delivery` alone owns Git mutation.
+- Do not edit, stage, commit, post review comments, or deliver code in audit mode. Route approved remediation to `dev-rust`. `repo-review` owns Worktree and immutable review coordination; `repo-delivery` alone owns Git mutation.
 - Do not claim profiles were reviewed when their workload, runtime, target, dataset, or tool support was unavailable. Mark the exact gap `Not verified`.
 
 ## Do Not Use For
 
 - Repository orientation without a Rust task; use `repo-map`.
-- Rust implementation, modification, refactoring, or porting; use `implement-rust`.
+- Rust implementation, modification, refactoring, or porting; use `dev-rust`.
 - Root-cause diagnosis of a concrete failure; use the host's built-in diagnosis under effective instructions.
 - Owning Worktree readiness or immutable repository/range/PR/release coordination; use `repo-review`, which may delegate a bounded Rust surface here.
 - Commit, push, squash, branch cleanup, or remote proof; use `repo-delivery` only when the user explicitly requests delivery.
@@ -97,5 +97,4 @@ Start with selected profiles and severity-ranked findings. For each finding, rep
 - Read [review-checklist.md](references/review-checklist.md) for common gates and profile-scoped checks.
 - Read [anti-patterns.md](references/anti-patterns.md) for detectable failure patterns and corrective decisions.
 - Read [reference-corpus.md](references/reference-corpus.md) for official source evidence, adopted rules, and rejected cargo-cult choices.
-- Read [usage.md](references/usage.md) for trigger, routing, and reporting examples.
-- Read [eval-cases.md](references/eval-cases.md) for trigger, non-trigger, scenario, quality, and scoring evals.
+- Read [usage.md](references/usage.md) and [eval-cases.md](references/eval-cases.md) for routing/reporting/evals; load [codebase-design.md](references/codebase-design.md) only for a selected public-module, seam, abstraction, locality, or testability audit.

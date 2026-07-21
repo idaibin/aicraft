@@ -1,4 +1,4 @@
 interface:
   display_name: "Repository Review"
-  short_description: "Review repository changes against standards and specs"
-  default_prompt: "Use $repo-review to review a local or immutable repository basis read-only across independent Standards and Spec axes, then return consolidated P0-P3 findings."
+  short_description: "Review changes, specs, and protocol contract drift"
+  default_prompt: "Use $repo-review to review a fixed local or immutable basis read-only across Standards, Spec, and applicable protocol-contract evidence, then return consolidated P0-P3 findings."

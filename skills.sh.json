@@ -4,7 +4,7 @@
   "groupings": [
     {
       "title": "Core Engineering",
-      "description": "Independent but interoperable skills for repository mapping, domain modeling, review, and Git delivery.",
+      "description": "Independent but interoperable skills for repository mapping, domain modeling, review, and categorized Git delivery.",
       "skills": [
         "repo-map",
         "domain-modeling",
@@ -13,25 +13,32 @@
       ]
     },
     {
-      "title": "External Review",
-      "description": "Skill for explicitly authorized external ChatGPT review coordination.",
+      "title": "ChatGPT Collaboration",
+      "description": "Ask ChatGPT for an explicitly authorized independent review, research result, visual exploration, or decision challenge.",
       "skills": [
-        "chatgpt-review"
+        "ask-chatgpt"
+      ]
+    },
+    {
+      "title": "Product Definition (Experimental)",
+      "description": "Candidate Skill for implementation-ready product specifications and authorized product-fact updates; behavior and workflow are not verified.",
+      "skills": [
+        "product-spec"
       ]
     },
     {
       "title": "Design",
-      "description": "Skill for creating, extracting, maintaining, and evaluating repository-owned design systems before source implementation.",
+      "description": "Skill for designing concrete Feature UI and, only when shared tokens, component semantics, variants, or visual language change, maintaining a repository-owned Design System profile.",
       "skills": [
-        "design-system"
+        "ui-design"
       ]
     },
     {
       "title": "Implementation",
       "description": "Skills that own requested source-code implementation and refactoring within their domains.",
       "skills": [
-        "implement-frontend",
-        "implement-rust"
+        "dev-frontend",
+        "dev-rust"
       ]
     },
     {

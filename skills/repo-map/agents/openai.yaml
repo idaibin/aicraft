@@ -1,4 +1,4 @@
 interface:
   display_name: "Repository Map"
-  short_description: "Map Git or non-Git project truth and verified reuse routes"
-  default_prompt: "Use $repo-map to resolve real project roots and maintain the smallest useful semantic map of boundaries, commands, task routes, and verified reuse."
+  short_description: "Map project truth, reuse, and protocol authority routes"
+  default_prompt: "Use $repo-map to resolve real roots and maintain the smallest semantic map of boundaries, commands, task routes, verified reuse, and requested protocol-authority chains with owner-bounded stale repair."

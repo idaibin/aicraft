@@ -24,7 +24,7 @@ Use these cases when changing `ops-client` triggers, modes, platform adapters, w
 | --- | --- | --- |
 | `Reuse a browser tab to fill a web form.` | Should prefer `ops-browser`. | Browser operation workflow. |
 | `Make this webpage button easier for AI to identify and click.` | Should prefer `ops-browser` or frontend work. | Browser UI is not desktop-client operation. |
-| `Add aria-labels and stable selectors to this Tauri settings UI.` | Should prefer `implement-frontend`. | Desktop webview code implementation. |
+| `Add aria-labels and stable selectors to this Tauri settings UI.` | Should prefer `dev-frontend`. | Desktop webview code implementation. |
 | `Open the dev server page and check its console errors.` | Should prefer `ops-browser`. | Browser-preview behavior without desktop proof. |
 | `Review current git changes and split commits.` | Should prefer `repo-review`. | Dirty-tree review. |
 | `Understand this repository's directories and commands first.` | Should prefer `repo-map`. | Repository map task. |

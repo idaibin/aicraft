@@ -9,8 +9,8 @@ Use this checklist when committing, pushing, syncing, squashing, or cleaning up 
 - Read relevant repo guidance before delivery.
 - Run `git status --short --branch`.
 - Identify branch, upstream, staged files, unstaged files, untracked files, and unrelated local work.
-- Confirm the requested delivery target and path scope.
-- Confirm the user authorized the exact staging, commit, push, sync, squash, or cleanup action being performed.
+- Confirm the requested delivery target, path scope, and whether one commit was explicitly required.
+- Confirm the user authorized the exact staging, commit, push, sync, branch-integration, or cleanup action being performed.
 - Confirm review status or run `repo-review` first when ownership, mixed hunks, or commit groups are unclear.
 - Run task-matching validation or report why it was skipped.
 - Inspect staged diff before every commit.
@@ -18,6 +18,9 @@ Use this checklist when committing, pushing, syncing, squashing, or cleaning up 
 
 ## Staging And Commit
 
+- Classify every approved path/hunk into semantic categories and record dependency order before staging.
+- Default to one commit per independent category. One commit is valid when the user explicitly requests it or the reviewed scope has one indivisible intent.
+- Keep one contract change with its required tests, migrations, generated artifacts, and documentation even when they span directories.
 - Stage only approved files or hunks.
 - Prefer exact paths or hunk staging.
 - Never use broad staging unless the user explicitly approves that exact scope.
@@ -25,6 +28,16 @@ Use this checklist when committing, pushing, syncing, squashing, or cleaning up 
 - Preserve user-provided commit text verbatim.
 - Use repository convention or concise Conventional Commits when no text is provided.
 - Record the resulting commit hash.
+- Recheck the remaining dirty tree after every category so later commits cannot absorb already delivered or unrelated content.
+- Stop after a local commit unless push or another Git target was separately authorized.
+
+## Merge Or Rebase Conflicts
+
+- Load `resolving-merge-conflicts.md` only for an authorized in-progress operation.
+- Trace both sides' primary intent for every conflicted hunk; never clear markers by blindly choosing ours/theirs.
+- Run focused checks. If staging is authorized, stage only resolved paths/hunks and inspect the cached diff; continue only when separately authorized.
+- Abort when intent, basis, permissions, or local-work preservation cannot be established; no rule forbids a safe abort.
+- Conflict resolution does not imply staging, continuation, commit, push, force-push, cleanup, or branch deletion.
 
 ## Push And Sync
 
@@ -34,12 +47,21 @@ Use this checklist when committing, pushing, syncing, squashing, or cleaning up 
 - Use `--force-with-lease` only when rewrite delivery is explicitly requested and repo guidance permits it.
 - Verify remote refs after push with `git ls-remote`, `git status --short --branch`, or an equivalent repo-defined command.
 
+## Branch Integration Strategy
+
+- Fix the target tip and source range before deciding how history should land.
+- Preserve source commits when each is meaningful, reviewed, independently coherent, dependency-ordered, and useful for future traceability or rollback.
+- Squash when the source history is WIP/fixup-heavy, conflict-repair-heavy, mechanically fragmented, or intentionally represents one outcome; also follow an explicit one-commit or repository-policy requirement.
+- Fold fixup, conflict-only, and validation-repair commits into their owning intent instead of preserving them as important history.
+- Use a partial cherry-pick only when partial integration is explicit; account for every omitted source commit and verify the resulting target tree matches the approved scope.
+- Record the chosen strategy and why the rejected alternative was less faithful to the reviewed intent.
+
 ## Squash-To-Main
 
 - Use only when requested or required by repo guidance.
 - Confirm the current branch contains the completed reviewed work.
 - Ensure `main` is refreshed from `origin/main` before final integration unless repo guidance says otherwise.
-- Produce exactly one final commit on `main` when that is the requested workflow.
+- Produce exactly one final commit on `main` only when squash is the selected strategy.
 - Push `main` only after staged diff and validation are complete.
 - Delete temporary branches only after `main` remote state is verified.
 

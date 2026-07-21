@@ -2,38 +2,32 @@
 
 ## Summary
 
-Use `domain-modeling` to make business language, identity, lifecycle, rules, and context boundaries explicit before technical design or implementation.
+Use `domain-modeling` when shared business vocabulary, meaning, rules, lifecycle, or real business boundaries are ambiguous across product work. Default to the smallest terminology/rules decision; load lifecycle or bounded contexts only when needed.
 
 ## Triggers
 
-- `Model the Node, Metric, Observation, Alert, Report, and Policy domain before we redesign the screens.`
-- `Clarify what account, tenant, member, and user mean here.`
-- `Draw the order lifecycle and identify invalid transitions.`
-- `Separate the billing and entitlement bounded contexts.`
-- `Turn these business rules into an explicit domain model, but do not plan code yet.`
+- `Our docs use account, tenant, member, and user inconsistently; resolve the shared vocabulary.`
+- `These two features disagree on whether a paused subscription may renew; clarify the durable business rule.`
+- `Map the order lifecycle because retry, cancellation, and terminal outcomes change the requirements.`
+- `Billing and entitlement use the same term with different owners and consistency rules; clarify the boundary.`
 
 ## Non-Triggers
 
-- Map repository roots, startup commands, or reusable code: use `repo-map`.
-- Produce technical design, tasks, owners, and validation: use the host's built-in planning.
-- Diagnose a failing transition in current code: use the host's built-in diagnosis under effective instructions.
-- Implement the modeled behavior: use the matching `implement-*` skill.
+- Map roots, commands, source ownership, or reusable code: use `repo-map`.
+- Specify one feature whose shared language and rules are already clear: use `product-spec`.
+- Define APIs, schemas, database tables, frontend/backend structure, or technical tasks: use the appropriate technical owner or host planning.
+- Diagnose a concrete failure: use the host's built-in diagnosis under effective instructions.
 
 ## Composition
 
-For complex product work, use the smallest necessary chain:
-
 ```text
-repo-map (only when repository truth is unknown)
-  -> domain-modeling (when business language or lifecycle is unclear)
-  -> host planning
-  -> implement-*
-  -> repo-review
-  -> repo-delivery
+domain-modeling (only when shared meaning/rules are unresolved)
+  -> product-spec or host planning
+  -> dev-* -> repo-review -> repo-delivery
 ```
 
-Do not invoke every step ceremonially. A clear, small technical change may start at implementation; a pure terminology request stops after the domain model.
+Do not invoke `repo-map` or every lifecycle step ceremonially. A clear feature or technical change may start at its direct owner.
 
 ## Output
 
-Return a concise model with confirmed facts, inference, contradictions, decisions, open questions, and unverified gaps. Prefer tables for term definitions and relationships, and a state diagram only when transitions are meaningful.
+Return concise confirmed facts, inference, contradictions, decisions, open questions, and unverified gaps. Include a state diagram or bounded-context view only when the selected profile makes it useful. Do not write a repository artifact without the explicit three-part artifact gate.

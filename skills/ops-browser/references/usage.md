@@ -2,7 +2,7 @@
 
 ## Summary
 
-Use `ops-browser` for browser-based operations where existing tabs, sessions, state, visual evidence, or artifacts matter. It covers inspection, visual/responsive verification, Browser Debug Evidence, form filling, upload/download, and browser evidence collection. Use the host's built-in diagnosis for cross-system root-cause coordination and `implement-frontend` for code changes.
+Use `ops-browser` for browser-based operations where existing tabs, sessions, state, visual evidence, or artifacts matter. It covers inspection, visual/responsive verification, browser DevTools evidence, form filling, upload/download, and browser evidence collection. Use the host's built-in diagnosis for cross-system root-cause coordination and `dev-frontend` for code changes.
 
 ## Trigger Examples
 
@@ -17,15 +17,24 @@ Use `ops-browser` for browser-based operations where existing tabs, sessions, st
 - `Check whether the current browser session is logged in to the right account.`
 - `Check browser console/network to see why this failed.`
 - `Verify this page, then close the temporary window afterward.`
+- `Check notifications and topic results on the verified X account, but do not post or interact.`
+- `Prepare a Xiaohongshu post in the verified account and stop before publishing.`
+- `Publish this approved Juejin draft once, then prove the resulting post state.`
+- `Open the named Lanhu project, inspect its annotations, and download the authorized asset.`
+- `At this localhost URL, reproduce these exact steps and collect DOM, Console, and Network evidence for the observed browser failure.`
+- `Inspect this authorized production page with DevTools, but do not reload, clear storage, or change data.`
 
 ## Non-Triggers
 
 - Repository-only code review without browser execution.
 - Pure API inspection that does not require a browser session.
-- Frontend implementation, component refactors, or design-system choices; use `implement-frontend`.
+- Frontend implementation, component refactors, or ui-design choices; use `dev-frontend`.
 - Desktop client verification that must inspect a real app window; use `ops-client`.
+- Ongoing account goals, voice, editorial calendars, audience strategy, or engagement policy; the caller must supply those decisions before browser execution.
 
 ## Operation Notes
+
+- For content communities, design collaboration, development collaboration, and admin tools, select a reusable operation pattern from [platform-operations.md](platform-operations.md). Keep platform adapters thin and verify live labels, rules, account, and capabilities at execution time.
 
 - Treat browser products as separate state owners. The ChatGPT desktop built-in browser keeps its own state and supports in-app multi-tab work, sign-in, downloads, and annotations when available. ChatGPT cloud/agent browsing may run remotely or in the background but can have stricter public-page, login, download, and transaction limits. Controlled Chrome is the route for required existing Chrome cookies, tabs, profile state, or extensions. Re-check current capability instead of carrying these product descriptions forward as guarantees.
 - Official capability references: [desktop built-in browser](https://help.openai.com/en/articles/20001277-using-the-built-in-browser-in-the-chatgpt-desktop-app), [cloud browser](https://help.openai.com/en/articles/20001280-using-cloud-browser-in-chatgpt), and [ChatGPT agent](https://help.openai.com/en/articles/11752874-chatgpt-agent/).
@@ -34,7 +43,7 @@ Use `ops-browser` for browser-based operations where existing tabs, sessions, st
 - Enumerate browser sessions and existing tabs before opening a page only when the active tool exposes enumeration. Record only available browser/window details, tab handle when exposed, URL/title, account or session note, and whether the tab can be reused safely. If enumeration is unavailable, do not claim reuse or identity; for ordinary browser work use a safely isolated managed page only when profile state is unnecessary. For a bridge handoff, never change the bridge-selected route: return the blocked capability/identity claim instead.
 - Choose the session in this order: user-requested or recorded session; tab with required login/state evidence; managed browser session when external profile state is not required; user browser session when the task depends on the user's profile, downloads, extensions, or account state.
 - Reuse the same tab and browser session for one task whenever practical. Before opening a new tab, re-enumerate tabs and search by session record, exact URL, stable session id, title helper, and account note.
-- For external ChatGPT review, accept the surface, authorization state, package path, round scope, selected browser route/capability, and conversation mapping—or the coordinator's explicit policy to create exactly one first conversation—from `chatgpt-review`. Perform only low-level actions on that route and return evidence. If the route or mapping cannot be revalidated, stop and return the break; do not switch sessions, create an unrequested conversation, package repository content, decide that sending is authorized, add rounds, or write the response archive.
+- For external ChatGPT collaboration, accept the surface, authorization state, package path, round scope, selected browser route/capability, conversation mapping—or the coordinator's explicit policy to create exactly one first conversation—plus Chat/Work, model/reasoning preference, and ordered fallbacks from `ask-chatgpt`. Perform only low-level actions on that route, verify the selected controls before submit, and return evidence. If the route, mapping, or selection cannot be revalidated, stop and return the break; do not switch sessions or unconfigured model modes, create an unrequested conversation, package repository content, decide that sending is authorized, add rounds, or write the response archive.
 - For that bridge handoff, return one `browser-operation/v1` Capability Snapshot, accept only a complete Handoff Request, and return the same `operation_id` in the Handoff Result. The bridge owns the operation ledger and retry decision; the browser operator owns direct before/action/side-effect/after evidence.
 - On reconnect or interruption, inspect the same target and expected postcondition. Return `ambiguous` when submission cannot be proven absent or present; never retry, switch route, create a replacement conversation, or invent a new operation ID.
 - Operate the intended target tab, not whichever tab is currently active. Revalidate tab identity before typing, uploading, downloading, submitting, or navigating away.
@@ -64,12 +73,6 @@ Use `ops-browser` for browser-based operations where existing tabs, sessions, st
 
 ## Browser Debug Evidence
 
-- Enter this mode only after the caller supplies an already-isolated browser-layer evidence request. Route unexplained or cross-system root-cause requests back to the caller for diagnosis before browser operation.
-- Build the browser feedback loop first: exact target URL, viewport or account state if relevant, action sequence, expected symptom, observed symptom, and the evidence source that can prove red/green.
-- Prefer a short repeatable browser script, deterministic DOM/console/network check, or documented manual sequence over exploratory clicking.
-- Wait for the page state that matters before inspecting dynamic apps; do not inspect stale DOM or pre-hydration markup and treat it as final.
-- Minimize the reproduction by removing steps, inputs, cache/auth isolation, and viewport changes one at a time while the symptom still appears.
-- Form one browser hypothesis at a time, then test it with the smallest safe action. Do not bundle cache clearing, reloads, account switches, and code changes into one experiment.
-- Tag temporary state and evidence with a unique task prefix. Remove disposable probes, injected filters, and task-only tabs when safe; retain referenced screenshots, downloads, traces, and logs until embedded, archived, transferred, or accepted by the handoff owner, then report retention and cleanup separately.
-- If the issue cannot be reproduced, report the loop attempts, missing evidence, and what artifact would unblock diagnosis instead of guessing at a fix.
-- Confirm only browser-layer facts. Return DOM, console, network, storage, route, screenshot, and red/green evidence to the caller; do not declare a final cross-system root cause or permanent remediation.
+- Use [devtools-debugging.md](devtools-debugging.md) only after the request fixes the URL, steps, expected behavior, observed symptom, and browser evidence needed for a red/green decision.
+- Route unexplained or cross-system symptoms back to the caller before browser operation. Return direct browser facts and unresolved gaps; keep permanent source remediation with its owning workflow.
+- Retain referenced screenshots, traces, logs, and downloads until the caller accepts or archives them, then report cleanup separately.

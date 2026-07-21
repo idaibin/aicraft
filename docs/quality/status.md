@@ -5,7 +5,7 @@ maturity labels or treat format validation as proof of model behavior.
 
 ## Evidence Basis
 
-- Recorded: `2026-07-18`
+- Recorded: `2026-07-20`
 - Evidence revision: the commit containing this file; resolve with
   `git log -1 --format=%H -- docs/quality/status.md`
 - Structure host: local repository validator on macOS
@@ -28,21 +28,34 @@ end-to-end task completion.
 | --- | --- | --- | --- | --- | --- |
 | `repo-map` | Core Engineering | available | verified | not_verified | not_verified |
 | `domain-modeling` | Core Engineering | available | verified | not_verified | not_verified |
+| `product-spec` | Product Definition | available | verified | not_verified | not_verified |
 | `repo-review` | Core Engineering | available | verified | not_verified | not_verified |
 | `repo-delivery` | Core Engineering | available | verified | not_verified | not_verified |
-| `design-system` | Design | available | verified | not_verified | not_verified |
-| `implement-rust` | Implementation | available | verified | not_verified | not_verified |
-| `implement-frontend` | Implementation | available | verified | not_verified | not_verified |
+| `ui-design` | Design | available | verified | not_verified | not_verified |
+| `dev-rust` | Implementation | available | verified | not_verified | not_verified |
+| `dev-frontend` | Implementation | available | verified | not_verified | not_verified |
 | `audit-rust` | Specialist Audit | available | verified | not_verified | not_verified |
 | `audit-frontend` | Specialist Audit | available | verified | not_verified | not_verified |
 | `audit-security` | Specialist Audit | available | verified | not_verified | not_verified |
 | `ops-browser` | Runtime Operations | available | verified | not_verified | not_verified |
 | `ops-client` | Runtime Operations | available | verified | not_verified | not_verified |
-| `chatgpt-review` | External Review | available | verified | not_verified | not_verified |
+| `ask-chatgpt` | ChatGPT Collaboration | available | verified | not_verified | not_verified |
 | `human-writing` | Writing Extension | available | verified | not_verified | not_verified |
 
 Functional category states what a skill owns. Release states whether it is
 offered for installation. Validation states only what current evidence proves.
+
+`product-spec` is an experimental candidate for live trials. `available` means
+installable, not Stable; its behavior and workflow remain `not_verified`.
+
+## Candidate Live Trial Evidence
+
+The working checkout may contain local, untracked live-trial notes, but this
+revision does not include a recoverable trial artifact or evidence manifest.
+Therefore it makes no concrete trial-result claim. Generated-contract behavior,
+browser/runtime paths, model routing, and cross-Skill workflow remain
+`not_verified`; a later candidate may cite a trial only after its sanitized basis,
+evidence, limits, and verification record are committed together.
 
 `code-planner` and `diagnose` were retired from the public catalog on
 `2026-07-18`. Their concise planning and diagnosis guardrails moved to personal

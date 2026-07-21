@@ -40,7 +40,7 @@ Without this evidence, write `memory growth observed; cause Not verified`.
 3. Separate startup, warm-up, active workload, idle, cleanup, and shutdown.
 4. Correlate retained objects with an owner and lifecycle event.
 5. Define one owner, bound, or allocation-path experiment and route requested
-   code or configuration changes to `implement-rust`.
+   code or configuration changes to `dev-rust`.
 6. Verify a rerun under the same conditions and compare peak, steady state,
    cleanup, and performance cost.
 

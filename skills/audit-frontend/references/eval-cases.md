@@ -7,7 +7,7 @@
 | `Audit a TanStack Router Console feature for architecture/reuse and query-state contracts; leave accessibility out of scope.` | Trigger `audit-frontend` with Architecture/Reuse and State/Data/Contracts profiles. |
 | `Audit a Vue 3 feature for reactivity loss, watcher loops, composable lifetime, Pinia ownership, and Router contracts.` | Trigger State/Data/Contracts with the Vue Composition API framework profile. |
 | `Under repo-review, perform a read-only specialist audit of only the changed Vue SFCs for state, lifecycle, accessibility, and performance.` | Trigger bounded `audit-frontend`; keep `repo-review` as local Git-change review owner. |
-| `Under repo-review, inspect only the changed frontend paths for design-system duplication and accessibility.` | Trigger bounded `audit-frontend`; keep `repo-review` as repository/range review owner. |
+| `Under repo-review, inspect only the changed frontend paths for ui-design duplication and accessibility.` | Trigger bounded `audit-frontend`; keep `repo-review` as repository/range review owner. |
 | `Audit the Tauri frontend/Rust boundary for progress, cancellation, errors, menus, and shortcuts.` | Trigger Desktop Boundary plus applicable State/Data/Contracts. |
 | `Audit this frontend design system for duplicated primitives, variants, tokens, spacing, and scroll ownership.` | Trigger Component/Layout/Design System. |
 | `Audit this React and Tailwind table for scale drift, class conflicts, responsive behavior, and duplicated spacing ownership.` | Trigger React plus Tailwind with Component/Layout/Design System; add Performance only when evidence warrants it. |
@@ -19,13 +19,13 @@
 
 | Prompt | Expected |
 | --- | --- |
-| `Change one known component's copy and keep everything else unchanged.` | Prefer `implement-frontend`. |
+| `Change one known component's copy and keep everything else unchanged.` | Prefer `dev-frontend`. |
 | `Find the unknown cause of this failing frontend test.` | Do not trigger this Skill; use the host's built-in diagnosis under effective instructions. |
 | `Operate the real Tauri window and capture evidence.` | Prefer `ops-client`. |
 | `Review the whole local dirty tree and prepare exact staging.` | Prefer `repo-review`. |
 | `Review this entire repository range and coordinate frontend, Rust, security, CI, and docs.` | Prefer `repo-review`, which may delegate bounded frontend paths. |
 | `Stage and commit the accepted frontend fix.` | Prefer `repo-delivery`. |
-| `Create a new UI profile, scoped reference registry, tokens, and task brief before implementation.` | Prefer `design-system`. |
+| `Create a new UI profile, scoped reference registry, tokens, and task brief before implementation.` | Prefer `ui-design`. |
 
 ## Scenario Eval
 
@@ -75,7 +75,7 @@ Each scenario must produce the listed investigation, decision, rejection, and re
 | Coordinator boundary | keeps Worktree and immutable basis ownership inside `repo-review` while the specialist remains path-bounded | lets specialist take over whole review, staging, or final cross-domain severity |
 | Scope | preserves unrelated work and does not run excluded profiles | drive-by audit or cleanup |
 | Validation | runs relevant real commands/runtime proof or reports Not verified | invented commands or unsupported pass claim |
-| Read-only boundary | leaves code and Git/GitHub state unchanged, routes fixes to `implement-frontend`, and returns bounded findings to the coordinating reviewer | edits, stages, commits, comments, claims readiness, or expands scope |
+| Read-only boundary | leaves code and Git/GitHub state unchanged, routes fixes to `dev-frontend`, and returns bounded findings to the coordinating reviewer | edits, stages, commits, comments, claims readiness, or expands scope |
 
 ## Scoring
 

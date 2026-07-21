@@ -9,16 +9,17 @@ every host reads `AGENTS.md` directly.
 
 ## Naming And Routing
 
-- Implementation skills use `implement-<domain>` and own requested source changes.
+- Implementation skills use `dev-<domain>` and own requested source changes.
 - Domain audit skills use `audit-<domain>`, stay read-only by default, select only applicable profiles, and route requested fixes to the corresponding implementation skill.
-- `repo-map` owns separate repository mapping, reuse inventory, and docs/code alignment; it does not rank defects.
-- `domain-modeling` owns business language, identity, relationships, lifecycle, invariants, and bounded contexts; it does not own repository mapping or technical implementation planning.
+- `repo-map` owns separate repository mapping, reuse inventory, bounded
+  protocol-authority/consumer maps, and docs/code alignment; it does not rank defects
+  or claim runtime/compatibility results from topology alone.
+- `domain-modeling` owns shared business language, ambiguity, rules, and boundary scenarios; lifecycle and bounded contexts are conditional depth. It does not own technical DDD, repository mapping, APIs, databases, frontend/backend structure, or implementation planning.
 - Planning and diagnosis use the host's built-in capabilities plus effective personal and repository instructions; do not recreate them as public catalog Skills unless they later gain non-trivial domain knowledge, tooling, or a distinct authority boundary.
-- `repo-review` owns read-only review of current local Git changes and immutable snapshots, ranges, pull requests, release candidates, and review packages through basis-specific modes.
+- `repo-review` owns three read-only bases: current Worktree/index, fixed immutable SHA/range, and verified review package. Pull requests resolve to fixed base/head SHAs; Release is a conditional profile over a fixed basis.
 - `audit-security` owns bounded read-only security assessment and may act as a specialist under `repo-review`.
-- `chatgpt-review` owns local review packages and explicitly authorized external ChatGPT review rounds; `ops-browser` owns only delegated low-level browser operations.
-- `repo-delivery` owns staging, commits, pushes, squash, cleanup, and other Git mutations after review.
-- Do not reintroduce retired aliases such as `repo-context`, `code-context`, `code-review`, `code-delivery`, `chatgpt-review-bridge`, `code-security`, `frontend-implementation`, `frontend-governance`, or `rust-engineering-governance` inside skill packages.
+- `ask-chatgpt` owns local ChatGPT request packages and explicitly authorized ChatGPT web collaboration only after a Codex-first gate; it selects content theme separately from Standard Chat, Search, Deep Research, Images, or reviewer-browser capability. `ops-browser` owns only delegated low-level browser operations.
+- `repo-delivery` owns categorized commits by default, explicit single commits, pushes, evidence-based branch integration, cleanup, and other Git mutations after review.
 
 Before creating a new public skill, search existing skills and references for direct reuse or an internal profile extension point. Create a new skill only when user intent, authority, workflow, output contract, and nearest non-trigger boundary are materially distinct. Framework names or checklist categories alone are not sufficient.
 
@@ -40,8 +41,18 @@ Skill-specific validation thresholds and cross-artifact term contracts belong in
 as new prose literals in the validator.
 Package maintenance rules belong here and in the repository standards, not in a
 runtime `SKILL.md` Maintenance section.
+Keep execution economical: one primary owner by default, selected references and
+profiles only, the smallest decisive evidence set, focused checks before broader
+gates, and no task, review, or handoff expansion without a required outcome.
 
-Before review or delivery, run from the repository root:
+Validation is risk-tiered:
+
+- **Targeted:** for one package's bounded prose/reference correction with no routing,
+  metadata, eval, contract, shared protocol, validator, or package-set change, run
+  `python3 scripts/validate-skills.py`, focused tests when applicable, and
+  `git diff --check -- skills/<name>`.
+- **Full:** for routing/metadata/eval/contract/protocol/validator changes, package
+  add/remove/rename, multiple packages, or any review, commit, or publish, run:
 
 ```bash
 python3 scripts/sync-shared-protocols.py --check
@@ -51,5 +62,9 @@ python3 scripts/eval-skill-contracts.py --validate-only
 python3 scripts/measure-skill-footprint.py --baseline-ref HEAD
 git diff --check
 ```
+
+Do not run both tiers or repeat unchanged commands in one basis. Re-run only failed
+or invalidated checks during iteration, then run the selected tier once on the final
+basis.
 
 Preserve unrelated local changes and stage only the files owned by the task.

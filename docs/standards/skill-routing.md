@@ -26,33 +26,42 @@ Framework-specific or domain-specific checks should stay as profiles when these 
 | Skill | Primary object | Mutation | Primary output |
 | --- | --- | --- | --- |
 | `repo-map` | workspace/repository semantics and reuse map | read-only by default; repo-map write only after explicit request | real boundaries, task routes, verified reuse entries, alignment gaps |
-| `domain-modeling` | business language, concepts, lifecycle, rules, and contexts | read-only by default; domain-artifact write only after explicit request | evidence-backed domain model, decisions, contradictions, and open questions |
-| `repo-review` | local worktree/index or immutable snapshot/range/PR/release/package | read-only | basis-specific readiness, staging guidance, or consolidated P0-P3 findings |
-| `implement-frontend` | requested frontend source change | source mutation | implemented and validated frontend change |
-| `implement-rust` | requested Rust source change | source mutation | implemented and validated Rust change |
+| `domain-modeling` | shared business language, ambiguity, rules, and conditional lifecycle/context depth | read-only by default; existing fact-source update only after explicit request | resolved terms/rules, contradictions, decisions, scenarios, and open questions |
+| `product-spec` | product behavior, scope, rules, states, and acceptance for one implementation slice | read-only by default; named product-artifact write only after explicit request | one feature/foundation spec or bounded product-fact update with Ready-for-slice verdict |
+| `ui-design` | one page/flow visual and interaction design; conditional shared-system change | design-artifact write only; no source/runtime/Git mutation | Feature UI artifacts and handoff, or a bounded shared-system revision |
+| `repo-review` | current Worktree/index, fixed immutable SHA/range, or verified review package; PR resolves to base/head and Release is conditional | read-only | basis-specific readiness, staging guidance, or consolidated P0-P3 findings |
+| `dev-frontend` | requested frontend source change | source mutation | implemented and validated frontend change |
+| `dev-rust` | requested Rust source change | source mutation | implemented and validated Rust change |
 | `audit-frontend` | selected frontend domain profiles | read-only | bounded frontend findings and validation gaps |
 | `audit-rust` | selected Rust domain profiles | read-only | bounded Rust findings and validation gaps |
 | `audit-security` | known security-sensitive surface | read-only | scoped security findings and threat sketch |
-| `repo-delivery` | reviewed local Git changes | Git mutation | staged/committed/pushed/synchronized refs and proof |
-| `ops-browser` | browser session/page state | authorized browser actions | browser evidence and state-change report |
+| `repo-delivery` | reviewed local changes or a fixed source branch range | Git mutation | categorized commits or explicit single commit, evidence-based integration, refs, and proof |
+| `ops-browser` | browser session/page state and bounded platform operation | authorized browser actions | browser evidence and state-change report |
 | `ops-client` | real desktop client process/window | authorized client actions | process/window/runtime evidence |
-| `chatgpt-review` | external ChatGPT review package or round | local artifact write or authorized external action | prepared/routed package, attributed response, local verification |
+| `ask-chatgpt` | local ChatGPT request package or independently required ChatGPT web collaboration | local artifact write or authorized external action | bounded request, attributed response/artifact, and locally verified implications |
 | `human-writing` | supplied technical draft | text transformation | edited publication-ready text |
 
 ## Engineering Lifecycle
 
 ```text
-repo-map (repository truth unknown)
-  -> domain-modeling (business language or lifecycle unclear)
+repo-map (only when repository truth needs a durable map)
+  -> domain-modeling (shared language/rules unclear)
+  -> product-spec (product behavior or acceptance unclear)
   -> host planning (technical design and task slices needed)
-  -> implement-* (source mutation requested)
+  -> ui-design (concrete UI design needed)
+  -> dev-* (source mutation requested)
   -> repo-review (Standards and Spec axes)
   -> repo-delivery (authorized Git mutation)
 ```
 
 This chain is composable, not mandatory ceremony. Start at the earliest unresolved owner and stop at the last outcome the user requested.
 
-`domain-modeling` remains separate from general planning: it defines business meaning and rules independent of implementation. Technical design, task ownership, dependencies, acceptance criteria, and validation use the host's built-in planning plus effective repository instructions.
+`domain-modeling` remains separate from general planning: it resolves shared business meaning and rules independent of implementation. It does not default to technical DDD structures, APIs, databases, or frontend/backend design. Lifecycle and bounded contexts load only when material complexity requires them. Technical design, tasks, and validation use host planning and the appropriate implementation owner.
+
+`product-spec` is also separate from general planning: it owns unresolved product
+behavior and an authorized product-fact artifact, while host planning owns technical
+decomposition after the relevant implementation slice is ready. It does not own a
+complete domain model, shared Design System profile, technical interface definition, or source work.
 
 ## `repo-map` And `repo-review`
 
@@ -65,21 +74,31 @@ Answers:
 - What exists?
 - Where is the real entry point or owner?
 - Which canonical component, function, type, or API can be reused, extended, or wrapped before declaring another one?
+- Which current-source declaration owns a protocol contract, which native client and
+  real consumers depend on it, and which generated artifacts exist when applicable?
 - Do project docs and current structure agree?
 
 It stops when the requested facts are supported. It does not rank defects or determine commit/release safety.
+Its API Contract Map profile records bounded authority and consumer topology only;
+ordinary REST does not require OpenAPI or a generated client. The profile records
+those fields only when the repository already owns them or an explicit trial adds them.
+`repo-review` still owns fixed-basis compatibility/readiness findings, and runtime
+operators still own live evidence.
 
 ### `repo-review`
 
 Answers:
 
-- What changed in the current local worktree/index, which changes belong to this task, and are there mixed hunks?
-- How should reviewed local changes be grouped and staged safely?
+- What changed in the requested Worktree scope and necessary interface closure?
+- When commit-readiness is requested, which changes belong together and how can they be staged safely?
 - What actionable defects exist in a fixed repository snapshot, branch comparison, commit range, PR, release candidate, or verified review package?
 - Which findings should block merge or release?
 - How do frontend, Rust, security, CI, tests, docs, and structural evidence integrate?
 
-It selects one review basis first. Worktree mode owns ownership, mixed hunks, commit readiness, and exact staging guidance; immutable modes resolve SHAs and own P0-P3 findings. All modes stay read-only and coordinate bounded specialists.
+It selects one basis first. Worktree findings-only inventories full status but deeply
+reviews only the requested scope and interface closure. Worktree commit-readiness
+adds complete ownership/mixed-hunk classification and staging guidance. Immutable
+modes resolve SHAs and own P0-P3 findings. All modes stay read-only.
 
 ## Security Audit
 
@@ -92,7 +111,7 @@ It selects one review basis first. Worktree mode owns ownership, mixed hunks, co
 
 ## Diagnosis And Implementation
 
-General diagnosis uses the host's built-in reasoning plus effective personal and repository instructions. Confirm the failure, evidence, cause, and regression seam before applying a permanent fix. When the user requests remediation, the matching `implement-*` Skill owns the source change, `repo-review` checks the resulting local diff, and `repo-delivery` performs authorized Git mutation.
+General diagnosis uses the host's built-in reasoning plus effective personal and repository instructions. Confirm the failure, evidence, cause, and regression seam before applying a permanent fix. When the user requests remediation, the matching `dev-*` Skill owns the source change, `repo-review` checks the resulting local diff, and `repo-delivery` performs authorized Git mutation.
 
 ## Cross-Skill Handoff Contracts
 
@@ -115,7 +134,31 @@ required one-of group must be present, and no undeclared, optional, or
 forbidden handoff may appear. Exact top-1 remains a diagnostic and per-Skill
 coverage metric, but it is not sufficient on its own.
 
-For `chatgpt-review -> ops-browser -> chatgpt-review`, both
+Compose only owners needed for an independently required result. Keep one owner when
+it can finish the request, load only selected references/profiles, reuse evidence while
+the basis and environment remain unchanged, and run focused checks before broader
+risk or repository gates. Do not create tasks, subagents, browser operations, durable
+artifacts, or review rounds merely because the catalog can support them. Continue safe
+local work and collect deferrable approval blockers at the end.
+
+Host-specific model selection remains an execution policy in effective Agent
+instructions, not a public Skill or handoff. A faster model may execute one bounded
+slice, but the owning Skill, authorization, evidence basis, and coordinator validation
+remain unchanged; fallback must not duplicate work or reinterpret ordinary failures
+as capacity exhaustion.
+
+For combined review, `ask-chatgpt` fixes one basis and creates an unbiased package;
+`repo-review` and ChatGPT inspect it independently. Codex verifies and deduplicates both
+finding sets in live source, applies only confirmed fixes through the matching owner,
+runs proportionate validation, and performs one final local review. Repeat ChatGPT only
+with explicit authorization plus a confirmed P0/P1, permission/privacy/security,
+migration/irreversible, public-compatibility, production/release, or equivalent new
+risk. A verified ChatGPT Project provides durable context but never replaces
+the per-round package and fixed basis.
+
+ChatGPT collaboration starts only after a Codex-first gate: when Codex, an existing Skill, or an available host tool can complete the requested result and no independent ChatGPT output was requested, use that local owner and stop. Otherwise `ask-chatgpt` derives a bounded request from natural language, selects a product/domain, UI/design, architecture, repository, implementation/security/delivery, review, or open-ended theme separately from Standard Chat, Search, Deep Research, Images, or reviewer-browser capability, and reuses the same package, authorization, operation, attribution, and local-verification infrastructure. Deep Research may supply a reviewable plan; a separate prompt-refinement chat is optional, not a mandatory round. External output does not mutate product facts, source, Git, or other systems.
+
+For `ask-chatgpt -> ops-browser -> ask-chatgpt`, both
 published packages carry the identical `browser-operation/v1` protocol. The
 bridge owns the Capability requirements, Handoff Request, operation ledger,
 `operation_id`, retry decision, rounds, and attribution. `ops-browser` owns the
@@ -205,4 +248,4 @@ Before publishing a skill change:
 - ensure audits and reviews remain read-only;
 - ensure implementation skills do not claim staging, commit, push, or PR ownership;
 - ensure external/browser actions require their own explicit authorization;
-- run targeted and full validation.
+- run the applicable targeted or full tier from `skills/AGENTS.md`, never both for one unchanged basis.

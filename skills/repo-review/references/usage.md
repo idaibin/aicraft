@@ -5,9 +5,12 @@
 - reviewing current staged, unstaged, or untracked changes before commit;
 - classifying dirty-tree ownership or mixed hunks;
 - preparing semantic commit groups and exact staging guidance;
-- reviewing a fixed commit, `base..head`, branch comparison, or PR;
-- reviewing a release candidate or verified review package;
+- reviewing a fixed commit or `base..head`, including a branch or PR normalized to immutable SHAs;
+- reviewing a verified review package;
+- adding release-readiness evidence only when that conditional profile is explicitly requested;
 - coordinating bounded frontend, Rust, or security specialist findings.
+- reviewing a fixed-basis HTTP REST contract change across authority, normalized
+  OpenAPI, backend conformance, generated client, consumer, and CI.
 
 ## Nearest Skill Boundaries
 
@@ -15,9 +18,10 @@
 | --- | --- |
 | Map directories, architecture, commands, conventions, and reuse entries | `repo-map` |
 | Review any local or immutable repository change basis | `repo-review` |
+| Define unresolved product behavior or API business intent | `product-spec` |
 | Audit only a known security surface | `audit-security` |
 | Diagnose a concrete failure | Host diagnosis under effective instructions |
-| Apply accepted fixes | matching `implement-*` |
+| Apply accepted fixes | matching `dev-*` |
 | Stage, commit, push, squash, or clean branches | `repo-delivery` |
 
 ## Examples
@@ -34,22 +38,34 @@ Inventory status/index evidence, classify ownership and mixed hunks, inspect com
 
 Resolve both endpoints to immutable SHAs before conclusions.
 
-### Pull request
+### Pull request normalized to fixed range
 
 `Review PR 42 without posting comments.`
 
-Verify complete PR evidence and resolved SHAs; comment posting remains unauthorized.
+Verify complete PR evidence, resolve base/head SHAs, and review that fixed range; comment posting remains unauthorized.
 
-### Release candidate
+### Conditional Release profile
 
 `Review this release candidate for migrations, packaging, CI, rollback, and security configuration.`
 
-Use the immutable candidate revision and report merge/release implications.
+Add this profile to a fixed candidate revision only when release readiness was requested; report merge/release implications and `Not verified` runtime/CI gaps.
 
 ### Repo-map navigation
 
 A `repo-map` artifact may identify owners and shortest reading paths. Independently verify finding facts at the selected basis. If a mapped path is stale, search from the nearest existing ancestor and route document repair to `repo-map`.
 
+### Protocol contract
+
+`Review this fixed range for OpenAPI compatibility and generated-client drift.`
+
+Fix the Git basis, authority type, generator version/command, baseline normalized
+OpenAPI, and candidate clean generation before findings. Static checks do not prove
+backend runtime conformance, consumer states, or clean CI.
+
 ## Output
 
-All modes report basis, scope, findings, evidence, validation, exclusions, and gaps. Worktree mode adds ownership, mixed-hunk risks, commit groups, staging guidance, and commit messages. Immutable modes add resolved SHAs and merge/release implications.
+All modes report basis, scope, findings, evidence, validation, exclusions, and gaps.
+Worktree findings-only records full status but reports bounded findings without
+commit groups or staging guidance. Worktree commit-readiness additionally reports
+complete ownership, mixed hunks, semantic groups, exact staging, and commit messages.
+Fixed-basis review adds resolved SHAs. Release implications appear only when the conditional Release profile was selected.

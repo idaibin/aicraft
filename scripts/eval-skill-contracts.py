@@ -204,6 +204,7 @@ def committed_skill_fixture_hash(revision: str) -> str:
         raise ValueError(f"cannot read committed skills fixture for {revision}")
     digest = hashlib.sha256()
     package_names = discover_skill_names()
+    supported_package_names = package_names
     for record in tree.stdout.split(b"\0"):
         if not record:
             continue
@@ -225,7 +226,7 @@ def committed_skill_fixture_hash(revision: str) -> str:
             or path.is_absolute()
             or len(path.parts) < 3
             or path.parts[0] != "skills"
-            or path.parts[1] not in package_names
+            or path.parts[1] not in supported_package_names
             or ".." in path.parts
             or path.as_posix() != path_text
         ):

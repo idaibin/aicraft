@@ -9,11 +9,12 @@ Use this compact structure after the requested Git state is reached or when deli
 - <implemented/reviewed/delivered outcome; link existing spec or review>
 
 ## Changed Files
-- <semantic group and exact paths>
+- <semantic category, dependency order, exact paths, and resulting commit SHA>
 
 ## Verification
 - <command or probe>: <result>
 - Review: <basis and verdict>
+- Commit strategy: <categorized commits|explicit single commit|preserved source commits|squash|explicit partial integration> and <rationale>
 - Git proof: <local SHA and remote ref when applicable>
 
 ## Known Issues
@@ -25,6 +26,7 @@ Use this compact structure after the requested Git state is reached or when deli
 ## Git Status
 - Branch/upstream: <state>
 - Commit: <SHA or skipped reason>
+- Integration: <source range, target, strategy, and omitted commits or None>
 - Remote: <verified ref or Not verified>
 - Worktree: <clean or preserved out-of-scope changes>
 ```

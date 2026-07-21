@@ -200,8 +200,12 @@ def _git_bytes(arguments: Sequence[str]) -> bytes:
 
 
 def resolve_revision(
-    revision_spec: str, *, allow_historical_subset: bool = False
+    revision_spec: str,
+    *,
+    allow_historical_subset: bool = False,
 ) -> GitRevision:
+    """Resolve a committed fixture against the current package inventory."""
+
     commit = _git_text(["rev-parse", "--verify", f"{revision_spec}^{{commit}}"])
     if re.fullmatch(r"[0-9a-f]{40}", commit) is None:
         raise RunnerError(f"resolved Skill revision is not a full Git commit: {commit!r}")
@@ -218,14 +222,15 @@ def resolve_revision(
         and parts[2] == "SKILL.md"
     }
     current_inventory = set(OWNER_ENUM)
-    extra = sorted(discovered - current_inventory)
+    comparable_inventory = discovered
+    extra = sorted(comparable_inventory - current_inventory)
     if not discovered or extra:
         raise RunnerError(
             "Skill revision must contain a non-empty subset of the current "
             f"package inventory; extra={extra}"
         )
-    if not allow_historical_subset and discovered != current_inventory:
-        missing = sorted(current_inventory - discovered)
+    if not allow_historical_subset and comparable_inventory != current_inventory:
+        missing = sorted(current_inventory - comparable_inventory)
         raise RunnerError(
             "Candidate Skill revision must contain the current "
             f"{len(OWNER_ENUM)}-package inventory; missing={missing}"

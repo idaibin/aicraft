@@ -14,13 +14,16 @@
 | `当前目录不是 Git；检查里面有没有子 Git 仓库，没有也按普通目录项目梳理。` | Trigger Repo Map mode. | Root classification must support multi-repo and non-Git directory projects. |
 | `路径还在，但导出和路由注册已经换了，局部修复 repo map。` | Trigger Navigation Repair mode. | Semantic staleness must be repaired even when paths resolve. |
 | `Map the repository sources that define the Order domain, but do not decide its business vocabulary or lifecycle.` | Trigger `repo-map`; domain decisions remain with `domain-modeling`. | Repository evidence mapping only. |
+| `Map PageHeader and MetricCard by design term, visual job, definition, export, owner root, consumers, variants, and current evidence.` | Trigger Reuse Inventory mode. | Durable design-to-component navigation is requested. |
+| `核查并记录 Admin 创建用户接口的唯一 authority、OpenAPI 生成命令、generated client、真实 React consumer 和重复 DTO 边界。` | Trigger Targeted Update with the API Contract Map profile. | Durable current-source contract navigation is requested. |
+| `记录这个原生 REST operation 的 route、DTO、client、真实 consumer 和测试入口；仓库没有 schema 生成链。` | Trigger a bounded API Contract Map and record generated artifacts as `Not applicable`. | Native contract navigation is still valuable without OpenAPI. |
 
 ## Non-Trigger Eval
 
 | User prompt | Expected result | Why |
 | --- | --- | --- |
-| `Implement this login page now.` | Prefer `implement-frontend`. | No separate map deliverable. |
-| `Implement this Rust API now.` | Prefer `implement-rust`. | No separate map deliverable. |
+| `Implement this login page now.` | Prefer `dev-frontend`. | No separate map deliverable. |
+| `Implement this Rust API now.` | Prefer `dev-rust`. | No separate map deliverable. |
 | `Review all local changes before commit.` | Prefer `repo-review`. | Dirty-tree readiness. |
 | `Review main..feature for P0-P3 findings.` | Prefer `repo-review`. | Immutable range review. |
 | `Find why the build fails.` | Do not trigger this Skill; use the host's built-in diagnosis under effective instructions. | Concrete failure. |
@@ -28,6 +31,9 @@
 | `Define the entities, relationships, lifecycle, invariants, and bounded contexts for this product domain.` | Prefer `domain-modeling`. | Business model, not repository semantics. |
 | `Audit this endpoint for authorization risk.` | Prefer `audit-security`. | Bounded security audit. |
 | `Turn these verified project notes into a technical article.` | Prefer `human-writing`. | Source-grounded writing, not repository mapping. |
+| `Specify the user flows, permission rules, user-visible states, and acceptance for this new feature.` | Prefer `product-spec`. | Product behavior, not repository navigation. |
+| `Regenerate OpenAPI and migrate the React caller to the generated client.` | Prefer the matching `dev-*` owner. | Source implementation, not a durable map deliverable. |
+| `Review this feature range for dual authority, breaking API changes, and runtime gaps.` | Prefer `repo-review`. | Defect and readiness judgment against a fixed basis. |
 
 ## Quality Eval
 
@@ -39,6 +45,9 @@
 | Reuse navigation | Names definitions, access/registration entries, representative callers, and new-contract gate. | Suggests new components or interfaces before searching. |
 | Reuse inventory | Lists the relevant reusable and reference implementations with exact entry paths and ownership. | Scans unrelated code or omits the nearest reuse candidate. |
 | Reuse evidence | Records canonical definition, actual access/registration visibility, representative consumers, boundary, and live evidence. | Treats a name or map row as proof without checking source. |
+| Component-map shape | Records design/semantic name, visual job, canonical path, symbol, export/registration, owner/provider root, consumers, states/variants, reuse boundary, and current-source evidence. | Stores only a component name/path or generates an exhaustive catalog. |
+| API Contract Map | Records the native authority, registration, DTO/envelope/auth owners, client/consumers, duplicate-DTO boundary, checks, and current evidence; generated artifacts are optional and schemas are not copied. | Requires OpenAPI, treats generated files as a second authority, inventories every endpoint, copies schemas, or claims live gates from paths alone. |
+| Contract verification boundary | Separates durable current-source topology from Git-basis hashes/results, runtime/browser evidence, compatibility findings, and CI execution. | Stores transient trial status in the map or treats command existence as a passing result. |
 | Conflicting reuse candidates | Ranks candidates by canonical ownership, active compatible consumers, validation, boundary fit, and deprecation; returns `Not verified` if authority remains ambiguous. | Selects the first name match, wraps an incompatible candidate, or declares `new` to avoid reconciling owners. |
 | Duplicate prevention | Searches by capability, symbols, exports/routes, endpoint shapes, and callers, then records `reuse`, `extend`, `wrap`, or justified `new`. | Allows a parallel declaration because the map had no exact-name match. |
 | Durable decision boundary | Reports task-local reuse decisions but persists only stable canonical owners, boundaries, or contracts in the map. | Stores one-off implementation choices as durable repository truth. |
@@ -52,6 +61,8 @@
 | Cross-root duplicate prevention | Searches the owning root, first-order mapped provider/shared roots, and explicitly owned transitive contract roots, then stops at external or exhausted owner edges. | Approves `new` while an applicable provider root is unchecked, unavailable, or ambiguously owned, or scans unrelated dependency graphs. |
 | Internal shared access | Records actual access or registration visibility, including module-private, framework-registered, generated, Rust `pub(crate)`, or Java package/module entries without widening visibility. | Omits a valid shared contract or makes it public solely to satisfy the map. |
 | Incremental repair | Ascends to the nearest existing ancestor, scans only the relevant subtree, and patches the smallest stale unit. | Declares missing after one lookup or rescans/rebuilds everything. |
+| Owner-root fallback | Ascends and searches only inside the recorded owner/provider root; if the root is absent, marks stale and performs ordinary bounded live discovery from current ownership. | Crosses the owner root or treats a stale root as authority. |
+| History boundary | Uses Git history only to explain a move/rename already proved by current definition, registration, and consumers. | Uses a historical definition or consumer to claim current reuse. |
 | Semantic repair | Detects still-resolving entries whose definition, access/registration, command, schema, owner, or runtime role changed and updates the smallest dependent consistency closure. | Treats a resolving path as current truth or patches one row while leaving derived routes and edges stale. |
 | Consistency-closure bound | Updates the changed entry and directly dependent entries/declared edges, then stops when no changed dependency edge remains. | Rewrites unrelated sections or stops while a declared dependent remains stale. |
 | Preservation | Keeps verified sections unchanged during a targeted refresh. | Rewrites the whole map for one stale path. |

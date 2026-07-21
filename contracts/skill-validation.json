@@ -63,7 +63,7 @@
   },
   "package_policy": {
     "maximum_description_characters": 260,
-    "maximum_skill_lines": 120,
+    "maximum_skill_lines": 100,
     "short_description_characters": {
       "minimum": 25,
       "maximum": 64
@@ -290,9 +290,9 @@
       "required_held_out_handoff_primary_owners": [
         "repo-map",
         "repo-review",
-        "chatgpt-review",
-        "implement-frontend",
-        "implement-rust"
+        "ask-chatgpt",
+        "dev-frontend",
+        "dev-rust"
       ],
       "required_held_out_owner_kinds": [
         "trigger",
@@ -332,6 +332,7 @@
       "core_skills": [
         "repo-map",
         "domain-modeling",
+        "product-spec",
         "repo-review",
         "repo-delivery"
       ],
@@ -350,9 +351,9 @@
       "required_handoff_primary_owners": [
         "repo-map",
         "repo-review",
-        "chatgpt-review",
-        "implement-frontend",
-        "implement-rust"
+        "ask-chatgpt",
+        "dev-frontend",
+        "dev-rust"
       ],
       "maximum_unauthorized_handoff_case_rate": 0.0,
       "maximum_overselected_handoff_group_case_rate": 0.0,
@@ -394,6 +395,17 @@
     }
   },
   "cross_artifact_terms": [
+    {"skill": "product-spec", "surface": "SKILL.md", "section": "## Workflow", "terms": ["Feature Spec", "Foundation Spec", "Artifact Update", "Ready for"]},
+    {"skill": "product-spec", "surface": "SKILL.md", "section": "## Hard Rules", "terms": ["technical interfaces", "`repo-map`", "Not verified"]},
+    {"skill": "repo-map", "surface": "references/reuse-index.md", "section": "## Drift Repair", "terms": ["owner/provider root", "Historical source", "current reusability"]},
+    {"skill": "repo-map", "surface": "references/api-contract-map.md", "section": "## Evidence Chain", "terms": ["repository-native authority", "Not applicable", "Not found", "Not verified"]},
+    {"skill": "repo-map", "surface": "references/api-contract-map.md", "section": "## Verification Boundary", "terms": ["product-spec", "repo-review", "dev-*", "clean CI"]},
+    {"skill": "dev-rust", "surface": "references/protocol-contracts.md", "section": "## Activation Gate", "terms": ["already defines", "explicitly", "Not applicable"]},
+    {"skill": "dev-rust", "surface": "references/protocol-contracts.md", "section": "## Select One Authority", "terms": ["Code-first", "Contract-first", "normalized OpenAPI"]},
+    {"skill": "dev-frontend", "surface": "references/protocol-contracts.md", "section": "## Activation Gate", "terms": ["already owns", "explicitly", "Not applicable"]},
+    {"skill": "dev-frontend", "surface": "references/protocol-contracts.md", "section": "## Consumer Boundary", "terms": ["generated", "normalized OpenAPI", "backend language"]},
+    {"skill": "repo-review", "surface": "references/protocol-contracts.md", "section": "## Activation Gate", "terms": ["already owns", "explicitly", "Not applicable"]},
+    {"skill": "repo-review", "surface": "references/protocol-contracts.md", "section": "## Fixed Contract Basis", "terms": ["Git basis", "generator", "baseline normalized OpenAPI", "candidate artifact"]},
     {"skill": "repo-review", "surface": "SKILL.md", "section": "## Hard Rules", "terms": ["review basis", "resolved SHAs", "read-only"]},
     {"skill": "repo-review", "surface": "references/usage.md", "section": "## Examples", "terms": ["Resolve both endpoints", "SHAs"]},
     {"skill": "repo-map", "surface": "SKILL.md", "section": "## Overview", "terms": ["does not judge", "defects"]},
@@ -403,7 +415,10 @@
     {"skill": "ops-browser", "surface": "SKILL.md", "section": "## Modes", "terms": ["caller", "already-isolated", "browser-layer"]},
     {"skill": "ops-browser", "surface": "references/usage.md", "section": "## Browser Debug Evidence", "terms": ["caller", "before browser operation", "retain referenced"]},
     {"skill": "ops-browser", "surface": "SKILL.md", "section": "## Hard Rules", "terms": ["operation_id", "ambiguous", "prior evidence"]},
-    {"skill": "chatgpt-review", "surface": "SKILL.md", "section": "## Browser Handoff", "terms": ["operation_id", "operation ledger", "ambiguous"]},
+    {"skill": "ops-browser", "surface": "SKILL.md", "section": "## Workflow", "terms": ["availability fields", "`unknown`", "gaps.reason", "not assessed: outside selected preflight scope"]},
+    {"skill": "ops-browser", "surface": "references/platform-operations.md", "section": "## Operation Patterns", "terms": ["Search and read", "Draft and fill", "Publish and interact", "Upload and download", "Inspect and verify"]},
+    {"skill": "ops-browser", "surface": "references/platform-operations.md", "section": "## Thin Adapter Record", "terms": ["semantic navigation", "confirmation boundary", "Not verified"]},
+    {"skill": "ask-chatgpt", "surface": "SKILL.md", "section": "## Browser Handoff", "terms": ["operation_id", "operation ledger", "ambiguous"]},
     {"skill": "ops-client", "surface": "SKILL.md", "section": "## Modes", "terms": ["caller", "already-isolated", "client-layer"]},
     {"skill": "ops-client", "surface": "SKILL.md", "section": "## Hard Rules", "terms": ["Retain screenshots", "handoff owner", "removed disposable state"]},
     {"skill": "ops-client", "surface": "references/usage.md", "section": "## Operation Notes", "terms": ["caller", "already-isolated", "retain referenced"]}

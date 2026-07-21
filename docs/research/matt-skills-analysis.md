@@ -15,23 +15,26 @@ The reviewed skills.sh page reported 55 published Skills and the install command
 
 | Upstream Skill | Useful method | Catalog destination |
 | --- | --- | --- |
-| `grill-me`, `grill-with-docs`, `to-spec` | Resolve requirements and decisions before implementation; separate synthesis from interviewing. | `code-planner` readiness and specification contract |
+| `grill-me`, `grill-with-docs`, `to-spec` | Resolve requirements and decisions before implementation; separate synthesis from interviewing. | `product-spec` internal clarification and Ready-for-slice contract |
 | `domain-modeling` | Ubiquitous language, scenario stress tests, state/rule clarification, sparse decision records. | Existing `domain-modeling` owner |
-| `to-tickets` | Tracer-bullet vertical slices and explicit blocking edges. | `code-planner` task packages |
-| `diagnosing-bugs` | Tight red/green loop, minimization, falsifiable hypotheses, one-variable probes, regression seam. | `diagnose` |
-| `tdd` | Behavior tests at public seams and vertical red-green slices. | Internal references in `implement-frontend` and `implement-rust` |
-| `implement` | Consume a spec, validate continuously, and review before delivery. | Existing `implement-* -> repo-review` chain |
+| `prototype` | One explicit question, materially different comparable variants, finite budget, and throwaway evidence. | UI branch in `ui-design`; conditional logic experiment under the relevant product/domain/technical owner |
+| `writing-great-skills` | Context/cognitive load, checkable completion criteria, single-source rules, branch disclosure, pruning, and leading words. | Skill standard and affected entrypoints |
+| `to-tickets` | Tracer-bullet vertical slices and explicit blocking edges. | Host planning under effective repository instructions |
+| `diagnosing-bugs` | Tight red-capable loop, minimization, falsifiable hypotheses, one-variable probes, regression seam. | Global diagnosis instructions; no public diagnosis Skill |
+| `tdd` | Behavior tests at public seams and vertical red-green slices. | Internal references in `dev-frontend` and `dev-rust` |
+| `implement` | Consume a spec, validate continuously, and review before delivery. | Existing `dev-* -> repo-review` chain |
 | `code-review` | Keep Standards and Spec review independent so one cannot hide the other. | Two-axis evidence inside `repo-review` |
-| `codebase-design`, `improve-codebase-architecture` | Deep modules, small interfaces, locality, leverage, and interface-as-test-seam. | `code-planner` deep-module reference plus existing audit/review profiles; no duplicate public review skill |
-| `handoff` | Compact references, continuation state, and redaction discipline. | Adapt inside the catalog-owned `repo-delivery` report contract |
+| `codebase-design`, `improve-codebase-architecture` | Deep modules, small interfaces, locality, leverage, and interface-as-test-seam. | Host planning plus existing audit/review profiles; no duplicate public review skill |
+| `handoff` | Compact references, continuation state, and redaction discipline. | Global continuation/task coordination; no public handoff Skill |
 
 ## Methods Not Imported
 
 - `ask-matt` and `setup-matt-pocock-skills`: the catalog already has a public routing graph, repository guidance, portable package rules, and install flow.
-- A generic `implement`: the catalog keeps domain owners `implement-frontend` and `implement-rust`.
+- A generic `implement`: the catalog keeps domain owners `dev-frontend` and `dev-rust`.
 - A second `code-review` or architecture-review owner: `repo-review` and bounded `audit-*` skills already own those decisions.
 - Upstream tracker-specific publishing, labels, `CONTEXT.md` location, automatic commits, and mandatory subagents: these are repository-specific policies, not portable catalog defaults.
-- Upstream `handoff` writes a temporary conversation-continuation document; it does not define a Git delivery report. The Delivery Report structure comes from this catalog's plan.
+- Upstream prototype capture may use a throwaway commit, but this catalog never derives commit/push authorization from prototyping; artifacts stay disposable unless separately delivered.
+- Upstream `handoff` writes a temporary conversation-continuation document; the catalog keeps continuation in host coordination rules rather than a Git delivery owner.
 - Upstream source text and templates: concepts are re-expressed against the catalog authority and validation contracts.
 
 ## Current Upstream Drift From The Supplied Proposal

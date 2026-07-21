@@ -1,59 +1,53 @@
 ---
 name: domain-modeling
-description: "Use when a product or business domain needs explicit language, entities, relationships, state transitions, invariants, business rules, or bounded contexts before planning or implementation."
+description: "Use when shared business terms, meanings, rules, lifecycle conflicts, or domain boundaries are ambiguous across product work and must be resolved before specification or implementation."
 ---
 
 # Domain Modeling
 
 ## Overview
 
-Build an evidence-backed domain model that gives users, specifications, code, and tests one precise language. Model the business problem and lifecycle; do not turn the result into a technical architecture or implementation plan.
+Resolve shared business language and rules from authoritative evidence. Default to terminology, ambiguity, rules, and boundary scenarios. Load lifecycle or bounded-context depth only when the business complexity actually requires it; do not turn the result into technical DDD, API, database, frontend, or backend design.
 
 ## Workflow
 
-1. Read effective repository and host guidance, then inspect only the supplied requirements, existing domain docs, contracts, representative code, and tests needed to understand the named domain.
-2. Run `git status --short` before any authorized artifact write and preserve unrelated changes.
-3. Establish the modeling scope, actors, goals, in-scope scenarios, excluded scenarios, and unresolved terms.
-4. Inventory candidate terms and challenge synonyms, overloaded words, implementation names, and conflicts between docs, code, and user language.
-5. Identify entities, value objects, events, commands, policies, and external actors only when evidence gives each a distinct responsibility or invariant.
-6. Map relationships, ownership, cardinality, identity, and lifecycle. Use a state machine when behavior depends on state or transition order.
-7. Stress-test the model with normal, edge, failure, retry, cancellation, concurrency, and historical-data scenarios that are relevant to the domain.
-8. Record business rules as testable statements. Separate confirmed rules, inferred rules, decisions, open questions, and contradictions.
-9. Define bounded contexts and context relationships only when terminology, ownership, or consistency rules materially differ.
-10. Check the model against requirements and representative code. Report drift instead of silently choosing one source as truth.
-11. Return the model in the output contract. Write or update a domain artifact only when the user explicitly requests it, using the repository's existing location and format when available.
+1. Read effective repository and host guidance, then inspect only the supplied requirements, existing business facts, representative behavior, and tests needed for the named ambiguity.
+2. Fix the scope, affected actors or capabilities, authoritative facts, conflicting terms or rules, excluded questions, and the decision that downstream work needs.
+3. Run the default terminology/rules pass: resolve synonyms, overloaded words, shared meanings, business constraints, and relevant normal or edge scenarios.
+4. Load the **Lifecycle** profile only when states, transition order, retry, cancellation, expiry, or terminal outcomes change business meaning.
+5. Load the **Bounded Context** profile only when the same term or rule has materially different meanings, owners, consistency needs, or sources of truth across boundaries.
+6. Label material statements `Confirmed`, `Inferred`, `Conflict`, or `Not verified`; request a decision when a conflict changes identity, permissions, money, lifecycle, compatibility, or irreversible behavior.
+7. Return only the model depth needed to unblock the request. Write or update a named domain artifact only when the user explicitly authorizes it, the repository already has a fact-source location, and the decision is durable across functions.
 
-## Modes
+## Profiles
 
-- **Terminology pass:** resolve a ubiquitous language and conflicting terms.
-- **Lifecycle pass:** model states, transitions, guards, events, and terminal outcomes.
-- **Boundary pass:** separate contexts, ownership, consistency, and external dependencies.
-- **Artifact update:** apply an explicitly authorized domain-doc change without editing product code or Git state.
+- **Terminology and rules (default):** shared vocabulary, ambiguity, business rules, contradictions, and boundary scenarios.
+- **Lifecycle (conditional):** states, transitions, guards, retries, cancellation, expiry, and terminal outcomes.
+- **Bounded Context (conditional):** different business meanings, owners, consistency rules, or sources of truth across real boundaries.
+- **Artifact update (authorized only):** update an existing durable domain fact source; never create or rewrite documentation automatically.
 
 ## Do Not Use For
 
 - Repository roots, commands, runtime boundaries, or reuse inventory; use `repo-map`.
-- Technical design, implementation tasks, dependencies, or validation gates; use the host's built-in planning after the domain is sufficiently clear.
-- Root-cause investigation of a failure; use the host's built-in diagnosis under effective instructions.
-- Source implementation or refactoring; use the matching `implement-*` skill.
-- Review findings or Git delivery; use `repo-review` or `repo-delivery`.
+- One feature's product behavior and acceptance when shared language/rules are already clear; use `product-spec`.
+- APIs, schemas, database design, frontend/backend architecture, technical tasks, dependencies, or validation gates; use the appropriate technical owner or host planning.
+- Source implementation, review findings, or Git delivery; use `dev-*`, `repo-review`, or `repo-delivery`.
 
 ## Hard Rules
 
-- Do not invent domain facts to complete a tidy diagram.
-- Do not use database tables, UI pages, API endpoints, classes, or folders as entities unless they represent a real domain concept.
-- Do not collapse actors, identities, resources, observations, commands, events, and policies merely because current code combines them.
-- Keep business rules independent of framework, storage, transport, and deployment choices.
-- Mark conflicting evidence and request a decision when the conflict changes identity, lifecycle, ownership, money, permission, or irreversible behavior.
-- Do not write domain docs without explicit authorization; never edit product source, stage, commit, or push.
-- Use `Not found` for missing sources and `Not verified` for unchecked rules or runtime behavior.
+- Do not invent facts to complete a tidy model.
+- Do not default to entities, value objects, aggregates, repositories, domain events, or other technical DDD structures.
+- Do not use tables, endpoints, classes, pages, folders, or service names as business concepts without business evidence.
+- Keep business rules independent of framework, storage, transport, deployment, and UI structure.
+- Do not write a domain artifact unless an existing fact source, durable cross-functional need, and explicit user authorization are all present.
+- Never edit product source, define technical interfaces, stage, commit, or push.
 
 ## Output Contract
 
-Return scope and evidence sources, glossary, entities/value objects, relationships, state machine, business rules/invariants, bounded contexts, scenarios tested, contradictions, decisions, open questions, and `Not verified` gaps. Distinguish confirmed facts from inference. If an artifact was authorized, report its exact path and the preserved Git state.
+Return the scope and evidence, resolved glossary, business rules, relevant scenarios, contradictions, decisions, open questions, and `Not verified` gaps. Include lifecycle or bounded contexts only when the selected conditional profile requires them. If an artifact update was authorized, report its exact path, why it is a durable shared fact source, and the preserved Git state. An explicitly requested independent external challenge/research may hand one fixed question to `ask-chatgpt`; it never implies sending.
 
 ## References
 
 - See [references/usage.md](references/usage.md) for triggers and routing examples.
-- See [references/modeling-guide.md](references/modeling-guide.md) for the modeling checklist and output template.
+- See [references/modeling-guide.md](references/modeling-guide.md) for the default pass and conditional profile checklists.
 - See [references/eval-cases.md](references/eval-cases.md) for trigger, non-trigger, and quality evals.

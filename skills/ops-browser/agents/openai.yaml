@@ -1,4 +1,4 @@
 interface:
   display_name: "Ops Browser"
-  short_description: "Operate the right browser surface with verified state"
-  default_prompt: "Use $ops-browser to operate an authorized browser surface with verified capability, identity, state, action boundaries, and before/after evidence."
+  short_description: "Operate browser surfaces with verified state and actions"
+  default_prompt: "Use $ops-browser to select the smallest browser or DevTools operation, verify capability, identity, target, and authorization, then return before/after evidence."

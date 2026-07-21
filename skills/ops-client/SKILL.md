@@ -7,7 +7,7 @@ description: "Use when directly operating or verifying a specified real desktop 
 
 ## Overview
 
-Operate and verify real desktop client windows. Treat platform automation as adapter-specific: the current built-in evidence path is macOS-first, while Windows and Linux require an available platform adapter before equivalent claims can be made. Use `implement-frontend` for UI code changes.
+Operate and verify real desktop client windows. Treat platform automation as adapter-specific: the current built-in evidence path is macOS-first, while Windows and Linux require an available platform adapter before equivalent claims can be made. Use `dev-frontend` for UI code changes.
 
 ## Workflow
 
@@ -45,7 +45,7 @@ Operate and verify real desktop client windows. Treat platform automation as ada
 ## Do Not Use For
 
 - Plain browser pages, web previews, form workflows, downloads, or browser console/network checks; use `ops-browser`.
-- Frontend implementation, desktop webview architecture, IPC layering, or design-system work; use `implement-frontend`.
+- Frontend implementation, desktop webview architecture, IPC layering, or ui-design work; use `dev-frontend`.
 - Ordinary repository discovery unless the user asks for client launch review, real-window verification, or browser-preview invalidation.
 - Browser preview evidence when the task requires proof from a Tauri, Electron, or native desktop runtime.
 - Repository onboarding or map discovery; use `repo-map`.
@@ -67,7 +67,7 @@ Operate and verify real desktop client windows. Treat platform automation as ada
 - On macOS, verify `CGWindowID`, owner/PID/title/bounds, and capture result before calling a screenshot real-window evidence.
 - On Windows or Linux, require the platform adapter's stable window/process identifier and capture provenance; do not reuse macOS terminology or commands.
 - If only a process can be proven, do not infer that the requested window is visible, current, or running the new build.
-- For code changes that add accessibility or automation surfaces, use `implement-frontend` or the relevant native implementation skill; return here for runtime verification.
+- For code changes that add accessibility or automation surfaces, use `dev-frontend` or the relevant native implementation skill; return here for runtime verification.
 - Re-verify the target process, runtime source, and window after rebuild/restart; stale windows do not prove current code.
 - Confirm only direct client facts. Do not claim a final cause across frontend, IPC, Rust, database, packaging, or platform layers, and do not decide a permanent fix; return the evidence to the caller.
 - Remove disposable task state such as temporary probes, injected instrumentation, test windows, and launched test instances when safe. Retain screenshots, logs, traces, and other handoff evidence until they are embedded, archived, or explicitly accepted by the handoff owner; report retained artifact paths/identifiers, embedded evidence, removed disposable state, and anything left running.

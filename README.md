@@ -36,12 +36,11 @@ Install one Skill:
 
 ```bash
 npx skills@latest add idaibin/skills \
-  --skill design-system \
+  --skill ui-design \
   --global --agent codex
 ```
 
-See [INSTALL.md](INSTALL.md) for project/global scope, updates, removal, and the
-`design-ui` to `design-system` migration.
+See [INSTALL.md](INSTALL.md) for project/global scope, updates, and removal.
 
 ## Catalog
 
@@ -49,18 +48,28 @@ See [INSTALL.md](INSTALL.md) for project/global scope, updates, removal, and the
 
 | Skill | Use when |
 | --- | --- |
-| `repo-map` | Current repository boundaries, commands, task routes, or reusable owners need a verified map. |
-| `domain-modeling` | Business language, identity, lifecycle, invariants, scenarios, or bounded contexts are unresolved. |
-| `repo-review` | Local changes or an immutable commit/range/PR/release basis need an independent read-only review. |
-| `repo-delivery` | Reviewed changes need authorized staging, commit, push, synchronization, or branch cleanup. |
+| `repo-map` | Current repository boundaries, commands, task routes, reusable owners, or a bounded native/optionally-generated protocol chain need a verified map. |
+| `domain-modeling` | Shared business terms, rules, lifecycle conflicts, or domain boundaries are ambiguous across product work. |
+| `repo-review` | Current Worktree/index, a fixed SHA/range (including resolved PR base/head), or a verified review package needs independent read-only review; Release is conditional. |
+| `repo-delivery` | Reviewed changes need categorized commits, an explicit single commit, push/sync, evidence-based branch integration, or cleanup. |
+
+### Product Definition (Experimental)
+
+| Skill | Use when |
+| --- | --- |
+| `product-spec` | Product behavior, scope, rules, states, or acceptance must become one implementation-ready feature/foundation spec or an authorized product-fact update. |
+
+`product-spec` is an available candidate for live evaluation. Its structure may
+be validated, but behavior and end-to-end workflow remain `not_verified`; this is
+not a Stable or Verified designation.
 
 ### Design and Implementation
 
 | Skill | Use when |
 | --- | --- |
-| `design-system` | A repository-owned design system must be created, extracted, maintained, or evaluated before source implementation. |
-| `implement-frontend` | A requested frontend feature, component, page, or design-system contract must be implemented and validated. |
-| `implement-rust` | A requested Rust feature, refactor, or port must be implemented with ownership and behavior evidence. |
+| `ui-design` | A concrete page or flow needs visual/interaction design, or shared tokens, component semantics, variants, or visual language must change. |
+| `dev-frontend` | A requested frontend feature, component, page, or accepted UI design must be implemented and validated. |
+| `dev-rust` | A requested Rust feature, refactor, or port must be implemented with ownership and behavior evidence. |
 
 ### Audit and Operations
 
@@ -69,14 +78,14 @@ See [INSTALL.md](INSTALL.md) for project/global scope, updates, removal, and the
 | `audit-frontend` | A known frontend surface needs a bounded read-only architecture, accessibility, performance, state, or design audit. |
 | `audit-rust` | A Rust workspace or surface needs a bounded ownership, concurrency, SQLite, unsafe/FFI, performance, or memory audit. |
 | `audit-security` | A known security-sensitive code or configuration surface needs a bounded read-only assessment. |
-| `ops-browser` | A browser page must be operated or verified with screenshot, console, network, form, or download evidence. |
+| `ops-browser` | A browser page or bounded platform action must be operated or verified with capability, identity, authorization, and before/after evidence. |
 | `ops-client` | A Tauri, Electron, or native desktop client must be verified against its real process and window. |
 
-### Review and Writing Extensions
+### ChatGPT and Writing Extensions
 
 | Skill | Use when |
 | --- | --- |
-| `chatgpt-review` | A local review package or explicitly authorized external ChatGPT review round is required. |
+| `ask-chatgpt` | Codex needs to ask ChatGPT for a local request package or an explicitly authorized independent review, research result, visual exploration, or decision challenge. |
 | `human-writing` | Source-grounded prose must be drafted or revised while preserving facts, voice, and disclosure boundaries. |
 
 ## Composition
@@ -86,16 +95,19 @@ Skills are composable owners, not a mandatory framework:
 ```text
 unknown repository -> repo-map
 unclear domain      -> domain-modeling
+unclear product     -> product-spec
 complex change      -> host planning and repository instructions
 known failure       -> evidence-driven diagnosis under effective instructions
-source work         -> implement-frontend / implement-rust
-design contract     -> design-system -> implement-frontend
+source work         -> dev-frontend / dev-rust
+UI design           -> ui-design (Feature UI; Design System when shared) -> dev-frontend
 review              -> repo-review (with bounded audit-* specialists when needed)
 delivery            -> repo-delivery
 ```
 
 The nearest applicable owner may start directly. Cross-Skill handoffs transfer
-bounded evidence, never implicit authorization.
+bounded evidence, never implicit authorization. Use one owner by default, load only
+the selected references, reuse unchanged evidence, and add tasks or review rounds only
+when they produce a required independent result.
 
 ## Package Contract
 

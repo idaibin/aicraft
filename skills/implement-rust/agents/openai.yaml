@@ -1,4 +1,0 @@
-interface:
-  display_name: "Rust Implementation"
-  short_description: "Implement Rust with composable risk validation"
-  default_prompt: "Use $implement-rust to make scoped Rust source changes with repository-grounded reuse, risk-selected validation, and no staging, commit, push, or PR mutation."

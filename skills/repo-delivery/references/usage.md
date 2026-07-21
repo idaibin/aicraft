@@ -6,10 +6,11 @@ Use `repo-delivery` when the user wants reviewed repository changes moved to a f
 
 ## Best For
 
-- Local commit after review scope is approved.
+- Categorized local commits after review scope is approved.
+- One commit only when explicitly requested or when the approved scope is one indivisible intent.
 - Push only the current branch after validation, without creating a PR.
 - Sync the current branch with its upstream.
-- Squash a completed branch into `main` when repo guidance requires it.
+- Integrate a completed branch by preserving useful semantic commits or squashing noisy/single-outcome history when repository guidance and evidence support it.
 - Delete temporary branches after final state is verified.
 - Prove local and remote refs match after delivery.
 
@@ -21,6 +22,9 @@ Use `repo-delivery` when the user wants reviewed repository changes moved to a f
 - `Sync this branch to remote; do not switch branches.`
 - `Commit these reviewed changes and show the final remote ref.`
 - `These changes are reviewed; stage and commit them locally, but do not push.`
+- `Group these reviewed changes by intent and commit each group locally.`
+- `Commit all reviewed paths as exactly one commit.`
+- `Merge this branch into main; preserve its meaningful commits if their boundaries are clean, otherwise squash it.`
 - `After verification, delete the temporary branch.`
 - `Ship this to main following the repo workflow.`
 
@@ -36,7 +40,7 @@ Use `repo-delivery` when the user wants reviewed repository changes moved to a f
 
 ## Output
 
-Report the delivery target, branch/upstream, staged scope, validation, commit hash, pushed refs, merge or squash action, cleanup action, final status, final remote evidence, and any `Not verified` items.
+Report the delivery target, branch/upstream, semantic categories, staged scope and hash for each commit, explicit single-commit reason when applicable, branch-integration strategy and rationale, validation, pushed refs, cleanup action, final status, final remote evidence, and any `Not verified` items.
 
 ## Maintenance
 

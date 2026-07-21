@@ -1,4 +1,0 @@
-interface:
-  display_name: "ChatGPT Review"
-  short_description: "Run ChatGPT reviews with optional live-page proof"
-  default_prompt: "Use $chatgpt-review to prepare a local package or run only explicitly authorized external rounds, then verify returned findings locally before any fix."

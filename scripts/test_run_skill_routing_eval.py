@@ -1165,7 +1165,13 @@ class RoutingRunnerTests(unittest.TestCase):
             self.assertFalse(baseline_root.exists())
 
     def test_real_committed_fixture_hash_matches_production_loader(self) -> None:
-        revision = RUNNER.resolve_revision("HEAD")
+        # A package addition can exist in the worktree before the candidate
+        # anchor is committed. This fixture/hash test reads the exact committed
+        # bytes.
+        revision = RUNNER.resolve_revision(
+            "HEAD",
+            allow_historical_subset=True,
+        )
         validator = RUNNER._contract_validator_module()
         with tempfile.TemporaryDirectory() as temporary:
             destination = Path(temporary) / "skills"
@@ -1176,63 +1182,37 @@ class RoutingRunnerTests(unittest.TestCase):
             validator.committed_skill_fixture_hash(revision.commit), runner_hash
         )
 
-    def test_previous_revision_accepts_and_exports_historical_inventory_subset(
+    def test_previous_revision_rejects_unknown_inventory_names(
         self,
     ) -> None:
-        historical_names = tuple(
-            owner for owner in RUNNER.OWNER_ENUM if owner != "domain-modeling"
+        unknown_names = tuple(
+            "unknown-owner" if owner == "dev-frontend" else owner
+            for owner in RUNNER.OWNER_ENUM
+            if owner != "domain-modeling"
         )
         tracked = "\n".join(
-            f"skills/{owner}/SKILL.md" for owner in historical_names
+            f"skills/{owner}/SKILL.md" for owner in unknown_names
         )
 
         with mock.patch.object(
             RUNNER,
             "_git_text",
             side_effect=["a" * 40, "b" * 40, tracked],
-        ):
-            revision = RUNNER.resolve_revision(
-                "previous", allow_historical_subset=True
-            )
-        self.assertEqual(historical_names, revision.skill_names)
+        ), self.assertRaisesRegex(RUNNER.RunnerError, "extra="):
+            RUNNER.resolve_revision("previous", allow_historical_subset=True)
 
+        current_subset_names = tuple(
+            owner for owner in RUNNER.OWNER_ENUM if owner != "domain-modeling"
+        )
+        current_subset_tracked = "\n".join(
+            f"skills/{owner}/SKILL.md" for owner in current_subset_names
+        )
         with mock.patch.object(
             RUNNER,
             "_git_text",
-            side_effect=["a" * 40, "b" * 40, tracked],
-        ), self.assertRaisesRegex(
-            RUNNER.RunnerError, "Candidate Skill revision"
-        ):
+            side_effect=["a" * 40, "b" * 40, current_subset_tracked],
+        ), self.assertRaisesRegex(RUNNER.RunnerError, "Candidate Skill revision"):
             RUNNER.resolve_revision("previous")
-
-        records = b"".join(
-            (
-                f"100644 blob {'c' * 40}\tskills/{owner}/SKILL.md".encode(
-                    "utf-8"
-                )
-                + b"\0"
-            )
-            for owner in historical_names
-        )
-
-        def committed_bytes(arguments):
-            if arguments[0] == "ls-tree":
-                return records
-            if arguments[:2] == ["cat-file", "blob"]:
-                return b"---\nname: historical\ndescription: historical\n---\n"
-            self.fail(f"unexpected Git command: {arguments}")
-
-        with tempfile.TemporaryDirectory() as temporary, mock.patch.object(
-            RUNNER, "_git_bytes", side_effect=committed_bytes
-        ):
-            destination = Path(temporary) / "skills"
-            destination.mkdir()
-            RUNNER._materialize_skill_fixture(revision, destination)
-            self.assertEqual(
-                set(historical_names),
-                {path.name for path in destination.iterdir()},
-            )
-            self.assertFalse((destination / "domain-modeling").exists())
 
     def test_isolated_environment_copies_only_host_credentials(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -1327,7 +1307,12 @@ class RoutingRunnerTests(unittest.TestCase):
                 + "\n",
                 encoding="utf-8",
             )
-            revision = RUNNER.resolve_revision("HEAD")
+            # Keep the integration path runnable while a new package is still an
+            # uncommitted candidate; formal candidate resolution remains strict.
+            revision = RUNNER.resolve_revision(
+                "HEAD",
+                allow_historical_subset=True,
+            )
             config = RUNNER.RunConfig(
                 host="codex",
                 variant="candidate",

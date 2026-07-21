@@ -8,7 +8,7 @@ define workload
 → profile
 → identify hot path
 → define a one-factor experiment
-→ route code/config changes to implement-rust
+→ route code/config changes to dev-rust
 → verify comparable rerun evidence
 → record trade-offs
 ```
@@ -36,7 +36,7 @@ must not replace an end-to-end comparison when the user-facing claim is broader.
 - Use a platform-appropriate profiler already supported by the repository or
   environment. Capture the command, profile/build settings, and raw artifact.
 - Recommend release debug line tables or frame pointers only when needed for
-  profiling; route configuration edits to `implement-rust` and keep them scoped.
+  profiling; route configuration edits to `dev-rust` and keep them scoped.
 - Use allocation profiling before rewriting clones, collections, buffers, or
   allocators. Report allocation rate and call path, not just a source count.
 - Measure I/O and syscalls before introducing buffering, mmap, caching, or
@@ -60,7 +60,7 @@ and regression coverage:
 When an implemented optimization is audited, report the baseline, new result,
 variance, resource trade-offs, binary/compile impact, portability constraints,
 and the benchmark or test that prevents regression. Reject unsupported proposals;
-route any requested implementation or revert to `implement-rust`.
+route any requested implementation or revert to `dev-rust`.
 
 ## Common Misreadings
 

@@ -7,7 +7,7 @@ description: "Use when a known frontend surface needs a scoped, read-only audit 
 
 ## Overview
 
-Audit frontend engineering from repository evidence rather than a universal framework or folder template. Detect the real framework and local API style, then select only the profiles required by the request. This skill is read-only: use it directly for frontend domain audits or as a bounded specialist under `repo-review`; use `implement-frontend` for requested changes.
+Audit frontend engineering from repository evidence rather than a universal framework or folder template. Detect the real framework and local API style, then select only the profiles required by the request. This skill is read-only: use it directly for frontend domain audits or as a bounded specialist under `repo-review`; use `dev-frontend` for requested changes.
 
 ## Rule Priority
 
@@ -25,7 +25,7 @@ Never rewrite a working local structure merely to match this skill or an externa
 ## Workflow
 
 1. Read repository guidance, run `git status --short`, and identify the target app, project class, framework, package manager, scripts, documented architecture, and coordinating review owner when delegated.
-2. Consume current `repo-map` output or perform a targeted inventory of route/page entry, owning feature, analogous screens, UI primitives, layout/tokens, data/cache, forms/schema, state/store, tests, docs, and desktop adapter. When a `design-system` package is in scope, verify its accepted revision and use it as the declared design contract, not as runtime proof.
+2. Consume current `repo-map` output or perform a targeted inventory of route/page entry, owning feature, analogous screens, UI primitives, layout/tokens, data/cache, forms/schema, state/store, tests, docs, and desktop adapter. When a `ui-design` package is in scope, verify its accepted revision and use it as the declared design contract, not as runtime proof.
 3. Classify the product surface as Web, high-density Console, or Tauri Desktop. Select exactly one framework profile per audited boundary: **React**, **Vue Composition**, **Vue Options**, or **Repository-native Other**. Select only styling profiles present in scope: **Tailwind**, **CSS Modules**, **Sass/Less**, **CSS-in-JS**, **Ant Design**, **shadcn/ui**, or a documented local system.
 4. Select one or more audit profiles; explicitly mark the rest `Out of scope`:
    - **Architecture/reuse:** routes, features, shared layers, dependency direction, reuse, abstractions, structural lifecycle, and docs.
@@ -63,18 +63,18 @@ Never rewrite a working local structure merely to match this skill or an externa
 - Keep Tauri pages behind a typed frontend adapter or service. Commands expose stable transport DTOs and errors, delegate business logic to Rust owners, and provide real progress/cancellation for long work.
 - Under Accessibility, preserve keyboard operation, visible focus, accessible names, focus management, form labels/errors, and non-color status communication.
 - Do not refactor unrelated legacy code. File length alone never justifies splitting.
-- Do not edit, stage, commit, post review comments, or deliver code in audit mode. `repo-review` owns Worktree and immutable review coordination; `repo-delivery` alone owns Git mutation. Route accepted remediation to `implement-frontend`.
+- Do not edit, stage, commit, post review comments, or deliver code in audit mode. `repo-review` owns Worktree and immutable review coordination; `repo-delivery` alone owns Git mutation. Route accepted remediation to `dev-frontend`.
 
 ## Do Not Use For
 
 - Repository orientation, commands, reuse inventory, or docs/code alignment without an audit request; use `repo-map`.
-- Frontend implementation, modification, or refactoring; use `implement-frontend`.
-- Creating UI direction, project profiles, reference registries, tokens, or task design assets; use `design-system`.
+- Frontend implementation, modification, or refactoring; use `dev-frontend`.
+- Creating UI direction, project profiles, reference registries, tokens, or task design assets; use `ui-design`.
 - Root-cause diagnosis of a concrete failure; use the host's built-in diagnosis under effective instructions.
 - Owning Worktree readiness or immutable repository/range/PR/release coordination; use `repo-review`, which may delegate a bounded frontend surface here.
 - Actual staging, commit, rebase/squash, push, or delivery; use `repo-delivery`.
 - Browser or real desktop runtime operation; use `ops-browser` or `ops-client`.
-- A backend-only Rust implementation or audit; use `implement-rust` or `audit-rust`.
+- A backend-only Rust implementation or audit; use `dev-rust` or `audit-rust`.
 
 ## Output Contract
 
@@ -95,3 +95,4 @@ Start with selected product, framework, styling, and audit profiles; explicitly 
 - Read [reference-corpus.md](references/reference-corpus.md) for official source evidence, adopted rules, and rejected cargo-cult choices.
 - Read [usage.md](references/usage.md) for trigger, routing, and profile examples.
 - Read [eval-cases.md](references/eval-cases.md) for trigger, non-trigger, scenario, quality, and scoring evals.
+- See [references/codebase-design.md](references/codebase-design.md) only for a selected public-module, seam, abstraction, locality, or testability audit.

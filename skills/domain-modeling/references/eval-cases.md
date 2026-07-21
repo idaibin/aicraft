@@ -1,42 +1,47 @@
 # Eval Cases
 
-Use these cases when changing `domain-modeling` triggers, authority, artifact behavior, output, or routing.
-
 ## Trigger Eval
 
 | User prompt | Expected result | Why |
 | --- | --- | --- |
-| `Before planning code, model Node, Metric, Observation, Alert, Report, and Policy, including their states and rules.` | Should trigger `domain-modeling`. | Explicit concepts, lifecycle, and rules. |
-| `Our docs use account, tenant, member, and user inconsistently. Establish one ubiquitous language.` | Should trigger `domain-modeling`. | Terminology conflict. |
-| `Map the order state machine, invalid transitions, retries, and cancellation invariants.` | Should trigger `domain-modeling`. | Lifecycle modeling. |
-| `Separate billing and entitlement into bounded contexts and show ownership.` | Should trigger `domain-modeling`. | Context-boundary modeling. |
-| `Update the existing domain glossary with the decisions we just confirmed, but do not touch code.` | Should trigger Artifact update mode after checking explicit write scope. | Authorized domain-doc write. |
+| `Our docs use account, tenant, member, and user inconsistently; resolve the shared vocabulary.` | Trigger the default terminology/rules profile. | Cross-feature terminology conflict. |
+| `Two product areas disagree on whether a paused subscription may renew; resolve the durable rule and edge cases.` | Trigger the default profile. | Shared business-rule contradiction. |
+| `Map the order states, invalid transitions, retries, cancellation, and terminal outcomes because requirements conflict.` | Trigger the Lifecycle profile. | Transition meaning is materially complex. |
+| `Billing and entitlement use the same term with different owners and consistency rules; clarify the boundary.` | Trigger the Bounded Context profile. | Real business meanings and owners differ. |
+| `Update the existing domain glossary with these confirmed cross-functional decisions.` | Trigger Artifact Update only after explicit path/scope authorization is verified. | Durable fact-source write may be appropriate. |
 
 ## Non-Trigger Eval
 
 | User prompt | Expected result | Why |
 | --- | --- | --- |
-| `Map the real repository roots, startup commands, and reusable modules.` | Should prefer `repo-map`. | Repository semantics, not business modeling. |
-| `Turn this approved model into technical tasks, dependencies, validation, and reject gates.` | Should not trigger this Skill; use the host's built-in planning. | Executable planning. |
-| `Find why the order gets stuck in processing.` | Should not trigger this Skill; use the host's built-in diagnosis under effective instructions. | Concrete failure investigation. |
-| `Implement the approved order transition in Rust.` | Should prefer `implement-rust`. | Source mutation. |
-| `Review this branch for missing requirements and regressions.` | Should prefer `repo-review`. | Change review. |
+| `Map the real repository roots, startup commands, and reusable modules.` | Prefer `repo-map`. | Repository semantics. |
+| `Specify this settings feature's users, flows, failure behavior, and acceptance; shared terms are already clear.` | Prefer `product-spec`. | Slice-level product behavior. |
+| `Design the REST API, database tables, frontend stores, and backend services.` | Do not trigger this Skill; use technical planning/owners. | Technical architecture. |
+| `Implement the approved order transition in Rust.` | Prefer `dev-rust`. | Source mutation. |
+| `Review this branch for missing requirements and regressions.` | Prefer `repo-review`. | Change review. |
+| `Create aggregates, repositories, entities, value objects, and domain events for this codebase.` | Do not trigger by default; clarify the business ambiguity or route technical design to host planning. | Technical DDD vocabulary alone is not the owner boundary. |
+
+## Independent Review Outlet Eval
+
+| User prompt | Expected result |
+| --- | --- |
+| `Resolve the shared rule, then explicitly prepare one independent ChatGPT primary-source domain challenge.` | Keep `domain-modeling` as owner and emit one lightweight `ask-chatgpt` handoff. |
+| `Resolve the shared rule from the supplied evidence only; no external review was requested.` | Emit no `ask-chatgpt` handoff. |
 
 ## Quality Eval
 
 | Case | Expected evidence | Reject if |
 | --- | --- | --- |
-| Evidence discipline | Labels confirmed, inferred, conflicting, and unverified statements. | Presents guesses as business truth. |
-| Ubiquitous language | Resolves synonyms and overloads per bounded context. | Preserves ambiguous terms without a decision or open question. |
-| Concept quality | Separates entities, value objects, commands, events, policies, and actors by identity and responsibility. | Mirrors tables, pages, or classes as the domain. |
-| Lifecycle | Defines states, transitions, guards, terminal outcomes, retries, and relevant concurrency. | Lists statuses without transition rules. |
-| Business rules | Expresses invariants as observable, testable statements independent of framework/storage. | Mixes implementation decisions into business rules. |
-| Boundaries | Creates contexts only from language, ownership, consistency, authority, or source-of-truth differences. | Splits contexts by folder or team name alone. |
-| Scenario testing | Probes relevant normal, edge, failure, retry, cancellation, or historical cases. | Produces a tidy model without stress-testing it. |
-| Artifact authority | Writes only an explicitly authorized domain artifact and preserves source/Git state. | Edits product code, stages, commits, or writes docs without authorization. |
-| Planning boundary | Stops at the domain model and leaves technical design/tasks to host planning. | Claims implementation planning ownership. |
-| Repository-map boundary | Uses source truth as evidence but routes repository mapping to `repo-map`. | Turns domain modeling into repository onboarding. |
+| Evidence discipline | labels confirmed, inferred, conflicting, and unverified statements | presents guesses as truth |
+| Default economy | resolves only shared terms, rules, contradictions, and relevant scenarios | expands into a complete domain catalog |
+| Conditional depth | loads lifecycle or bounded contexts only when material complexity is evidenced | emits both profiles for every request |
+| Business boundary | keeps rules independent of API, database, frontend/backend, framework, and deployment | produces technical architecture |
+| DDD restraint | uses business-native language and avoids default aggregates/repositories/domain events | imposes technical DDD structures |
+| Scenario testing | probes only relevant normal, edge, failure, retry, cancellation, permission, or historical cases | creates a tidy model without stress-testing material rules |
+| Artifact authority | requires existing fact source, durable cross-functional need, and explicit authorization | writes docs automatically |
+| Product-spec boundary | hands one-feature behavior to `product-spec` when shared meaning is already clear | absorbs all product specification |
+| Repository-map boundary | uses source as evidence but routes repository mapping to `repo-map` | turns modeling into onboarding |
 
 ## Scoring
 
-Score each quality case from 0 to 10. Minimum pass: all trigger/non-trigger expectations are correct and every quality case scores at least 8. Artifact-authority violations are hard failures.
+Score each quality case 0–10. Minimum pass: routing is correct, every quality case scores at least 8, and artifact or technical-authority violations are hard failures.

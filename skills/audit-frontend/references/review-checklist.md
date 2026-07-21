@@ -6,7 +6,7 @@
 - Declare direct audit or bounded specialist review.
 - When delegated, record exact paths/diff, questions, exclusions, and coordinating owner:
   - `repo-review` for local dirty-tree and commit-readiness review;
-  - `repo-review` for repository snapshot, range, PR, release, or review-package review.
+  - `repo-review` for Worktree/index, fixed SHA/range (including resolved PR base/head), or verified review-package review; Release is a conditional profile.
 - Identify Web, Console, or Tauri Desktop.
 - Identify React, Vue Composition, Vue Options, or repository-native framework profile.
 - Identify only the styling profiles present in scope: Tailwind, CSS Modules, Sass/Less, CSS-in-JS, Ant Design, shadcn/ui, or a documented local system.
@@ -86,7 +86,7 @@ Do not perform token checks, memoization advice, generic accessibility scanning,
 - Use `ops-browser` for browser/runtime evidence and `ops-client` for real desktop-window evidence.
 - Report exact failures and `Not verified` gaps.
 - Leave source files, generated files, docs, index, checkout, refs, branches, PRs, and remote state unchanged.
-- Route accepted fixes to `implement-frontend`.
+- Route accepted fixes to `dev-frontend`.
 - Return specialist findings to the coordinating review owner.
 - `repo-delivery` alone performs authorized staging, commit, rebase/squash, push, or cleanup.
 

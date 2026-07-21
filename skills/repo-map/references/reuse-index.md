@@ -27,9 +27,15 @@ For APIs, prefer the chain `route/schema -> handler/service -> client function -
 
 ## Entry Shape
 
-| Capability | Kind | Canonical owner | Access or registration entry | Representative consumers | Reuse boundary | Evidence |
-| --- | --- | --- | --- | --- | --- | --- |
-| user search | API client | `packages/api/src/users.ts` | `searchUsers` export | admin picker; audit filter | reuse typed client; do not duplicate URL or DTO | route, export, two callers |
+For reusable UI components, use this full navigation shape:
+
+| Product/design term | Visual cue or semantic job | Canonical path | Symbol | Export/registration path | Owner/provider root | Representative consumers | States/variants | Reuse boundary | Current-source evidence |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| PageHeader | Page title, context, and primary actions | `packages/ui/src/page-header.tsx` | `PageHeader` | `packages/ui/src/index.ts` | `packages/ui` | users page; audit page | loading action; compact | reuse; extend owned variants only | definition, export, two live imports |
+
+For non-UI entries, retain the same decisive fields: product/domain term or
+capability, canonical path and symbol, access/registration path, owner/provider
+root, representative consumers, reuse boundary, and current-source evidence.
 
 Use map-root-relative paths and identify the owning Git root when one exists. Name symbols when they are more stable and precise than directory names.
 
@@ -38,7 +44,12 @@ Use map-root-relative paths and identify the owning Git root when one exists. Na
 Before a new declaration:
 
 1. Search map entries by capability and domain language.
-2. Search live source by likely symbols, UI text, endpoint path/method, schema/type names, access/registrations, and callers across the owning root, first-order mapped provider/shared roots, and only transitive roots explicitly identified as canonical owners by those contract edges. Stop when no new owner edge appears or the dependency is declared external; do not scan unrelated dependency graphs.
+2. Search live source by product/design term, visual role, visible text, likely
+   symbols, UI states/variants, endpoint path/method, schema/type names,
+   access/registrations, and callers across the owning root, first-order mapped
+   provider/shared roots, and only transitive roots explicitly identified as
+   canonical owners by those contract edges. Stop when no new owner edge appears
+   or the dependency is declared external; do not scan unrelated dependency graphs.
 3. If an applicable provider/shared root is unavailable, unchecked, or ambiguously owned, return `Not verified`; do not approve `new`.
 4. Inspect the nearest candidate's contract and consumers.
 5. When candidates conflict, rank canonical ownership, active compatible consumers, validation evidence, boundary compatibility, and non-deprecated status. If evidence cannot identify an authority, return `Not verified` rather than selecting arbitrarily.
@@ -56,3 +67,10 @@ Do not extract a speculative shared abstraction solely to make code look uniform
 ## Drift Repair
 
 Verify an entry's definition, access/registration entry, representative consumers, and constraints independently. Treat changed semantics as stale even when paths resolve, and patch the changed entry plus directly dependent entries or declared edges reachable from its owner/contract; stop when no changed dependency edge remains. For a missing path, ascend to the nearest existing ancestor, search only the owning subtree, and patch the affected row plus the same bounded dependents. Do not invalidate unrelated reuse entries.
+
+The ascent is bounded by the recorded owner/provider root. Never cross that root.
+If the root itself is absent, mark the entry stale and start ordinary bounded live
+discovery from current ownership evidence; do not use the stale row to select a
+replacement. Git history may explain a rename or move only after current source
+proves the present symbol, export/registration, and consumer. Historical source or
+consumers never establish current reusability.

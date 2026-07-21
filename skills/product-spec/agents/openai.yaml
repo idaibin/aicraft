@@ -1,0 +1,4 @@
+interface:
+  display_name: "Product Spec"
+  short_description: "Turn product ambiguity into an implementation-ready spec"
+  default_prompt: "Use $product-spec to turn this feature into the smallest implementation-ready product specification without implementing it."

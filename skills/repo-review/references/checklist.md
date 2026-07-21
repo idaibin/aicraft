@@ -1,5 +1,17 @@
 # Repository Review Checklist
 
+## Contents
+
+- [1. Basis and Scope](#1-basis-and-scope)
+- [2. Project Classification](#2-project-classification)
+- [3. Core Repository Profile](#3-core-repository-profile)
+- [4. Specialist Delegation](#4-specialist-delegation)
+- [5. Standards and Spec Axes](#5-standards-and-spec-axes)
+- [6. Finding Quality](#6-finding-quality)
+- [7. Severity Calibration](#7-severity-calibration)
+- [8. Read-Only Boundary](#8-read-only-boundary)
+- [9. Final Report](#9-final-report)
+
 ## 1. Basis and Scope
 
 - [ ] Record repository and requested review goal.
@@ -29,6 +41,32 @@ When applicable, inspect:
 - [ ] migrations, generated files, indexes, release artifacts, and stale references;
 - [ ] tests, fixtures, commands, CI, deployment, rollback, and documentation;
 - [ ] add/reuse/move/rename/delete lifecycle completeness.
+
+When current source already owns an OpenAPI/generated-client pipeline or the review
+explicitly requests that gate, select the protocol-contract profile. Ordinary REST
+uses the native route/DTO/error/client/consumer/test chain and marks this list
+`Not applicable`:
+
+- [ ] Fix the Git basis and record the baseline normalized OpenAPI artifact.
+- [ ] Identify one service authority: code-first declarations or contract-first OpenAPI.
+- [ ] Record authority path, generator name/version, exact commands, and generated markers.
+- [ ] Obtain the candidate from retained generation/CI evidence, or construct a
+      disposable isolated copy from the fixed basis plus candidate changes and run
+      clean generation there; never run a write-mode generator in the reviewed checkout.
+- [ ] Repeat clean generation only in that isolated copy, prove idempotence, and
+      prove the original worktree/index/status and relevant file hashes are unchanged.
+- [ ] Validate OpenAPI and run compatibility diff against the fixed baseline.
+- [ ] In the isolated copy, clean-regenerate the TypeScript client and reject
+      unexplained drift or touched hand-maintained duplicate DTOs.
+- [ ] Verify applicable backend success, unauthenticated/unauthorized, validation,
+      and business-error conformance.
+- [ ] Verify a real frontend consumer's loading/success/error behavior when claimed.
+- [ ] Verify clean-state CI reproduces generation, validation, compatibility,
+      client, backend contract tests, and frontend gates.
+- [ ] Mark every missing live/runtime/CI gate `Not verified`; static schema checks
+      cannot substitute for runtime conformance or consumer behavior.
+- [ ] When disposable isolation is unavailable, do not run generation; report that
+      regeneration and idempotence are `Not verified`.
 
 When docs or commands reference a missing path:
 

@@ -4,24 +4,28 @@
 
 | Matt capability | Catalog owner | Action |
 | --- | --- | --- |
-| `grill-me` / `grill-with-docs` | `code-planner`, `domain-modeling` | absorb readiness and domain clarification; no duplicate interview skill |
-| `to-spec` | `code-planner` | add requirements, decisions, technical design, acceptance, and validation contract |
-| `to-tickets` | `code-planner` | add vertical slices and blocking edges |
+| `grill-me` / `grill-with-docs` | `product-spec`, `domain-modeling` | keep decision-changing clarification internal; route deep shared domain work separately |
+| `to-spec` | `product-spec` | own product behavior, scope, states, acceptance, and Ready-for-slice; interface topology stays with `repo-map` |
+| `to-tickets` | host planning | keep technical slices, owners, dependencies, and validation in built-in planning |
 | `domain-modeling` | `domain-modeling` | retain the distinct public owner |
-| `diagnosing-bugs` | `diagnose` | strengthen feedback-loop and hypothesis gates |
-| `tdd` | `implement-frontend`, `implement-rust` | add opt-in behavior-first vertical-slice references |
-| `implement` | `implement-*` | retain domain-specific implementation owners |
+| `prototype` | `ui-design` plus conditional host experiments | absorb UI comparison only; keep logic experiments with the owning decision and never auto-commit/push |
+| `writing-great-skills` | catalog standards | prune context/cognitive load, use checkable steps, single-source protocols, branch disclosure, and leading words |
+| `diagnosing-bugs` | Global diagnosis rules | require a run red-capable command before hypotheses; do not restore a public diagnosis Skill |
+| `tdd` | `dev-frontend`, `dev-rust` | add opt-in behavior-first vertical-slice references |
+| `implement` | `dev-*` | retain domain-specific implementation owners |
 | `code-review` | `repo-review` | add independent Standards and Spec axes under one severity owner |
-| `codebase-design` | `code-planner` and existing audit profiles | add internal deep-module design guidance; do not create another owner |
-| `handoff` | `repo-delivery` | borrow compact references and redaction; use the catalog's Git Delivery Report |
+| `codebase-design` | host planning and existing audit profiles | keep technical design in built-in planning; do not create another owner |
+| `handoff` | Global continuation rules | borrow compact basis/scope/evidence/redaction; do not create a public handoff Skill |
 
 ## Catalog Lifecycle
 
 ```text
 Discovery: repo-map when repository truth is unknown
   -> Domain: domain-modeling when language, lifecycle, or business rules are unclear
-  -> Design: code-planner for technical design and executable tasks
-  -> Implementation: implement-frontend or implement-rust
+  -> Product: product-spec when product behavior or acceptance is unresolved
+  -> UI: ui-design when one page/flow needs visual or interaction decisions
+  -> Design: host planning for technical design and executable tasks
+  -> Implementation: dev-frontend or dev-rust
   -> Quality: repo-review with bounded audit specialists
   -> Delivery: repo-delivery
 ```
@@ -32,11 +36,11 @@ This is composable, not mandatory ceremony. Start at the earliest unresolved own
 
 The proposal's Rust, frontend, Tauri, and content profiles remain internal references because they do not create distinct authority or output contracts:
 
-- Rust: `implement-rust` and `audit-rust` references.
-- Frontend and Tauri: `implement-frontend` and `audit-frontend` references.
+- Rust: `dev-rust` and `audit-rust` references.
+- Frontend and Tauri: `dev-frontend` and `audit-frontend` references.
 - Content: `human-writing` references.
 - TDD guidance: package-local implementation references.
-- Deep-module guidance: `code-planner` technical-design reference, with architecture review remaining inside existing audit and `repo-review` surfaces.
+- Deep-module guidance: host technical planning, with architecture review remaining inside existing audit and `repo-review` surfaces.
 
 No provider-specific mirror is added. Published packages remain under `skills/`, with detailed guidance one level down in `references/`.
 

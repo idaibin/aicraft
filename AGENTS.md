@@ -8,14 +8,14 @@ This file defines how AI agents should work on this repository. It is not the pr
 - Only when the user explicitly asks to install skills from `https://github.com/idaibin/skills`, read `INSTALL.md` and follow that installation flow.
 - Do not switch into installation mode just because this repository contains `skills/`.
 - Use `repo-map` for separate repository mapping, reuse inventory, or docs/code alignment.
-- Use `domain-modeling` for business language, entities, relationships, lifecycle, invariants, and bounded contexts before technical planning when those concepts are unresolved.
+- Use `domain-modeling` when shared cross-functional business language or rules conflict; load lifecycle or bounded-context depth only when that shared ambiguity requires it. Route feature-local behavior and acceptance to `product-spec`.
 - Use the host's built-in planning for requirement readiness, technical design, task decomposition, acceptance criteria, and validation gates.
 - For concrete failures, follow the effective personal or repository diagnosis rules before permanent remediation; use the matching implementation skill only when a source change is requested.
-- Use `implement-frontend` or `implement-rust` for requested code changes.
+- Use `dev-frontend` or `dev-rust` for requested code changes.
 - Use `audit-frontend`, `audit-rust`, or `audit-security` for bounded read-only domain audits.
-- Use `repo-review` for read-only review of local Git changes or immutable repository snapshots, ranges, pull requests, release candidates, and review packages; select the matching basis mode first.
-- Use `chatgpt-review` for local ChatGPT review packages or explicitly authorized external ChatGPT review rounds; use `ops-browser` only for delegated low-level browser operations.
-- Use `repo-delivery` for staging, commits, pushes, squash, cleanup, and other Git mutations.
+- Use `repo-review` for read-only review of the current Worktree/index, a fixed immutable SHA/range, or a verified review package. Resolve pull requests to fixed base/head SHAs; apply Release only as a conditional profile over a fixed basis.
+- Use `ask-chatgpt` for local ChatGPT packages or explicitly authorized ChatGPT review, research, visual exploration, and decision challenge after the Codex-first gate; use `ops-browser` only for delegated low-level browser operations.
+- Use `repo-delivery` for categorized commits by default, explicit single commits, pushes, evidence-based branch integration, cleanup, and other Git mutations.
 
 ## Repository Work Rules
 
@@ -51,14 +51,7 @@ together; do not preserve stale checks only because old fixtures pass.
 
 ## Skill Validation
 
-Before reviewing, committing, or publishing skill changes, run:
-
-```bash
-python3 scripts/sync-shared-protocols.py --check
-python3 scripts/validate-skills.py
-python3 -m unittest discover -s scripts -p 'test_*.py'
-python3 scripts/eval-skill-contracts.py --validate-only
-python3 scripts/measure-skill-footprint.py --baseline-ref HEAD
-```
-
-Also run `git diff --check` and report any runtime or external behavior that was not verified.
+Use the risk-tiered validation matrix in `skills/AGENTS.md`. Routing, package-set,
+shared-protocol, validator/contract, multi-Skill, review, commit, and publish changes
+require its full suite; a bounded prose/reference correction may use the targeted
+tier. Always run `git diff --check` and report unverified runtime/external behavior.

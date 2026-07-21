@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rust Implementation"
+  short_description: "Implement Rust with risk and protocol contract gates"
+  default_prompt: "Use $dev-rust to make scoped Rust changes with repository-grounded reuse, composable risk validation, and single-authority OpenAPI gates when HTTP contracts change."

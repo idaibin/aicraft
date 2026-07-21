@@ -15,22 +15,7 @@ from datetime import date
 from pathlib import Path
 
 
-LEGACY_SKILL_NAMES = (
-    "repo-context",
-    "code-context",
-    "code-review",
-    "code-delivery",
-    "code-security",
-    "commit-reviewer",
-    "planner",
-    "frontend-implementation",
-    "frontend-governance",
-    "rust-engineering-governance",
-)
 SKILL_NAME_RE = re.compile(r"^[a-z0-9-]+$")
-LEGACY_RE = re.compile(
-    r"(?<![A-Za-z0-9_-])(" + "|".join(re.escape(name) for name in LEGACY_SKILL_NAMES) + r")(?![A-Za-z0-9_-])"
-)
 MARKDOWN_LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 SKILL_INVOCATION_RE = re.compile(r"(?<![A-Za-z0-9_.])\$([a-z][a-z0-9-]*)")
 EVAL_CASES_FILE = "eval-cases.md"
@@ -50,11 +35,12 @@ MIN_NON_TRIGGER_CASES = 3
 MIN_QUALITY_CASES = 4
 QUALITY_CATEGORIES = {
     "Core Engineering",
+    "Product Definition",
     "Design",
     "Implementation",
     "Specialist Audit",
     "Runtime Operations",
-    "External Review",
+    "ChatGPT Collaboration",
     "Writing Extension",
 }
 RELEASE_STATES = {"available", "hidden", "removed"}
@@ -1621,7 +1607,7 @@ def validate_specialized_eval_contracts(
     """Validate high-risk package contracts that generic table checks cannot prove."""
 
     errors: list[str] = []
-    if skill_name == "implement-rust":
+    if skill_name == "dev-rust":
         section = "## Overlay Selection Eval"
         if section not in eval_text:
             errors.append(f"{label}: missing specialized section {section!r}")
@@ -1693,7 +1679,7 @@ def validate_specialized_eval_contracts(
                             f"{label}: audit-rust scenario {number} missing field {field!r}"
                         )
 
-    elif skill_name == "chatgpt-review":
+    elif skill_name == "ask-chatgpt":
         required = (
             "Package artifact",
             "Split package artifact",
@@ -1715,7 +1701,7 @@ def validate_specialized_eval_contracts(
         )
         for case in missing_table_cases(eval_text, "## Quality Eval", required):
             errors.append(
-                f"{label}: chatgpt-review Quality Eval missing required case {case!r}"
+                f"{label}: ask-chatgpt Quality Eval missing required case {case!r}"
             )
 
     elif skill_name == "audit-frontend":
@@ -2156,6 +2142,12 @@ def validate_package(package: SkillPackage, *, label: str) -> tuple[list[str], Q
             else ""
         ),
     }
+    contract_surfaces.update(
+        {
+            f"references/{reference.name}": reference.read_text(encoding="utf-8")
+            for reference in sorted((package_path / "references").glob("*.md"))
+        }
+    )
     errors.extend(
         validate_cross_artifact_contracts(package.name, contract_surfaces, label=label)
     )
@@ -2168,9 +2160,6 @@ def validate_package(package: SkillPackage, *, label: str) -> tuple[list[str], Q
         if file_path.suffix.lower() not in TEXT_FILE_SUFFIXES:
             continue
         file_text = file_path.read_text(encoding="utf-8", errors="ignore")
-        if LEGACY_RE.search(file_text):
-            relative = file_path.relative_to(package_path)
-            errors.append(f"{label}: stale legacy skill name found in {relative}")
         if PLACEHOLDER_RE.search(file_text):
             relative = file_path.relative_to(package_path)
             errors.append(f"{label}: unresolved placeholder marker found in {relative}")
@@ -2206,7 +2195,7 @@ def validate_source_packages(packages: list[SkillPackage]) -> tuple[list[str], d
 def validate_shared_browser_operation_protocol(root: Path) -> list[str]:
     source_relative = Path("protocols/browser-operation-v1.md")
     generated_paths = (
-        Path("skills/chatgpt-review/references/browser-operation-protocol.md"),
+        Path("skills/ask-chatgpt/references/browser-operation-protocol.md"),
         Path("skills/ops-browser/references/browser-operation-protocol.md"),
     )
     errors: list[str] = []

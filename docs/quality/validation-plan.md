@@ -114,6 +114,14 @@ workspace diff, stop or recovery state, duration, and token counts when
 available. A successful narrative without the required evidence is a failed
 workflow result.
 
+For cross-repository candidate trials, retain a handback record with the source
+task/thread ID, target repository and fixed Git basis, candidate Skill basis,
+artifact paths/hashes, exact commands, gate-by-gate results, worktree/commit state,
+review basis, failures, and `Not verified` items. Inspect the retained target
+repository evidence before using the record. Store non-formal empirical records
+under `docs/quality/live-trials/`; do not insert them into the formal evidence
+manifest or promote status merely because the narrative is complete.
+
 Workflow traces have the same producer-attested boundary as authority traces.
 They cannot set workflow to `verified` until an independent event-to-action and
 verifier mapping is enforced.

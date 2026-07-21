@@ -77,7 +77,7 @@ the profile selected and mark the exact claim `Not verified`.
 - [ ] Distinguish leak, live owner, cache, allocator retention, mmap, SQLite page
       cache, OS cache, and index reader/writer retention.
 - [ ] Define one-factor experiment evidence and regression protection; route any
-      requested code/config edit to `implement-rust`.
+      requested code/config edit to `dev-rust`.
 
 ## 6. SQLite Profile
 

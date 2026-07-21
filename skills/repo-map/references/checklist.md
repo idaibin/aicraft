@@ -24,8 +24,18 @@
 - Shortest reading order for common task types
 - Typical page, API, backend, CLI, or worker change chains
 - Verified reuse index for components, functions/helpers, hooks/composables, stores, services, endpoints, routes, handlers, repositories, traits/types/DTOs, and reference implementations
-- Canonical definition, access or registration entry with actual visibility, representative consumers, reuse boundary, and verification evidence for each indexed contract
+- For reusable UI components: product/design term, visual cue or semantic job,
+  canonical path, symbol, export/registration path, owner/provider root,
+  representative consumers, states/variants, reuse boundary, and current-source evidence
+- For other indexed contracts: canonical definition, access or registration
+  entry with actual visibility, owner/provider root, representative consumers,
+  reuse boundary, and current-source evidence
 - Cross-boundary contracts including API clients, generated code, IPC, events, persistence, exports, and deployment edges when applicable
+- For a requested API Contract Map: native authority/path, registration,
+  request/success/error/auth owners, client and representative consumers,
+  duplicate-DTO boundary, checks, and `Not verified` results. Include normalized
+  OpenAPI/generator/generated client only for an existing or explicitly introduced
+  pipeline; otherwise record them `Not applicable`.
 - Naming/placement patterns and the gate for creating new files or contracts
 - Frequent edit areas, protected/high-risk areas, exceptions, and `Not verified` gaps
 
@@ -37,12 +47,17 @@ Treat an entry as stale when its path fails or when its definition, access/regis
 
 1. Resolve it from the documented or repository root.
 2. Check the exact path and its immediate parent.
-3. If the parent is absent, ascend one directory at a time until the nearest existing ancestor is found.
-4. Search downward only from that ancestor for the missing basename, owning symbol, manifest/config registration, route/module registration, or generated source.
-5. Use history only if current evidence cannot distinguish move, rename, deletion, generation, or branch drift.
-6. Update the smallest stale unit: path, row, command, diagram edge, or section.
-7. Recheck links and nearby references affected by the same move.
-8. Preserve every still-verified section.
+3. If the parent is absent, ascend one directory at a time only within the
+   recorded owner/provider root and stop at that root.
+4. Search downward only from that ancestor for the missing basename, owning
+   symbol, manifest/config registration, route/module registration, or generated source.
+5. If the root itself is absent, mark stale and return to ordinary bounded live
+   discovery; never cross the old root boundary.
+6. Use history only to explain a move/rename already proven in current source;
+   never use historical definitions or consumers as current reuse evidence.
+7. Update the smallest stale unit: path, row, command, diagram edge, or section.
+8. Recheck links and nearby references affected by the same move.
+9. Preserve every still-verified section.
 
 Rebuild the entire document only if it is missing, corrupt, structurally unusable, or explicitly requested.
 

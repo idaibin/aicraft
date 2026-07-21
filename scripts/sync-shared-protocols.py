@@ -10,8 +10,19 @@ from pathlib import Path
 
 PROTOCOLS = {
     Path("protocols/browser-operation-v1.md"): (
-        Path("skills/chatgpt-review/references/browser-operation-protocol.md"),
+        Path("skills/ask-chatgpt/references/browser-operation-protocol.md"),
         Path("skills/ops-browser/references/browser-operation-protocol.md"),
+    ),
+    Path("protocols/behavior-first-v1.md"): (
+        Path("skills/dev-frontend/references/behavior-first.md"),
+        Path("skills/dev-rust/references/behavior-first.md"),
+    ),
+    Path("protocols/codebase-design-v1.md"): (
+        Path("skills/dev-frontend/references/codebase-design.md"),
+        Path("skills/dev-rust/references/codebase-design.md"),
+        Path("skills/audit-frontend/references/codebase-design.md"),
+        Path("skills/audit-rust/references/codebase-design.md"),
+        Path("skills/repo-review/references/codebase-design.md"),
     ),
 }
 

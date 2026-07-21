@@ -1,4 +1,4 @@
 interface:
   display_name: "Domain Modeling"
-  short_description: "Model domain entities, rules, states, and boundaries"
-  default_prompt: "Use $domain-modeling to clarify domain language, entities, state transitions, business rules, and bounded contexts before design or implementation."
+  short_description: "Resolve shared business language, rules, and boundaries"
+  default_prompt: "Use $domain-modeling to resolve shared business terms, ambiguities, and rules, loading lifecycle or bounded-context depth only when material complexity requires it."

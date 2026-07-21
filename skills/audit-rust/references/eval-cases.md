@@ -26,7 +26,7 @@
 
 | Prompt | Expected |
 | --- | --- |
-| `Rename one known private Rust function and run its existing test.` | Prefer `implement-rust`. |
+| `Rename one known private Rust function and run its existing test.` | Prefer `dev-rust`. |
 | `Find why this test started failing; the cause is unknown.` | Do not trigger this Skill; use the host's built-in diagnosis under effective instructions. |
 | `Memory grows after each Rust import and nobody knows whether the cause is ownership, allocator retention, or the operating system.` | Use host diagnosis to reproduce the concrete symptom and isolate its cause before auditing a selected remediation surface. |
 | `Map the repository and tell me whether it contains Rust.` | Prefer `repo-map`. |

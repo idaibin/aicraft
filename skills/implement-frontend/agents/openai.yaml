@@ -1,4 +1,0 @@
-interface:
-  display_name: "Frontend Implementation"
-  short_description: "Implement frontend framework and styling profiles safely"
-  default_prompt: "Use $implement-frontend to make scoped frontend source changes with reuse-first discovery, repository-native conventions, and matching validation without Git delivery."
