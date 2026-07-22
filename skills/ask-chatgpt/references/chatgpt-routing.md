@@ -12,6 +12,7 @@
 - [Standalone Playwright Routing](#standalone-playwright-routing)
 - [Text And File Input](#text-and-file-input)
 - [Output Capture](#output-capture)
+- [Page State Recovery](#page-state-recovery)
 - [Prompt Template](#prompt-template)
 
 ## Terminology Basis
@@ -164,6 +165,31 @@ Reject or mark `Not verified` if the tab is ambiguous, generation is still strea
 For multiple rounds, append one attributed pass per round and verify Codex's
 changes before sending the next package. Reuse the same Project conversation by
 default; use separate conversations only when independence is requested.
+
+## Page State Recovery
+
+Before composing, submitting, or capturing a response, classify the current
+ChatGPT page from direct evidence as one of:
+
+- clearly authenticated and normal: continue with the requested operation;
+- clearly unauthenticated: ask the user to sign in in the controlled browser;
+- abnormal or indeterminate: blank, partially rendered, stalled, showing an
+  error, or otherwise lacking enough evidence for either state above.
+
+For an abnormal or indeterminate page, use `ops-browser` for one bounded
+recovery action: refresh the exact same URL, then re-verify the active route,
+account/workspace and login state, conversation identity, and relevant controls.
+Do not refresh a clearly unauthenticated page in a loop. If the refreshed page
+is normal, continue; if it is clearly unauthenticated, request sign-in; if it
+remains abnormal or indeterminate, record the page state `Not verified` and
+stop.
+
+When recovery happens after submission, it only reconciles the original
+operation. Preserve its conversation and operation ledger; never resend the
+prompt, select Regenerate, create another conversation, or change the route.
+Capture the existing response only after re-verifying its URL/ID and submitted-
+prompt attribution. If completion still cannot be established, record the
+response `Not verified` and stop.
 
 ## Prompt Contract
 
