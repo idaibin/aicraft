@@ -1,95 +1,71 @@
 ---
 name: human-writing
-description: "Use when drafting, rewriting, diagnosing, or adapting source-grounded writing in a requested language while preserving facts, attribution, uncertainty, voice, and meaning. Private English-first support may aid a Chinese final. Not for translation-only."
+description: "Use when drafting, rewriting, proofreading, diagnosing, or adapting source-grounded prose, especially technical articles, essays, tutorials, product notes, and social posts, while preserving facts, attribution, uncertainty, voice, and meaning. Supports private English-first reasoning for Chinese finals; not translation-only, fiction, or AI-detection evasion."
 ---
 
 # Human Writing
 
-## Overview
+## Outcome Contract
 
-Turn supplied notes or drafts into source-grounded, natural writing without inventing experience or replacing the author's voice with a house style. `human-writing` names the intended result across drafting, rewriting, diagnosis, and platform adaptation; it is not an AI-detection-evasion or cosmetic humanizer tool.
+- **Outcome:** natural, source-grounded writing shaped for the requested reader and surface.
+- **Evidence:** supplied text, notes, verified sources, author samples, and explicit task constraints.
+- **Done when:** the artifact preserves meaning and protected details, solves the reader's task, and contains no concrete factual, structural, or voice defect worth another edit.
+- **Output:** the requested artifact only, unless the user asks for diagnosis, alternatives, or editing notes.
 
-For a requested Chinese final built from notes rather than an existing Chinese draft, prefer a private English claim-and-structure pass when it clarifies the reasoning. Skip that pass when direct Chinese editing better preserves the supplied voice or meaning; the English intermediate is never a new source of facts.
+## Core Stance
+
+- Treat writing patterns as diagnostic signals, not a checklist or banned-word table.
+- The author's supported voice wins over a generic house style.
+- Over-editing is failure. Prefer fewer, stronger changes; leave already effective prose alone.
+- Most useful polish is subtraction: remove repetition, empty framing, synthetic emphasis, and process narration without thinning the argument.
+- Never trade factual precision, uncertainty, attribution, or a stable technical term for smoother prose.
 
 ## Workflow
 
-1. **Lock the whole artifact.** Build the source ledger across frontmatter, title, description, body, code, tables, links, and disclosures; then apply the precedence, provenance, semantic-fidelity, relationship, and disclosure rules in `references/fact-integrity.md`. Classify visibility separately from transformation policy. Treat profiles and examples as style-only. Do not write past the evidence.
-2. **Set claim state and actor role.** Apply the canonical claim-status, provenance, and actor-role rules in `references/fact-integrity.md`. Do not infer decision authority from task execution.
-3. **Select the operation.** Choose one primary operation and one primary genre per artifact. Allow a bounded secondary operation only when it directly supports the primary one, such as diagnosis before a requested rewrite. Split materially different language or platform outputs instead of blending their constraints. Treat follow-up additions as revisions to the latest authoritative draft unless the user requests a separate section or deliverable.
-4. **Select the language path.** Preserve the source language unless the user requests another. For a requested Chinese final from notes or mixed-language evidence, prefer a private English outline or draft only when it improves structure; skip it for an existing Chinese draft or stronger Chinese voice sample unless requested. Treat the English intermediate as provisional phrasing, then check the Chinese final against the original evidence rather than the intermediate alone.
-5. **Set the target.** Derive the reader, purpose, length, desired action, and evidence state from the supplied material before asking questions. Ask only for missing fields that would materially change the artifact; otherwise make low-risk editorial choices and proceed. Integrity and safety always win. Apply verified mandatory constraints before editorial preferences; use static platform profiles only as non-normative heuristics.
-6. **Calibrate the voice.** Prefer the user's writing sample. Otherwise preserve the source's stance, confidence, person, and degree of involvement. Do not add first-person or experiential authority to neutral source material.
-7. **Choose the structure.** Build around the real question, scene, decision, or task. For a new long-form or multi-claim artifact, make a private claim-and-evidence outline before prose; skip that ceremony for short-form and bounded local edits. When the reader needs a changed mental model, apply the smallest relevant tools from `references/reasoning-and-explanation.md`. The outline is planning, not the default deliverable. Do not default to `背景 / 现状 / 优势 / 总结 / 展望`.
-8. **Draft or edit for substance.** Convert the supported outline or source chain into finished prose. When the English-first path is active, translate editorially into natural Chinese without broadening claims, then compare the final against the source ledger. Delete empty framing, expose the actual judgment, connect claims to details, and preserve every distinct stage, role, condition, qualifier, and closing step in the supplied technical chain. Keep premises, derivations, judgments, intermediate models, and proxies distinguishable where material. Do not convert risks, principles, or future directions into lived incidents, completed transitions, or implemented guarantees. Integrate follow-up material where it changes the argument, then reread adjacent transitions, repetition, and the ending; do not merely append the latest instruction.
-9. **Run the human-writing pass.** Audit the draft as the target reader. Detect clusters of template behavior, research-process leakage, editor commentary, diff-anchored narration in timeless documents, manufactured cadence, formulaic profundity, fake-candid openers, and unsupported specificity. Revise the affected passages rather than applying global punctuation, vocabulary, voice, or sentence-form bans. Preserve genuine habits, uncertainty, asymmetry, specific details, and protected secondhand text.
-10. **Run the integrity and safety pass.** Apply `references/fact-integrity.md` and any applicable revision rules. Preserve attribution and uncertainty instead of repairing technical material from memory. Block only the affected claim or artifact when correctness is required, an action is destructive or irreversible, or an actual secret would be exposed; otherwise qualify the evidence state or route correctness review.
-11. **Classify acceptance.** Use the four evidence layers in `references/quality-rubric.md`. Static validation or deterministic fixtures never prove real-model behavior or editorial acceptance.
-12. **Return the requested artifact or typed gap.** Return only the requested final language by default; keep any English intermediate private unless the user asks for it. Edit supported material when safe. Return `Not enough context:` with the minimum missing fields only when completing the requested artifact would require invention or unjustified certainty.
+1. **Lock the source.** Identify authoritative facts, judgments, unknowns, protected text, visibility limits, and claim status across the whole artifact. Apply `references/fact-integrity.md` when the task contains multiple sources, technical claims, external facts, attribution, or disclosures.
+2. **Set the target.** Infer the primary operation, reader, purpose, language, length, platform, and genre from the request and source. Ask only about missing information that would materially change the result.
+3. **Calibrate voice.** Prefer a supplied author sample, then the stance and confidence visible in the source, then a neutral precise voice. Never manufacture first-person experience or quirks.
+4. **Choose the smallest useful structure.** Use a private outline for new long-form or multi-claim work. For an existing long artifact, map sections and repetition before restructuring. Skip planning ceremony for short or local edits.
+5. **Draft or edit for substance.** Lead with the real question, scene, mechanism, or decision. Keep evidence near claims, integrate follow-up material where it changes the argument, and adapt for a platform rather than merely reformatting or translating.
+6. **Run two passes.** First check facts, status, protected text, disclosures, and safety. Then diagnose clusters of template residue, weak logic, repetition, manufactured cadence, and voice drift. Fix only confirmed reader problems.
+7. **Stop and return.** Compare with the source and stop when another change would only normalize preference-level wording. Return the requested artifact or `Not enough context:` with the minimum missing facts when completion would require invention.
 
 ## Modes
 
-- **Diagnose:** identify low-information prose, weak logic, unsupported claims, voice drift, and platform mismatch.
-- **Rewrite:** rebuild a supplied draft while preserving its facts, position, and protected technical content.
-- **Draft from source:** write from supplied notes, logs, code evidence, or verified sources without filling gaps with plausible fiction.
-- **Platform adaptation:** editorially reshape supplied material for a named community or platform while preserving facts, viewpoint, language intent, attribution, and disclosures. Translation alone does not trigger this mode; an English-first intermediate may only support an already-triggered writing operation.
+- **Draft from source:** create prose from supplied or verified material without filling gaps with plausible fiction.
+- **Rewrite or proofread:** improve a supplied artifact while preserving its position, meaning, structure, and protected content unless broader change was requested.
+- **Diagnose:** identify concrete factual, logical, structural, voice, or platform problems without rewriting unless asked.
+- **Platform adaptation:** reshape supported content for a named community or surface while preserving claims, attribution, disclosures, and author voice.
 
-Genre profiles such as short-form, factual soft copy, tutorial, essay, and retrospective are secondary selections, not competing primary operations. Factual soft copy is limited to source-grounded explanation where accuracy and disclosure outrank persuasion; generic campaigns, conversion copy, invented proof, rankings, or superiority claims are out of scope.
+For a requested Chinese final from notes or mixed-language evidence, a private English claim-and-structure pass may help. Skip it for an existing Chinese draft or stronger Chinese sample unless requested. Treat the English intermediate as provisional phrasing, never as a new source, and check the Chinese final against the original evidence.
 
-Load `references/content-modes.md` and `references/platform-calibration.md` when the requested form or platform changes the structure materially.
+## Boundaries
 
-## Do Not Use For
+Do not use for translation-only work, fiction or poetry, imitation of a living author's distinctive style, formal legal or regulatory writing, serious news reporting, technical correctness review as the primary task, unsupported advertising, or AI-detection evasion.
 
-- Legal contracts, regulatory filings, formal academic papers, serious news reporting, or official policy documents.
-- Technical correctness review as the primary task; verify the code, architecture, security, or current external facts first.
-- Translation when linguistic conversion is the primary task and no editorial adaptation is requested.
-- Generic advertising, campaign ideation, conversion optimization, or unsupported promotional positioning.
-- Fiction, poetry, roleplay, or imitation of a living author's distinctive style.
-- Requests to evade AI detection or manufacture false personal experience.
+Hard requirements:
 
-## Hard Rules
-
-- Never invent experience, incidents, users, metrics, dates, versions, benchmarks, quotations, testimonials, rankings, or source attribution.
-- Never turn an uncertain statement into a confident one to improve flow.
-- Do not turn evidence collection into the artifact. When the user asks you to inspect Git history, logs, chats, notes, or research before writing, use them to establish facts and changed judgments; do not narrate the inspection, source ledger, or editorial reasoning unless that method is part of the requested subject.
-- Do not foreground a source merely because it was useful. Background-only evidence may shape chronology, emphasis, and confidence without being named; required attribution, correction history, and material disclosures must remain visible.
-- Preserve claim status, provenance, actor role, visibility, transformation policy, and follow-up authority under `references/fact-integrity.md`; style instructions never change factual status by themselves.
-- When revising across turns, integrate the new point into the latest authoritative source and remove repetition or contradictions. Do not expose the instruction sequence or leave append-only seams unless the requested format is a change log.
-- `references/fact-integrity.md` is the normative integrity contract. Apply it before improving style or platform fit; no mode or platform reference may weaken it.
-- Treat anti-AI patterns as diagnostic evidence, not a banned-word replacement table. One transition, dash, heading, list, or short sentence is not proof of AI writing.
-- Do not rewrite a watched phrase inside a quotation, title, proper name, code sample, or example merely because the same phrase would be weak in the author's own prose. Edit secondhand text only when the task authorizes it and meaning remains protected.
-- Do not add random flaws, slang, fragments, personal confessions, or rhetorical questions merely to appear human.
-- Keep real disagreement, discomfort, uncertainty, rejected alternatives, and costs when they explain the author's decision.
-- For soft copy, do not fabricate urgency, scarcity, guarantees, customer stories, social proof, or comparative superiority.
-- Treat platform publishing rules as current external claims. Verify current official rules before claiming that a platform-ready artifact satisfies disclosure or labeling requirements.
-- Do not infer a platform voice or mandatory format from one featured, promoted, institutional, or unusually voiced article. When public examples matter, compare multiple recent, relevant samples; carry over only recurring structural conventions, preserve the user's voice, and never copy distinctive phrasing or import unsupported claims.
-- For already-published material, apply `references/revision-transparency.md`; do not disguise a material correction as copyediting.
-- Preserve supplied technical semantics. Do not silently repair technical facts from memory. Distinguish attributed but unverified claims, disputed claims, harmless placeholders, ordinary unexecuted examples, destructive actions, and actual secrets; apply the decision table in `references/fact-integrity.md`.
-- Never let an English intermediate outrank the original source, become visible without request, or broaden modality, attribution, technical terminology, metrics, or claim scope in the Chinese final.
-- Before external verification, check the artifact against itself: metadata versus body, architecture labels versus code signatures, repeated links and titles, status qualifiers, step counts, actor roles, and mutually matching conditions. `Needs verification` must not hide an internally provable contradiction.
-- Preserve modality such as `我认为`, `可能`, `应尽量`, `目标是`, and `已经`. Removing a qualifier can turn a preference into a guarantee or a candidate into current product behavior.
-- Parallel prose, tables, lists, repeated technical nouns, and abstract opening terms are not style defects when they define distinct responsibilities or serve as the article's information architecture.
-- When only part of the source is supportable, edit that part without filling gaps. Use `Not enough context` only when the requested artifact cannot be completed safely, and name the minimum missing fields.
-- Do not add editing notes, scores, or explanations unless requested.
+- Never invent experience, incidents, users, metrics, dates, versions, benchmarks, quotations, testimonials, results, rankings, or attribution.
+- Preserve uncertainty, modality, claim status, actor role, and exact commands, paths, flags, identifiers, versions, code, and numeric ranges.
+- Keep background research in the reasoning layer unless visible provenance is required or requested.
+- Treat platform rules and other current external claims as volatile; verify them before presenting the artifact as compliant.
+- Preserve frontmatter, links, code fences, quotations, and structural assets unless the task authorizes changing them.
+- Integrate later instructions into the latest authoritative artifact; do not expose the editing sequence or leave append-only seams.
+- Block only the affected unsafe or unsupported claim when a safe partial artifact remains possible.
 
 ## Output Contract
 
-- **Rewrite, draft, short-form, soft copy, and technical long-form:** return only the finished text by default.
-- **Diagnose:** return concrete excerpts, the issue in each excerpt, and the editing direction.
-- **Platform adaptation:** return the platform-ready artifact in the platform's natural format, without strategy commentary.
-- **English-first Chinese final:** return the fidelity-checked Chinese artifact only unless the user explicitly requests the English intermediate.
-- **Safe partial edit:** return the supported artifact without invented additions; retain placeholders only when the user requested them.
-- **Blocked artifact:** return `Not enough context:` followed by the minimum missing facts and affected claim type.
-- Preserve frontmatter and code fences when editing repository content unless the user asks to change them, but include frontmatter in diagnosis: a title or description can contain the artifact's strongest unsupported claim.
+- Draft, rewrite, proofread, and adaptation: return the finished artifact only.
+- Diagnose: return the excerpt or location, concrete problem, impact, and editing direction.
+- Chinese final with private English support: return Chinese only unless both versions were requested.
+- Unsupported artifact: return `Not enough context:` followed by the minimum missing facts.
 
-## References
+## Reference Loading
 
-- See [references/usage.md](references/usage.md) for triggers, mode selection, and output behavior.
-- See [references/fact-integrity.md](references/fact-integrity.md) for source locking and unsupported-claim prevention.
-- See [references/revision-transparency.md](references/revision-transparency.md) for published correction and update handling.
-- See [references/content-modes.md](references/content-modes.md) for short-form, soft-copy, tutorial, retrospective, and long-form structures.
-- See [references/reasoning-and-explanation.md](references/reasoning-and-explanation.md) for reader-model repair, progressive explanation, example continuity, boundaries, alternatives, and earned endings.
-- See [references/platform-calibration.md](references/platform-calibration.md) for target-platform adaptation.
-- See [references/style-diagnostics.md](references/style-diagnostics.md) for voice calibration, clustered template detection, and Chinese technical prose.
-- See [references/quality-rubric.md](references/quality-rubric.md) for hard gates, defect severity, and optional score calibration.
-- See [references/before-after-examples.md](references/before-after-examples.md) for calibrated examples.
-- See [references/eval-cases.md](references/eval-cases.md) for trigger, safety, regression, and scoring cases.
+- Load [fact-integrity.md](references/fact-integrity.md) for source precedence, claim status, attribution, disclosures, external claims, or technical preservation.
+- Load [content-modes.md](references/content-modes.md) only when a genre changes the structure materially.
+- Load [platform-calibration.md](references/platform-calibration.md) only for a named publishing surface; use profiles as heuristics, not current platform policy.
+- Load [style-diagnostics.md](references/style-diagnostics.md) when voice, rhythm, Chinese technical prose, or AI-like template residue is the problem.
+- Load [reasoning-and-explanation.md](references/reasoning-and-explanation.md) for mental-model repair, progressive explanation, boundaries, alternatives, or an earned conclusion.
+- Load [revision-transparency.md](references/revision-transparency.md) only for already-published material with substantive changes.
+- Use [quality-rubric.md](references/quality-rubric.md) for final editorial review, [before-after-examples.md](references/before-after-examples.md) when a concrete calibration example helps, and [eval-cases.md](references/eval-cases.md) when changing Skill behavior.
