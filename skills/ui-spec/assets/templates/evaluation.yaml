@@ -1,4 +1,4 @@
-version: 1
+version: 2
 revision: 1
 status: not-verified
 deterministic:
@@ -17,3 +17,4 @@ total: 0
 decision: pending
 reviewer: pending-human-review
 gaps: []
+promotion_approvals: []

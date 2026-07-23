@@ -25,12 +25,13 @@
 
 `evaluation.yaml` separates deterministic results, hard blockers, weighted criteria, score, decision, reviewer, and remaining gaps.
 
-`artifact-manifest.yaml` binds repository/ref, selected-source identity, input revisions, output paths and hashes, evaluation revision, approval, effort, and rollback target.
+`artifact-manifest.yaml` binds repository/ref, selected-source identity, input revisions, output roots, paths and SHA-256 hashes, evaluation revision, approval, effort, and rollback target. Schema v2 records each output as `{root, path, sha256}`: `task-local` is resolved within the supplied task package, while `durable-shared` uses the safe repository-relative `profile.durable_shared.root` and requires an exact approved, sanitized tuple in `evaluation.promotion_approvals`.
 
 ## Version and rights rules
 
 - Increment the relevant revision when a profile, task, selected source, reference set, token set, mapping, or rubric changes.
 - Never overwrite an accepted manifest in place.
+- Schema v1 packages are intentionally rejected with `V1_MIGRATION_REQUIRED`; migrate all documents and string output paths to v2 before validation.
 - Mark third-party images `reference-only` unless separate evidence permits redistribution.
 - Keep code license and reference-content rights separate.
 - Preserve the selected visual source unchanged; new alternatives or edits belong to Product Design.

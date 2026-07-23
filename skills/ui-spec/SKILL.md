@@ -1,6 +1,7 @@
 ---
 name: ui-spec
 description: "Use when a selected visual source or accepted UI surface must become an implementation-ready specification covering layout, states, interaction, responsive/accessibility behavior, component/token mappings, shared visual contracts, and acceptance before frontend source changes."
+compatibility: "Python 3.10+; PyYAML 6.0.2; jsonschema 4.25.1 with Draft 2020-12 support."
 ---
 
 # UI Specification
