@@ -6,8 +6,9 @@
 
 1. Durable files
 2. Task files
-3. Version and rights rules
-4. Budgets and recovery
+3. Design-system automation manifest
+4. Version and rights rules
+5. Budgets and recovery
 
 ## Durable files
 
@@ -26,6 +27,31 @@
 `evaluation.yaml` separates deterministic results, hard blockers, weighted criteria, score, decision, reviewer, and remaining gaps.
 
 `artifact-manifest.yaml` binds repository/ref, selected-source identity, input revisions, output roots, paths and SHA-256 hashes, evaluation revision, approval, effort, and rollback target. Schema v2 records each output as `{root, path, sha256}`: `task-local` is resolved within the supplied task package, while `durable-shared` uses the safe repository-relative `profile.durable_shared.root` and requires an exact approved, sanitized tuple in `evaluation.promotion_approvals`.
+
+## Design-system automation manifest
+
+The durable `docs/ui/design-system/manifest.yaml` has a different owner from the task
+package's `artifact-manifest.yaml`. It is an optional automation contract, not a second
+semantic design source. `assets/design-system-manifest.schema.json` is its structural
+authority and `scripts/validate_design_system_manifest.py` verifies repository paths,
+SHA-256 bindings, uniqueness, approval identity, and timezone-aware approval time.
+Copy `assets/design-system-manifest/manifest.yaml` only after its named automation
+consumer already exists in the repository.
+
+The manifest must declare:
+
+- `role: automation-contract` and the real automation consumer's stable ID,
+  repository path, and SHA-256;
+- the human-readable semantic authority path and SHA-256;
+- only declared machine asset bindings and their SHA-256 values;
+- `conflict_policy: fail`;
+- the approved design revision, approver, and timezone-aware approval time.
+
+Because the schema rejects unknown fields, the manifest cannot add token values,
+component semantics, visual principles, or other independent design decisions. A
+changed consumer, `DESIGN.md`, or bound asset invalidates its recorded hash and must
+fail validation before automation chooses either side. A manifest cannot speculate
+about future automation.
 
 ## Version and rights rules
 

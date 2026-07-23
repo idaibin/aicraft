@@ -5,12 +5,24 @@
 1. Use the repository's existing authoritative product fact source.
 2. Use the repository's established feature/spec convention.
 3. Only when neither exists and the user explicitly authorizes a new fallback,
-   use one of:
-   - `docs/product/PRODUCT.md` for a foundation;
-   - `docs/product/features/<feature>/spec.md` for a feature.
+   use `docs/prd/` directly:
+   - `docs/prd/PRODUCT.md` for a foundation;
+   - `docs/prd/<slice-id>/spec.md` for one feature slice;
+   - `docs/prd/index.md` only for several independent feature slices.
 
-Do not create both. Do not add a new `docs/product` tree when an equivalent ADR,
-RFC, feature, requirements, or product directory already owns the fact.
+Do not create an index for one slice or add a `docs/specs/` wrapper. Do not add a new
+`docs/prd/` tree when an equivalent ADR, RFC, feature, requirements, or product
+directory already owns the fact.
+
+Use the same stable `<slice-id>` as the related `docs/ui/<slice-id>/spec.md` contract
+when both exist. Cross-link the two artifacts and keep their authorities separate:
+product behavior stays in PRD, while selected-source layout, components, interaction,
+responsive/accessibility rules, and UI acceptance stay in UI.
+
+For one product slice, a consumer reads only its authoritative foundation facts when
+applicable and `docs/prd/<slice-id>/spec.md`. For several slices, add
+`docs/prd/index.md`; a consumer reads that index and the target slice, not every
+sibling specification.
 
 ## Conditional Artifacts
 

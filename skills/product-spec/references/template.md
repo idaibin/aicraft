@@ -21,6 +21,21 @@ Use repository conventions before these shapes. Omit inapplicable sections.
 ## Ready for <implementation slice>
 ```
 
+For several independent features, add a short index before the slice documents:
+
+```markdown
+# <Request> Product Index
+
+## Shared confirmed facts
+## Slice inventory, links, and status
+## Shared dependencies and exclusions
+## Slice-specific blockers
+## Consumer read contract
+```
+
+Each linked slice uses the Feature Spec template. Do not repeat UI colors, typography,
+components, tokens, or page geometry; link the target UI contract instead.
+
 ## Foundation Spec
 
 ```markdown

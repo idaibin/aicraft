@@ -8,6 +8,7 @@
 | `We are launching a new product line; define its boundary, users, journeys, MVP, non-goals, and first ready slice.` | Trigger Foundation Spec. |
 | `Update only our existing PRODUCT.md with these confirmed product decisions.` | Trigger Artifact Update after authorization and path verification. |
 | `Clarify the one unresolved decision that changes subscription cancellation behavior, then produce the smallest feature spec.` | Trigger internal clarification within Feature Spec. |
+| `Stress-test the permission, recovery, and acceptance decisions for this product slice before writing its spec.` | Trigger the internal decision pressure test, resolve the load-bearing frontier one question at a time, then synthesize only the selected slice. |
 
 ## Non-Trigger Eval
 
@@ -35,12 +36,22 @@
 | Scenario | Correct decision | Reject if |
 | --- | --- | --- |
 | One feature affects several product surfaces | Use one Feature Spec and include only relevant user-visible states and dependencies. | Exposes Brief/Standard as modes or splits files by default. |
+| One connected feature uses several pages | Keep one Feature Spec when the pages share one job, behavior, and acceptance boundary. | Splits mechanically by page or treats every surface as an independent feature. |
+| Home, tasks, contacts, and profile are requested together | Produce one short product index plus independently readable Feature Specs for confirmed slices. | Merges independent behavior into one omnibus Feature Spec. |
+| Some requested features are confirmed and others remain open | Author confirmed slice facts and give each its own Ready verdict; keep open slices and blockers in the index. | Lets one open feature block all slices or invents unconfirmed behavior. |
+| UI direction already exists | Link the applicable UI contract and keep only behavior, user-visible meaning, and acceptance. | Repeats colors, typography, components, tokens, or page geometry. |
 | New module inside an existing product | Use Feature Spec unless the product boundary is being redefined. | Uses Foundation merely because work is large. |
 | Existing Foundation Spec is Ready and source exposes one bounded completion gap | Preserve the foundation and produce one Feature Spec for that gap when downstream implementation was requested. | Rewrites product positioning, invents a roadmap, or treats current code as authority for an unresolved product choice. |
 | Existing positioning is consistently split across a README, product map, and policy manifest | Use the smallest verified source set as Feature Spec evidence. | Creates a new Foundation Spec only to consolidate documents or ignores a conflicting authority. |
-| Repository already has an RFC convention | Use the RFC location and shape. | Creates `docs/product` in parallel. |
-| No spec convention exists | Preview one fallback only after explicit write authorization. | Creates a tree, glossary, ADR, and handoff automatically. |
+| Repository already has an RFC convention | Use the RFC location and shape. | Creates `docs/prd` in parallel. |
+| No spec convention exists and one feature slice is authorized for durable publication | Preview `docs/prd/<slice-id>/spec.md`; do not create an index. | Adds `docs/specs/`, creates `docs/prd/index.md` for one slice, or creates a glossary, ADR, and handoff automatically. |
+| No spec convention exists and several independent feature slices are authorized | Use `docs/prd/index.md` plus `docs/prd/<slice-id>/spec.md` for each confirmed slice. | Creates one omnibus PRD or adds a `docs/specs/` wrapper. |
+| Related PRD and UI contracts exist for one slice | Use the same stable slice ID and cross-link `docs/prd/<slice-id>/spec.md` with `docs/ui/<slice-id>/spec.md` without duplicating authority. | Uses unrelated IDs or copies visual details into PRD. |
 | Discoverable answer exists in source/docs | Read it before asking. | Interviews the user about current repository facts. |
+| Two material decisions remain and the second depends on the first | Ask the prerequisite decision first with a recommendation, trade-off, and affected slices; recompute the frontier after the answer. | Asks both questions together or guesses the dependent answer. |
+| A vague request contains many conceivable branches but only permissions and recovery can change the selected slice | Pressure-test only permissions and recovery, then stop at the slice Ready gate. | Exhaustively interviews every preference or unrelated future branch. |
+| The user stops before resolving a material decision for one of several slices | Preserve that decision as Open and keep only the affected slice not Ready; allow unrelated confirmed slices to proceed. | Invents confirmation, claims shared understanding, or blocks every slice. |
+| The selected slice already passes its Ready gate | Synthesize without activating the pressure test. | Reopens settled product decisions without contradictory evidence. |
 | Missing decision affects only an internal naming choice | Mark Assumption or Deferred and declare Ready for the slice. | Blocks implementation ceremony without behavioral impact. |
 | Missing decision changes permission or error behavior | Keep the slice not ready and ask one decision question. | Lets implementation invent the behavior. |
 | Feature spans several bounded contexts | Route the shared language/lifecycle/invariants to `domain-modeling`. | Builds a complete domain model inside the spec. |
@@ -52,9 +63,12 @@
 | Case | Pass evidence | Reject if |
 | --- | --- | --- |
 | Mode selection | Exposes only Feature Spec, Foundation Spec, and Artifact Update. | Publishes Discovery, grill, Brief, or Standard modes. |
-| Clarification | Searches repository facts, asks one material question with recommendation and trade-offs, and stops at the Ready gate. | Runs an open-ended interview or starts implementation. |
-| Progressive scope | Produces one main document and includes only applicable detail. | Requires every UI/data/domain section or splits by default. |
-| Ready gate | Names `Ready for <implementation slice>` and blocks only decision-changing ambiguity. | Uses one global Ready verdict or blocks on harmless detail. |
+| Decision pressure test | Activates only for material product choices, resolves facts first, asks the highest-impact frontier decision one at a time with recommendation/trade-off/affected slices, records the answer, and stops per slice at Ready. | Runs an exhaustive interview, asks dependent questions together, guesses decisions, or reopens a Ready slice. |
+| Progressive scope | Produces one main document for one feature, or a short index plus slice documents for proven independent features. | Requires every UI/data/domain section, splits one cohesive feature by page, or merges independent features. |
+| Ready gate | Names `Ready for <implementation slice>` for every slice and blocks only the affected slice on decision-changing ambiguity. | Uses one global Ready verdict, blocks unrelated slices, or blocks on harmless detail. |
+| Consumer read contract | One slice requires only shared index facts and its target slice. | Requires every sibling Feature Spec to be loaded. |
+| Documentation fallback | Uses repository convention first; otherwise writes directly under `docs/prd/`, adding its index only for multiple independent slices and never adding `docs/specs/`. | Creates a competing tree, an unnecessary index, or another wrapper layer. |
+| Visual-detail boundary | Links UI contracts without duplicating colors, typography, components, tokens, or geometry. | Turns product facts into a visual specification. |
 | Evidence states | Separates Confirmed, Assumption, Open, Rejected, and Deferred. | Hides assumptions as requirements. |
 | Artifact authority | Uses existing convention and writes only explicitly authorized product facts. | Overwrites or invents an authority. |
 | Conditional artifacts | Creates glossary, ADR, UI evidence, or handoff only when separately justified. | Treats them as minimum output. |

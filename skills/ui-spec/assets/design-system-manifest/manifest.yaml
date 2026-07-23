@@ -1,0 +1,19 @@
+version: 1
+role: automation-contract
+consumer:
+  id: repository-validator-name
+  path: path/to/automation/config-or-validator
+  sha256: 0000000000000000000000000000000000000000000000000000000000000000
+semantic_authority:
+  path: docs/ui/DESIGN.md
+  sha256: 0000000000000000000000000000000000000000000000000000000000000000
+bindings:
+  - id: design-tokens
+    kind: tokens
+    path: path/to/generated-or-declared-tokens.json
+    sha256: 0000000000000000000000000000000000000000000000000000000000000000
+conflict_policy: fail
+approval:
+  design_revision: 1
+  approved_by: design-owner
+  approved_at: 2026-07-23T10:00:00+08:00

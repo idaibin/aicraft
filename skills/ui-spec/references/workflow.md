@@ -4,10 +4,11 @@
 
 1. Visual source gate
 2. Evidence boundary
-3. Profile gate
-4. Specification pass
-5. Artifact pass
-6. Evaluation and handoff
+3. UI contract challenge
+4. Profile gate
+5. Specification pass
+6. Artifact pass
+7. Evaluation and handoff
 
 ## Visual Source Gate
 
@@ -18,6 +19,19 @@ A visual source proves appearance only. It does not prove exact tokens, componen
 ## Evidence Boundary
 
 Record confirmed product facts, available data/actions/states, current component and token owners, explicit exclusions, unresolved questions, and the source revision. Mark each specification decision `verified`, `extracted`, `proposed`, or `Not verified`.
+
+## UI Contract Challenge
+
+After product facts and the selected visual source are fixed, resolve repository and
+source evidence before asking a question. Challenge only a remaining decision that can
+change layout or ownership, component/token mapping, required states or interaction,
+responsive/accessibility behavior, or an executable UI acceptance result.
+
+Ask one bounded question at a time. Include the recommended answer, reason, principal
+trade-off, and affected slice. Stop when the slice passes its UI contract gates; do not
+traverse its product decision tree or reopen accepted visual direction. Route behavior,
+permission, failure semantics, or product acceptance to `product-spec`, and route
+visual alternatives or an unselected direction to Product Design.
 
 ## Profile Gate
 
@@ -47,11 +61,22 @@ Do not infer exact CSS values or behavior from pixels alone. Trace exact values 
 
 | Profile | Primary artifact | Optional dependencies |
 | --- | --- | --- |
-| Feature Spec | one page/flow implementation specification | source annotations, component/token mapping, state matrix, acceptance checklist |
-| Design System Spec | changed accepted shared contract | affected tokens/components, references, evaluation, rollback manifest |
+| Feature Spec, one slice | one page/flow implementation specification | source annotations, component/token mapping, state matrix, acceptance checklist |
+| Feature Spec, multiple domains | one short shared UI index plus one independently loadable contract per confirmed domain | only shared facts and per-slice links/status in the index |
+| Design System Spec | changed accepted shared contract | affected tokens/components, references, structured change/evaluation manifest, rollback |
 
-Produce only what removes a real implementation ambiguity. Use a shared manifest only when establishing or changing an accepted Design System Spec revision.
+For multiple surfaces, apply [the multi-surface scope gate](multi-surface.md). Produce
+only what removes a real implementation ambiguity. An accepted Design System Spec
+revision requires a structured change/evaluation manifest. The durable
+`docs/ui/design-system/manifest.yaml` is a separate automation contract and exists
+only when a verified repository consumer consumes it.
 
 ## Evaluation And Handoff
 
-Run source identity, product truth, rights, required-state, mapping, responsive, accessibility, overflow, approval, and implementation-budget gates first. Then compare source fidelity, task completion, information structure, interaction completeness, engineering fit, and evidence completeness. Hand accepted artifacts and unresolved gaps to `dev-frontend`; request runtime evidence from `ops-browser` or `ops-client` after implementation.
+Run source identity, product truth, rights, required-state, mapping, responsive,
+accessibility, overflow, approval, and implementation-budget gates per slice. Then
+compare source fidelity, task completion, information structure, interaction
+completeness, engineering fit, and evidence completeness. Emit one readiness verdict
+per slice and mark an incomplete multi-surface result `Partial`. Hand accepted
+artifacts and unresolved gaps to `dev-frontend`; request runtime evidence from
+`ops-browser` or `ops-client` after implementation.

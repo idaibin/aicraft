@@ -20,11 +20,11 @@ selected visual source + product facts -> ui-spec -> dev-frontend
                                              -> audit-frontend -> repo-review -> repo-delivery
 ```
 
-A task with an already selected visual source may start directly with `ui-spec`. If the source is missing and the user is still choosing what the UI should look like, stop before specification and route to Product Design. Start with `product-spec` only when behavior, permissions, failure semantics, or acceptance remain unresolved.
+A task with an already selected visual source may start directly with `ui-spec`. If the source is missing and the user is still choosing what the UI should look like, stop before specification and route to Product Design. Start with `product-spec` when behavior, permissions, failure semantics, or product acceptance remain unresolved. When only the UI contract remains ambiguous, resolve evidence first and ask one material layout, mapping, state/interaction, responsive/accessibility, or UI-acceptance question at a time. For more than one requested page, flow, or business domain, load [the multi-surface contract](multi-surface.md) before selecting artifact shape.
 
 ## Artifact Locations
 
-Prefer repository-defined locations. Otherwise keep task-local specifications under `.codex/artifacts/<task-id>/`. Promote only an explicitly approved, sanitized, durable shared contract into the repository's established `docs/` structure. A Feature Spec should not create a shared manifest or rewrite the accepted system unless shared ownership actually changes.
+Prefer repository-defined locations. Otherwise keep task-local specifications under `.codex/artifacts/<task-id>/`. For explicitly approved durable publication, follow [the UI documentation boundaries](documentation-boundaries.md): write directly under `docs/ui/`, use the same slice ID as related `docs/prd/` facts, and never add a `docs/specs/` wrapper. A Feature Spec should not create JSON or a shared manifest unless verified repository automation consumes it; reuse of the accepted system alone never activates that output.
 
 ## Handoff Examples
 

@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:idaibin:skills:schemas:design-system-manifest:v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "role",
+    "consumer",
+    "semantic_authority",
+    "bindings",
+    "conflict_policy",
+    "approval"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "role": {"const": "automation-contract"},
+    "consumer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path", "sha256"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "semantic_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "bindings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "path", "sha256"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "kind": {
+            "enum": ["tokens", "components", "assets", "contract"]
+          },
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        }
+      }
+    },
+    "conflict_policy": {"const": "fail"},
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["design_revision", "approved_by", "approved_at"],
+      "properties": {
+        "design_revision": {
+          "oneOf": [
+            {"type": "integer", "minimum": 1},
+            {"type": "string", "minLength": 1}
+          ]
+        },
+        "approved_by": {"type": "string", "minLength": 1},
+        "approved_at": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

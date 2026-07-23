@@ -4,7 +4,7 @@
 
 - `Define the user behavior, states, business rules, and acceptance for this cross-stack feature before implementation.`
 - `We are starting a new product line; create the minimum foundation specification.`
-- `Update only docs/product/PRODUCT.md with these confirmed product decisions.`
+- `Update only docs/prd/PRODUCT.md with these confirmed product decisions.`
 - `The team disagrees about permission and failure behavior; resolve the product decisions needed for the next implementation slice.`
 
 ## Public Modes
@@ -15,10 +15,11 @@
 | Foundation Spec | A new product/product line or product-boundary reset is explicit | One foundation document |
 | Artifact Update | A named existing fact source and confirmed changes are supplied | A bounded update to that artifact |
 
-Clarification is an internal phase in every mode. Search repository evidence
-before asking questions, ask one material question at a time, and stop once the
-selected implementation slice is ready. Do not advertise Discovery, grill,
-Brief, or Standard as additional modes.
+Clarification is an internal phase in every mode. Search repository evidence first.
+Load the [product decision pressure test](decision-pressure-test.md) only when a
+material product choice remains or the user explicitly requests a product stress
+test. Stop per slice at its Ready gate. Do not advertise Discovery, grill, Brief, or
+Standard as additional modes.
 
 ## Nearest Boundaries
 
@@ -39,3 +40,8 @@ Return one main spec with only applicable detail. A backend-only rule change doe
 not need invented UI sections; a UI-only display state does not need invented
 data structures or implementation details. Add conditional artifacts only when their separate
 ownership and long-lived value are explicit.
+
+For several independent features, return a short index plus independently readable
+slice specs. A consumer developing one slice reads shared index facts and that slice,
+not every sibling. Link selected-source visual details to `ui-spec`; do not copy color,
+type, component, token, or geometry decisions into product facts.
