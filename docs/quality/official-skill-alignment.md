@@ -1,6 +1,6 @@
 # Official Skill Alignment
 
-Reviewed: 2026-07-22
+Reviewed: 2026-07-23
 
 This catalog uses four current primary baselines:
 
@@ -38,6 +38,23 @@ justify their maintenance cost.
 Official formats establish compatibility, not guaranteed model behavior. For a material
 workflow change, run the affected Skill on representative tasks and inspect the actual
 outputs. Critical production use still requires validation in the target environment.
+
+## Upstream Practice Snapshot
+
+The following repository comparison was refreshed from shallow clones on 2026-07-23.
+It is a practice comparison, not an additional compatibility contract.
+
+| Repository and revision | Useful practice | Catalog decision |
+| --- | --- | --- |
+| `mattpocock/skills@ed37663` | concise writing guidance, concrete reusable procedures, direct reference links | keep entries operational and avoid forcing one authoring style across every package |
+| `anthropics/skills@1f630fd` | progressive disclosure, bundled deterministic helpers, representative with-Skill evaluation | retain one-level references and behavior canaries; add scripts only for repeated deterministic work |
+| `vercel-labs/skills@e173b8c` | repository discovery, installation, and distribution validation | keep distribution/tooling checks separate from each Skill's runtime workflow |
+| `openai/skills@49f948f` | compact core loops, provider metadata separated from portable `SKILL.md`, bundled wrappers for tool reliability | retain `agents/openai.yaml` as an adapter and keep portable instructions authoritative |
+| `google/skills@0ea2cd7` | explicit nearest-neighbor rerouting where ambiguity is real, scored failure-sample iteration | add one short metadata negative only for genuine routing collisions; refine from live failures rather than prose growth |
+
+Across the five repositories, negative metadata is not universal and large entrypoints are
+not evidence of better behavior. This catalog therefore does not impose a minimum entry
+length, a negative clause on every description, or upstream-specific folder conventions.
 
 The Agent Skills specification points to `skills-ref`, whose upstream repository marks
 it as a demonstration library rather than a production validator. This catalog therefore

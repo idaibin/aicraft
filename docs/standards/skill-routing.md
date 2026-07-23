@@ -51,17 +51,15 @@ repo-map -> domain-modeling/product-spec -> ui-spec/dev-* -> repo-review -> repo
 ```
 
 This is not mandatory ceremony. A known Rust implementation can start directly with
-`dev-rust`. `repo-review` identifies security-sensitive change surfaces and routes
-professional scanning to an available Codex Security workflow; repository/path scans
-may start with Codex Security directly.
-
-Codex Security is an optional host capability. If a requested professional security
-workflow is unavailable, return its name and requested scope as `Not verified` and
-stop that scan. No public catalog Skill recreates or silently substitutes for it.
+`dev-rust`. `repo-review` evaluates correctness, security, performance, and
+maintainability together on its selected basis. Security risk does not create a
+separate routing path or external scanning dependency.
 
 ## Review Checklist
 
-- The description clearly says what the Skill owns and when it triggers.
+- The description clearly says what the Skill owns and when it triggers; when a real
+  nearest neighbor is ambiguous, it also names the shortest negative or rerouting
+  condition without copying the full non-trigger list.
 - The nearest similar request is routed elsewhere in `Do Not Use For` or eval cases.
 - OpenAI metadata matches the same owner and action boundary.
 - References are loaded selectively and linked directly from `SKILL.md`.

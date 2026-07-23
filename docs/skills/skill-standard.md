@@ -42,7 +42,10 @@ documented owner and validator, and leave `SKILL.md` as the portable authority.
 - `name` matches the directory, uses lowercase letters, digits, and hyphens, and is at
   most 64 characters.
 - `description` is non-empty, at most 1,024 characters, and says what the Skill does
-  and when to use it. Prefer concise `Use when ...` wording.
+  and when to use it. Prefer concise `Use when ...` wording. When a real neighboring
+  Skill or host capability is easy to confuse with this owner, include one short
+  negative or rerouting condition in the description; do not enumerate the full
+  `Do Not Use For` section in always-loaded metadata.
 - Optional portable `license`, `compatibility`, `metadata`, and `allowed-tools` fields
   are allowed only when they carry real package requirements and match the specification.
 - `agents/openai.yaml` contains `display_name`, `short_description`, and a

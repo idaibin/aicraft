@@ -1,6 +1,6 @@
 ---
 name: ask-chatgpt
-description: "Use when Codex needs to ask ChatGPT for a local request package or an explicitly authorized independent review, research result, visual exploration, or decision challenge."
+description: "Use when the user requests a local ChatGPT request package or explicitly authorizes an independent ChatGPT review, research result, visual exploration, or decision challenge; do not use when Codex or an available host tool can complete the result directly."
 ---
 
 # Ask ChatGPT
@@ -23,8 +23,12 @@ Ask ChatGPT for one independently useful web result without replacing work Codex
    - one verified **ChatGPT capability** such as Standard Chat, Search, Deep Research, Images, or reviewer-side browser inspection.
    A theme defines content boundaries; a capability defines the web interaction. Do not infer either from the other.
 6. Let Codex create the smallest self-contained request from the user's words and verified context. For broad research, prefer Deep Research's reviewable proposed plan; use a separate prompt-drafting chat only when it adds an independently useful result and its additional send is authorized. Never require the user to write a formal prompt.
-7. Build a redacted `.codex/reviews/<review-id>/review-package.md` when durable or multipart context is needed, with the matching response log at `.codex/reviews/<review-id>/review.md`; a user-named path overrides this convention and compact requests may be sent as inspected text. Verify that the local review workspace is ignored before writing, and do not silently change tracked ignore rules. State facts, questions, selected theme/capability, evidence, exclusions, response contract, and Worktree/Git fingerprint or decision-basis identity without seeding conclusions. Package-only stops here.
-8. For authorized external action, load [chatgpt-routing.md](references/chatgpt-routing.md), then resolve the surface/account/conversation, Chat/Work interface, model/reasoning preferences, and required capability from explicit request settings followed by durable local defaults. Accept the page only when current evidence classifies it as clearly authenticated and normal or clearly unauthenticated. Ask the user to sign in for the latter; for every other blank, partial, stalled, error, or indeterminate state, delegate one refresh of the exact same URL and re-verify the route, identity/login state, conversation, and relevant controls. If the page remains indeterminate, record its state `Not verified` and stop. Treat stored UI/model values as preferences only: `ops-browser` must verify every selected control on the active surface before submit, use an authorized configured fallback when necessary, and otherwise stop. Then obtain one `Capability Snapshot` and use the browser handoff below for each state-changing action.
+7. Build a redacted `.codex/reviews/<review-id>/review-package.md` when durable or multipart context is needed, with the matching response log at `.codex/reviews/<review-id>/review.md`; a user-named path overrides this convention and compact requests may be sent as inspected text. Verify that the local review workspace is already ignored before writing. Do not change tracked or local ignore configuration without explicit authorization; when no approved ignored path exists, stop and report the gate. State facts, questions, selected theme/capability, evidence, exclusions, response contract, and Worktree/Git fingerprint or decision-basis identity without seeding conclusions. Package-only stops here.
+8. For authorized external action, load [chatgpt-routing.md](references/chatgpt-routing.md)
+   and follow its route, identity, capability, model/reasoning, page-recovery, and
+   fallback gates. Obtain one current Capability Snapshot from `ops-browser` and use
+   the browser handoff below for each state-changing action. Stored preferences never
+   prove current selection or authorize a fallback.
 9. Capture attributed responses and generated artifacts with their prompt, capability, operation IDs, and gaps. Codex verifies factual claims, research implications, repository findings, and artifact compliance against the fixed basis before accepting downstream work.
    If an abnormal or indeterminate state appears after submission, use the same bounded page-state recovery only to reconcile the existing conversation. Never resend the prompt, regenerate the response, or create a replacement conversation.
 10. Review/research-only requests stop after locally confirmed/rejected claims. Route fixes, design decisions, source edits, publication, or Git mutation only when separately authorized. After authorized uncommitted fixes, freeze a new Worktree fingerprint and use Worktree `repo-review`; use immutable fixed-basis review only after a commit/SHA exists. Another ChatGPT round requires exact authorization and an independently required result.
@@ -65,7 +69,11 @@ This skill owns authorization, surface, Project/conversation, Chat/Work interfac
 
 ## Output Contract
 
-Report the Codex-first decision; Worktree, immutable Git, or decision basis; authorization; selected theme and ChatGPT capability; prompt strategy; package/text input and integrity; verified surface, Project/conversation, Chat/Work interface, model/reasoning selection, and identity or gap; operation terminal states; response or generated-artifact paths; locally confirmed/rejected claims; authorized downstream owner or skipped-mutation reason; validation; and every blocker or `Not verified` claim.
+For package-only, report the Codex-first decision, fixed basis, authorization boundary,
+package path/content scope, validation, and `Not verified` external state. For an
+authorized external round, additionally report the selected theme/capability, verified
+route/identity/controls, operation states, attributed response or artifact paths,
+locally confirmed/rejected claims, downstream owner, blockers, and gaps.
 
 ## References
 

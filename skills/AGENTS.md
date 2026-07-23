@@ -29,24 +29,23 @@ When adding, renaming, or removing a package, update `README.md`, `INSTALL.md`, 
 
 ## Validation
 
-On a fresh maintainer checkout, install the pinned validation dependency with
-`python3 -m pip install --requirement requirements-dev.txt` from the repository root.
-GitHub Actions runs the full matrix below for pull requests and pushes to `main`.
+Use `bash scripts/check-skills.sh` as the single local validation entry point. On
+macOS it resolves and verifies Homebrew Python, refuses `/usr/bin/python3`, and uses
+`uv` with the pinned `requirements-dev.txt` when available. Other platforms use their
+configured `PYTHON_BIN` or `python3`. GitHub Actions keeps its existing equivalent
+validation steps.
 
 For a bounded prose correction in one package:
 
 ```bash
-python3 scripts/validate-skills.py
+bash scripts/check-skills.sh
 git diff --check -- skills/<name>
 ```
 
 For metadata, package structure, shared protocols, multiple packages, or delivery:
 
 ```bash
-python3 scripts/sync-shared-protocols.py --check
-python3 scripts/validate-skills.py
-python3 -m unittest discover -s scripts -p 'test_*.py'
-git diff --check
+bash scripts/check-skills.sh
 ```
 
 For behavior changes, exercise the affected Skill on roughly three representative

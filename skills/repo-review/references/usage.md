@@ -8,7 +8,7 @@
 - reviewing a fixed commit or `base..head`, including a branch or PR normalized to immutable SHAs;
 - reviewing a verified review package;
 - adding release-readiness evidence only when that conditional profile is explicitly requested;
-- coordinating bounded frontend/Rust specialist findings and professional Codex Security evidence for a fixed change basis.
+- coordinating bounded frontend/Rust specialist findings for a fixed change basis.
 - reviewing a fixed-basis HTTP REST contract change across authority, normalized
   OpenAPI, backend conformance, generated client, consumer, and CI.
 
@@ -19,9 +19,8 @@
 | Map directories, architecture, commands, conventions, and reuse entries | `repo-map` |
 | Review any local or immutable repository change basis | `repo-review` |
 | Define unresolved product behavior or API business intent | `product-spec` |
-| Review security-sensitive changes on a fixed change basis | `repo-review`, routing to `codex-security:security-diff-scan` when available |
-| Scan the complete repository tree at a fixed SHA | `repo-review`, safely materializing the snapshot and routing it to `codex-security:security-scan` |
-| Scan a repository or current-source path with no diff basis | `codex-security:security-scan` |
+| Review authentication, authorization, token, input, or other security risks on a fixed change basis | `repo-review` Standards axis |
+| Audit a bounded frontend or Rust source path with no change basis | matching `audit-*` Skill |
 | Diagnose a concrete failure | Host diagnosis under effective instructions |
 | Apply accepted fixes | matching `dev-*` |
 | Stage, commit, push, squash, or clean branches | `repo-delivery` |
@@ -71,7 +70,3 @@ Worktree findings-only records full status but reports bounded findings without
 commit groups or staging guidance. Worktree commit-readiness additionally reports
 complete ownership, mixed hunks, semantic groups, exact staging, and commit messages.
 Fixed-basis review adds resolved SHAs. Release implications appear only when the conditional Release profile was selected.
-
-When a direct or coordinated Codex Security workflow is unavailable, report the
-workflow name and exact requested scope as `Not verified`; do not substitute an
-internal checklist scan.

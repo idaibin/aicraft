@@ -1,6 +1,6 @@
 ---
 name: audit-frontend
-description: "Use when a known frontend surface needs a scoped, read-only audit of selected architecture, reuse, data/UI contract, accessibility, performance, or desktop-boundary profiles."
+description: "Use when a known frontend surface needs a scoped, read-only audit of selected architecture, reuse, data/UI contract, accessibility, performance, or desktop-boundary profiles; use repo-review when a Worktree or immutable change basis needs coordination."
 ---
 
 # Frontend Audit
@@ -52,16 +52,11 @@ Never rewrite a working local structure merely to match this skill or an externa
 
 - Select profiles before applying detailed checklists. Do not imply architecture, state, layout, accessibility, performance, and desktop were all reviewed when only some were evidenced.
 - Do not recommend a shared component, hook, composable, store, service, schema, or layout system before searching existing implementations and recording why reuse or adaptation is insufficient.
-- Keep route and page files primarily compositional. Move remote access, reusable behavior, business workflows, and cross-screen state to the existing owning boundary; do not create empty layers for visual neatness.
-- Keep `components/ui` or its local equivalent business-neutral. Keep business components, types, and state with their feature until a stable cross-feature contract and real consumers justify promotion.
-- Use hooks/composables only for real state, effects, subscriptions, lifecycle, or reusable behavior. Use services for remote/native boundaries, schemas for input/contract validation, and global stores only for genuinely cross-tree business state.
-- Distinguish server/cache, URL/route, form, shared business, and local UI state. Do not mirror one source of truth into another without a synchronization contract.
-- Reuse existing tokens, primitives, variants, layout owners, breakpoints, request/cache mechanisms, forms, toasts, and feedback states. Do not add a parallel system for a local feature.
-- Keep DOM and CSS minimal: one owner for page-edge spacing and scrolling, Flexbox for one-dimensional layout, Grid for real two-dimensional layout, adaptive children, no empty wrappers, and no duplicate declarations or margin patches.
-- Do not recommend React memoization, Vue computed/cache changes, virtualization, caching, or bundle changes by default. Require a traced path, measurement, request counts, or explicit complexity evidence under the Performance profile.
-- Apply only the selected framework and styling references. Do not cross-apply framework semantics or imply coverage of an unselected styling system.
-- Keep Tauri pages behind a typed frontend adapter or service. Commands expose stable transport DTOs and errors, delegate business logic to Rust owners, and provide real progress/cancellation for long work.
-- Under Accessibility, preserve keyboard operation, visible focus, accessible names, focus management, form labels/errors, and non-color status communication.
+- Load and apply only the selected framework, styling, architecture, state/data,
+  accessibility/performance, or desktop reference. Do not cross-apply an unselected
+  profile or imply its coverage.
+- Require reachable source evidence for ownership and reuse, and direct runtime or
+  measurement evidence when the selected claim cannot be established statically.
 - Do not refactor unrelated legacy code. File length alone never justifies splitting.
 - Do not edit, stage, commit, post review comments, or deliver code in audit mode. `repo-review` owns Worktree and immutable review coordination; `repo-delivery` alone owns Git mutation. Route accepted remediation to `dev-frontend`.
 

@@ -45,9 +45,8 @@ regenerate normalized OpenAPI and the TS client, and prove compatibility and err
 - Reviewing staged ownership or producing commit groups; use `repo-review`. Use `repo-delivery` for actual staging or commits after review.
 - Systematic read-only Rust architecture, performance, memory, concurrency,
   SQLite, unsafe, or FFI audit; use `audit-rust`.
-- Security-only change review; use `repo-review`, which routes professional
-  security work to Codex Security when available. Use Codex Security directly for
-  a repository/path scan with no diff basis.
+- Review of authentication, authorization, token, or input risks on a fixed
+  Worktree or immutable change basis; use `repo-review`.
 - Frontend UI work around a Tauri backend; use `dev-frontend`.
 - Product behavior, permissions, or failure semantics are unresolved; use
   `product-spec` before Rust implementation.

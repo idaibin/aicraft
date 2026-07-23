@@ -1,6 +1,6 @@
 ---
 name: dev-rust
-description: "Use when a Rust source change must be implemented, ported, or refactored across APIs, crates, services, CLIs, async, persistence, unsafe or FFI boundaries, tests, or docs; owns source edits and validation, not Git delivery."
+description: "Use when a Rust source change must be implemented, ported, or refactored across APIs, crates, services, CLIs, async, persistence, unsafe or FFI boundaries, tests, or docs; owns source edits and validation, not audit-only, review-only, or Git-delivery work."
 ---
 
 # Rust Implementation
@@ -47,7 +47,7 @@ Implement Rust changes against the repository's real toolchain, project class, c
 - Diagnosis-only requests without authorized Rust source changes; use the host's built-in diagnosis under effective instructions.
 - Dirty-tree ownership, staging plans, or commit grouping; use `repo-review`. Use `repo-delivery` for actual staging or commits after review.
 - Systematic Rust architecture, performance, memory, concurrency, SQLite, unsafe, or FFI audit without requested edits; use `audit-rust`.
-- Security-only change review; use `repo-review`, which routes professional security work to Codex Security when available. A repository/path scan with no diff basis belongs directly to Codex Security.
+- Review of a fixed Rust change basis, including authorization or token risks; use `repo-review`.
 - Frontend or webview UI changes; use `dev-frontend`.
 
 ## Hard Rules
@@ -58,11 +58,9 @@ Implement Rust changes against the repository's real toolchain, project class, c
 - Do not introduce OpenAPI or a generated client solely because a REST endpoint changes. When Protocol automation applies, discover the real toolchain, preserve one code-first or contract-first authority, and keep generated artifacts derived.
 - Preserve dependency direction. Entry modules stay thin; workflows belong in the established service/engine owner; deterministic domain logic avoids IO; persistence stays behind repository or storage boundaries when the project defines them.
 - Prefer typed errors and `Result` propagation. Do not add runtime `unwrap`, `expect`, `panic!`, silent error swallowing, or fallback behavior unless the contract explicitly requires it.
-- Do not add `unsafe`, broad feature flags, global mutable state, blocking work in async paths, or new dependencies without proving the need and validation.
-- Keep FFI and raw-pointer work behind narrow reviewed adapters. Define ABI, layout, ownership, lifetime, thread, cleanup, callback, allocator, and panic behavior; make each `unsafe` site state the invariant that makes it sound.
-- For language ports or large rewrites, preserve observable behavior before idiomatic cleanup. Record source-to-Rust mappings and lifetime/ownership decisions, prove a representative slice, and test release semantics and supported platforms. Compilation is only the first gate.
-- Prefer borrowing and slices at read-only API boundaries; clone only when ownership is required. Prefer static dispatch until runtime polymorphism is a real requirement. Measure before performance optimization.
-- Document public APIs with purpose, invariants, examples, and `# Errors`, `# Panics`, or `# Safety` sections when applicable. Keep comments for why; use types, naming, tests, rustdoc, and tracked issues instead of stale prose.
+- Load and apply only references for the selected protocol, concurrency, persistence,
+  unsafe/FFI, porting, target/platform, behavior-first, or codebase-design overlays.
+  Do not inherit heavy gates from an unselected overlay.
 - Treat new warnings in the touched surface as defects. Do not broaden scope to clean unrelated legacy warnings; report them separately. Prefer a local justified `#[expect(...)]` over weakening workspace lints.
 - Keep product-specific behavior in the product repository. Move code to a shared crate only after real reuse, stable API, named ownership, and consumer validation are established.
 - When adding, reusing, moving, renaming, or deleting a crate, module, feature, binary, migration, or shared surface, update every owning manifest, export, command, test, doc, CI/deploy path, generated output, and index in the same task.

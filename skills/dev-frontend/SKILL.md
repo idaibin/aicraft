@@ -1,6 +1,6 @@
 ---
 name: dev-frontend
-description: "Use when a frontend change must be implemented or refactored across UI, state, data, styling, accessibility, performance, or desktop integration; owns source edits and validation, but no staging, commit, push, or other Git delivery."
+description: "Use when a frontend change must be implemented or refactored across UI, state, data, styling, accessibility, performance, or desktop integration; owns source edits and validation, not audit-only, browser-only, UI-spec, or Git-delivery work."
 ---
 
 # Frontend Implementation
@@ -55,22 +55,10 @@ Implement frontend changes with existing-stack alignment, minimal DOM/CSS, clear
 - Do not introduce a parallel UI kit, CSS system, routing pattern, state layer, API helper, icon library, or form library when an existing one covers the need.
 - Do not create a page, component, hook, composable, helper, service, store, wrapper, or shared abstraction before checking the `repo-map` inventory and performing a targeted file/symbol search.
 - Create a new implementation only when reuse or adaptation would violate ownership or behavior. State the reason and place it in the existing directory and naming convention.
-- Keep layout ownership explicit: app/window shell owns chrome and global clipping; content containers own the page's outer inset; page roots own page layout; components own only their internal spacing; panels own panel bounds; inner regions own scrolling or overflow.
-- Keep the shortest valid layout path. Every wrapper must own semantics, layout, state, accessibility, animation, or reuse; flatten nested elements that do not.
-- Prefer Flexbox for one-dimensional row/column layout and Grid for genuinely two-dimensional layout.
-- Do not repeat page-edge margin, padding, inset, height, width, or overflow rules across shell/content/page/component layers.
-- Prefer semantic HTML, existing components, component props, natural document flow, cascade, and inheritance over redundant wrappers and one-off overrides.
-- Use project scale utilities for ordinary sizing and spacing; put real product geometry into named classes, tokens, variants, or CSS variables.
-- Preserve route paths, query parameters, payload shapes, response unwrapping, loading states, permission-hidden entries, and accessibility behavior unless the task requires changes.
-- Keep asynchronous query states distinct before applying empty defaults. Preserve
-  last successful data during background refresh failures when the repository's
-  cache contract does so, and make non-submit actions inside forms explicitly
-  `type="button"` or the framework-native equivalent.
-- Preserve the repository's API authority and nullability, optionality, enums, IDs,
-  dates, money, pagination, auth, success, and error semantics. When an existing or
-  explicitly requested OpenAPI/generated-client profile applies, use its generator
-  and do not hand-maintain touched DTOs or endpoint paths.
-- Apply only the selected framework and styling references. Preserve framework-native state, lifecycle, routing, component contracts, cleanup, and styling ownership without cross-applying another profile.
+- Preserve existing user-visible behavior and repository-owned route, state, data,
+  accessibility, and visual contracts unless the task explicitly changes them.
+- Load and apply only the selected framework, styling, protocol, behavior-first, or
+  codebase-design references. Do not cross-apply another stack profile.
 - Keep `lint`, `typecheck`, `test`, `check`, and formatting validation non-mutating; use an explicit fix/write command when source rewrites are intended.
 - Mark unchecked visual, responsive, console, network, runtime, or accessibility behavior as `Not verified`.
 - Report OpenAPI gates only when that profile applies; otherwise mark them `Not
@@ -78,7 +66,7 @@ Implement frontend changes with existing-stack alignment, minimal DOM/CSS, clear
 
 ## Output Contract
 
-Report the branch, frontend project class, detected framework/profile and toolchain, existing implementations checked, direct reuse or reference candidate, new-file justification when applicable, touched UI surface, structural lifecycle updates, layout and outer-spacing owners, state/reactivity/store ownership, component/injection/router/lifetime contracts, cleanup and cancellation behavior, Flex/Grid decision, DOM/CSS simplification choices, preserved contracts, commands run, failed commands, browser/client evidence or `Not verified` gaps, and intentionally excluded stack changes. If the user explicitly requests independent external review/research, hand one fixed basis/question to `ask-chatgpt`; never send implicitly.
+Report the branch, detected project class/stack and selected profiles, existing implementations checked, reuse or new-surface decision, changed files and ownership/contracts, validation and failures, runtime evidence or `Not verified` gaps, and intentionally excluded changes. Add detailed layout, state, protocol, desktop, or lifecycle evidence only when that profile materially affected the task. If the user explicitly requests independent external review/research, hand one fixed basis/question to `ask-chatgpt`; never send implicitly.
 
 ## References
 

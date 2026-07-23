@@ -1,6 +1,6 @@
 ---
 name: repo-map
-description: "Use when current Git or non-Git workspace truth needs a durable map of roots, ownership, architecture, commands, task routes, and reusable contracts, or an existing map needs evidence-based repair."
+description: "Use when current Git or non-Git workspace truth needs a durable map of roots, ownership, architecture, commands, task routes, and reusable contracts, or an existing map needs evidence-based repair; do not use for ordinary task-local discovery or change review."
 ---
 
 # Repository Map

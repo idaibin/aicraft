@@ -96,8 +96,7 @@ known failure       -> evidence-driven diagnosis under effective instructions
 source work         -> dev-frontend / dev-rust
 visual exploration  -> Codex Product Design -> selected visual source
 UI specification    -> ui-spec (Feature Spec; Design System Spec when shared) -> dev-frontend
-review              -> repo-review (with bounded frontend/Rust specialists when needed)
-security review     -> repo-review -> Codex Security when available
+review              -> repo-review (including security risks on the selected basis)
 delivery            -> repo-delivery
 ```
 
@@ -105,11 +104,6 @@ The nearest applicable owner may start directly. Cross-Skill handoffs transfer
 bounded evidence, never implicit authorization. Use one owner by default, load only
 the selected references, reuse unchanged evidence, and add tasks or review rounds only
 when they produce a required independent result.
-
-Professional security scanning is an optional host capability, not a bundled public
-Skill dependency. When the matching Codex Security workflow is unavailable, name the
-missing workflow and requested scope, mark the professional security result
-`Not verified`, and stop that scan without claiming an internal substitute.
 
 ## Package Contract
 
@@ -141,6 +135,10 @@ Use the concise command matrix in [`skills/AGENTS.md`](skills/AGENTS.md#validati
 The validator checks the portable Agent Skills package, OpenAI metadata, direct
 references, representative eval sections, and catalog consistency. Exercise behavior
 changes on a few representative tasks.
+
+```bash
+bash scripts/check-skills.sh
+```
 
 ## Design Principles
 

@@ -1,6 +1,6 @@
 ---
 name: ops-client
-description: "Use when directly operating or verifying a specified real desktop client, or gathering evidence for an isolated client-layer failure; require a verified target, window, and capability, not unexplained or cross-system diagnosis."
+description: "Use when directly operating or verifying a specified real desktop client, or gathering evidence for an isolated client-layer failure; require a verified target, window, and capability, not browser-page verification, source changes, or cross-system diagnosis."
 ---
 
 # Ops Client
@@ -51,7 +51,7 @@ Operate and verify real desktop client windows. Treat platform automation as ada
 - Repository onboarding or map discovery; use `repo-map`.
 - Future implementation planning; use the host's built-in planning.
 - Local dirty-tree review or commit readiness; use `repo-review`.
-- Security-only change review; use `repo-review`, which routes professional security work to Codex Security when available. A repository/path scan with no diff basis belongs directly to Codex Security.
+- Review of a fixed desktop-client code change, including IPC authorization risks; use `repo-review`.
 - Cross-system root-cause coordination for a frozen, stale, non-responsive, or dev-versus-release failure; use the host's built-in diagnosis, which may delegate real-client evidence collection here.
 
 ## Hard Rules

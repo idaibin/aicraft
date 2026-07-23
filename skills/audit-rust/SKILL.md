@@ -1,6 +1,6 @@
 ---
 name: audit-rust
-description: "Use when a Rust workspace or known Rust surface needs a scoped, read-only audit of selected architecture, ownership, error, concurrency, performance, persistence, or unsafe-boundary risks."
+description: "Use when a Rust workspace or known Rust surface needs a scoped, read-only audit of selected architecture, ownership, error, concurrency, performance, persistence, or unsafe-boundary risks; use repo-review when a Worktree or immutable change basis needs coordination."
 ---
 
 # Rust Audit
@@ -54,16 +54,10 @@ Do not rewrite a working local design merely to resemble an external project.
 - Do not add or recommend a public trait, global state, runtime, thread pool, cache, pool, repository/service/manager layer, or database abstraction before proving the consumer, lifecycle, replacement, test, or deployment need.
 - Do not hard-code the latest stable Rust release or universal MSRV. Read the repository's pinned toolchain and support policy.
 - Do not impose one `apps/`, `crates/`, `domain/`, `application/`, `infrastructure/`, or frontend-mirrored directory tree. Split by stable responsibility or deployment boundary, not file count.
-- Give every file, socket, mmap, connection, transaction, statement, rows iterator, task, subscription, lock, channel, buffer, cache, and index reader/writer a clear owner and bounded lifetime when that surface is selected.
 - Do not label every `clone`, `Arc`, `Mutex`, `unwrap`, large file, or full table scan as a finding. Prove context, frequency, reachability, and impact.
-- Keep expected failures recoverable and typed. Libraries do not exit the process; expected input/business errors do not panic; boundary layers translate errors without duplicate logs.
-- Do not make synchronous code async merely because Tokio exists. Keep blocking file, CPU, native, and SQLite work off executor threads; bound tasks/channels; define backpressure, timeout, cancellation, panic, and shutdown.
-- Optimize only from a representative workload and comparable release baseline. Do not introduce inline, unsafe, SIMD, allocator changes, mmap, pools, `SmallVec`, interning, caches, or parallel iteration on intuition alone.
-- Distinguish leaks from live references, caches, allocator retention, mmap, SQLite page cache, native allocations, and OS file cache. RSS alone is not leak proof.
-- Inspect actual SQLite runtime/linkage. Verify critical queries with representative data and `EXPLAIN QUERY PLAN`; treat WAL as one-writer concurrency; handle busy/locked outcomes; never delete `-wal` or `-shm` manually.
-- Do not default to `auto_vacuum=FULL`, run `VACUUM` without free-space/outage analysis, or raise cache/mmap settings without measurement. Keep network calls and long computation outside transactions.
-- Choose `rusqlite` or SQLx from actual runtime, connection, transaction, checking, and deployment needs; never migrate because one is newer or marketed as async.
-- Keep every unsafe block minimal and document its safety invariant. Verify FFI ownership, length, alignment, lifetime, ABI, callback/re-entry, panic, thread, allocator, and cleanup behavior.
+- Load and apply only references for the selected architecture, ownership/error,
+  concurrency, performance/memory, SQLite, or unsafe/FFI profiles. Require the
+  profile's workload, runtime, invariant, or target evidence before conclusions.
 - Apply stricter templates to new projects only when adopted. Migrate established projects incrementally at real change boundaries; never rename mechanically for visual consistency.
 - Do not edit, stage, commit, post review comments, or deliver code in audit mode. Route approved remediation to `dev-rust`. `repo-review` owns Worktree and immutable review coordination; `repo-delivery` alone owns Git mutation.
 - Do not claim profiles were reviewed when their workload, runtime, target, dataset, or tool support was unavailable. Mark the exact gap `Not verified`.
@@ -75,7 +69,7 @@ Do not rewrite a working local design merely to resemble an external project.
 - Root-cause diagnosis of a concrete failure; use the host's built-in diagnosis under effective instructions.
 - Owning Worktree readiness or immutable repository/range/PR/release coordination; use `repo-review`, which may delegate a bounded Rust surface here.
 - Commit, push, squash, branch cleanup, or remote proof; use `repo-delivery` only when the user explicitly requests delivery.
-- Security-only change review; use `repo-review`, which routes professional security work to Codex Security when available. A repository/path scan with no diff basis belongs directly to Codex Security.
+- Review of a fixed Worktree or immutable change basis, including authorization or token risks; use `repo-review`.
 - A frontend-only change with no Rust or SQLite boundary.
 
 ## Output Contract

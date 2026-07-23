@@ -1,6 +1,6 @@
 ---
 name: domain-modeling
-description: "Use when shared business terms, meanings, rules, lifecycle conflicts, or domain boundaries are ambiguous across product work and must be resolved before specification or implementation."
+description: "Use when shared business terms, meanings, rules, lifecycle conflicts, or domain boundaries are ambiguous across product work and must be resolved before specification or implementation; route feature-local behavior and acceptance to product-spec."
 ---
 
 # Domain Modeling
