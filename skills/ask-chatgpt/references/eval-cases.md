@@ -1,5 +1,11 @@
 # Eval Cases
 
+## Contents
+
+- [Trigger Eval](#trigger-eval)
+- [Non-Trigger Eval](#non-trigger-eval)
+- [Quality Eval](#quality-eval)
+
 Use these cases when triggers, capability gates, external authorization, routing, defaults, degradation, or output contracts change.
 
 ## Trigger Eval

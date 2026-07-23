@@ -22,6 +22,8 @@
 - Install, start, test, lint, typecheck, and build commands
 - Effective repository conventions and source documents
 - Shortest reading order for common task types
+- Links to verified specialist maps with their ownership boundary and live source
+  revalidation path; summarize only the routing facts needed at the root
 - Typical page, API, backend, CLI, or worker change chains
 - Verified reuse index for components, functions/helpers, hooks/composables, stores, services, endpoints, routes, handlers, repositories, traits/types/DTOs, and reference implementations
 - For reusable UI components: product/design term, visual cue or semantic job,
@@ -40,6 +42,9 @@
 - Frequent edit areas, protected/high-risk areas, exceptions, and `Not verified` gaps
 
 Do not include content obtainable from one directory listing, an exhaustive symbol catalog, or transient Git/local/runtime status.
+Do not flatten specialist maps into the root index. If a UI component map, API
+contract map, deployment map, or similar artifact already owns bounded detail,
+verify it, link it, and keep the root entry to authority, purpose, and reading order.
 
 ## Incremental Navigation Repair
 

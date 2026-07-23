@@ -17,6 +17,8 @@
 | `Map PageHeader and MetricCard by design term, visual job, definition, export, owner root, consumers, variants, and current evidence.` | Trigger Reuse Inventory mode. | Durable design-to-component navigation is requested. |
 | `Verify and record the single authority, OpenAPI generation command, generated client, real React consumer, and duplicate-DTO boundary for the Admin create-user operation.` | Trigger Targeted Update with the API Contract Map profile. | Durable current-source contract navigation is requested. |
 | `Record this native REST operation's route, DTO, client, real consumer, and test entry point; the repository has no schema-generation pipeline.` | Trigger a bounded API Contract Map and record generated artifacts as `Not applicable`. | Native contract navigation is still valuable without OpenAPI. |
+| `Update the root map, but keep the existing verified UI component and token maps as the detailed authorities.` | Trigger Targeted Update with federated specialist-map routing. | The root should route to bounded authorities without copying them. |
+| `Record where each product's positioning facts live in this monorepo, but do not rewrite or decide the positioning.` | Trigger Targeted Update for product-fact routing only. | The map should reach product authority without absorbing `product-spec`. |
 
 ## Non-Trigger Eval
 
@@ -52,6 +54,8 @@
 | Duplicate prevention | Searches by capability, symbols, exports/routes, endpoint shapes, and callers, then records `reuse`, `extend`, `wrap`, or justified `new`. | Allows a parallel declaration because the map had no exact-name match. |
 | Durable decision boundary | Reports task-local reuse decisions but persists only stable canonical owners, boundaries, or contracts in the map. | Stores one-off implementation choices as durable repository truth. |
 | Map creation gate | Creates or expands a map only when it reduces routing, repeated discovery, duplication, or cross-boundary inference. | Documents facts obtainable from one listing or manifest. |
+| Federated map authority | Keeps one root navigation index, links verified specialist maps, and records their bounded owner plus source revalidation path. | Copies specialist rows, tokens, schemas, or component inventories into the root map or creates a competing root. |
+| Product-fact routing | Links the smallest verified vision, README, product map, or equivalent authority set only when it changes task routing. | Rewrites product positioning, treats code as product approval, or creates a new product authority. |
 | Map granularity | Uses workspace, repository, and scoped levels based on real Git-root/ownership/build/deploy/runtime boundaries, including Git containers with independent nested repositories. | Mirrors directories or splits only because `src` and `src-tauri` both exist. |
 | Root resolution | Uses the containing Git root when present; otherwise keeps the requested directory as map root, discovers child Git roots, or maps an ordinary non-Git directory project and records `local-unversioned`. | Assumes the current directory is a Git root, chooses an arbitrary child root as owner, or refuses to map because Git is absent. |
 | Requested scope preservation | Keeps the requested subdirectory as initial working scope while recording its containing Git root, then selects repository or scoped map level from real ownership/build/deploy/runtime boundaries. | Automatically turns every subdirectory request into a repository-wide scan or invents a scoped map from directory shape alone. |

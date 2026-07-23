@@ -38,7 +38,8 @@ class ValidatorTests(unittest.TestCase):
             encoding="utf-8",
         )
         (package / "agents" / "openai.yaml").write_text(
-            'interface:\n  display_name: "Sample"\n  short_description: "Process samples"\n'
+            'interface:\n  display_name: "Sample"\n'
+            '  short_description: "Process representative samples"\n'
             '  default_prompt: "Use $sample-skill for this task."\n',
             encoding="utf-8",
         )
@@ -72,6 +73,48 @@ class ValidatorTests(unittest.TestCase):
         evals.write_text(evals.read_text().replace("## Quality Eval", "## Examples"))
         self.assertTrue(any("Quality Eval" in error for error in VALIDATOR.validate(root)))
 
+    def test_eval_sections_must_have_content(self) -> None:
+        root = self.make_repo()
+        evals = root / "skills" / "sample-skill" / "references" / "eval-cases.md"
+        evals.write_text(evals.read_text().replace("## Quality Eval\n\n- three", "## Quality Eval"))
+        self.assertTrue(any("empty ## Quality Eval" in error for error in VALIDATOR.validate(root)))
+
+    def test_eval_heading_must_be_exact(self) -> None:
+        root = self.make_repo()
+        evals = root / "skills" / "sample-skill" / "references" / "eval-cases.md"
+        evals.write_text(
+            "# Evals\n\n## Trigger Eval\n\n- one\n\n## Non-Trigger Eval\n\n- two\n\n"
+            "## Quality Eval Notes\n\n- not the required section\n"
+        )
+        self.assertTrue(any("missing ## Quality Eval" in error for error in VALIDATOR.validate(root)))
+
+    def test_eval_heading_outside_code_fence(self) -> None:
+        root = self.make_repo()
+        evals = root / "skills" / "sample-skill" / "references" / "eval-cases.md"
+        evals.write_text(
+            "# Evals\n\n## Trigger Eval\n\n- one\n\n## Non-Trigger Eval\n\n- two\n\n"
+            "```text\n## Quality Eval\n```\n"
+        )
+        self.assertTrue(any("missing ## Quality Eval" in error for error in VALIDATOR.validate(root)))
+
+    def test_eval_heading_outside_tilde_fence(self) -> None:
+        root = self.make_repo()
+        evals = root / "skills" / "sample-skill" / "references" / "eval-cases.md"
+        evals.write_text(
+            "# Evals\n\n## Trigger Eval\n\n- one\n\n## Non-Trigger Eval\n\n- two\n\n"
+            "~~~text\n## Quality Eval\n~~~\n"
+        )
+        self.assertTrue(any("missing ## Quality Eval" in error for error in VALIDATOR.validate(root)))
+
+    def test_eval_heading_inside_indented_code(self) -> None:
+        root = self.make_repo()
+        evals = root / "skills" / "sample-skill" / "references" / "eval-cases.md"
+        evals.write_text(
+            "# Evals\n\n## Trigger Eval\n\n- one\n\n## Non-Trigger Eval\n\n- two\n\n"
+            "    ## Quality Eval\n"
+        )
+        self.assertTrue(any("missing ## Quality Eval" in error for error in VALIDATOR.validate(root)))
+
     def test_package_install_command_fails(self) -> None:
         root = self.make_repo()
         usage = root / "skills" / "sample-skill" / "references" / "usage.md"
@@ -88,6 +131,77 @@ class ValidatorTests(unittest.TestCase):
         metadata = root / "skills" / "sample-skill" / "agents" / "openai.yaml"
         metadata.write_text(metadata.read_text().replace("interface:", "wrong_root:"))
         self.assertTrue(any("interface mapping" in error for error in VALIDATOR.validate(root)))
+
+    def test_openai_short_description_length_is_checked(self) -> None:
+        root = self.make_repo()
+        metadata = root / "skills" / "sample-skill" / "agents" / "openai.yaml"
+        metadata.write_text(metadata.read_text().replace("Process representative samples", "Too short"))
+        self.assertTrue(any("25-64 characters" in error for error in VALIDATOR.validate(root)))
+
+    def test_unknown_frontmatter_field_fails(self) -> None:
+        root = self.make_repo()
+        skill = root / "skills" / "sample-skill" / "SKILL.md"
+        skill.write_text(skill.read_text().replace("name: sample-skill", "name: sample-skill\nowner: team"))
+        self.assertTrue(any("unsupported frontmatter" in error for error in VALIDATOR.validate(root)))
+
+    def test_portable_optional_fields_are_typed(self) -> None:
+        root = self.make_repo()
+        skill = root / "skills" / "sample-skill" / "SKILL.md"
+        skill.write_text(
+            skill.read_text().replace(
+                "name: sample-skill",
+                "name: sample-skill\ncompatibility: 42\nmetadata:\n  version: 1",
+            )
+        )
+        errors = VALIDATOR.validate(root)
+        self.assertTrue(any("compatibility" in error for error in errors))
+        self.assertTrue(any("metadata must map strings to strings" in error for error in errors))
+
+    def test_long_reference_requires_contents(self) -> None:
+        root = self.make_repo()
+        usage = root / "skills" / "sample-skill" / "references" / "usage.md"
+        usage.write_text("# Usage\n" + "detail\n" * 101)
+        self.assertTrue(any("needs a ## Contents" in error for error in VALIDATOR.validate(root)))
+
+    def test_long_reference_requires_exact_contents_heading(self) -> None:
+        root = self.make_repo()
+        usage = root / "skills" / "sample-skill" / "references" / "usage.md"
+        usage.write_text(
+            "# Usage\n"
+            + "detail\n" * 101
+            + "## Contents List\n\n- item one\n- item two\n"
+        )
+        self.assertTrue(any("needs a ## Contents" in error for error in VALIDATOR.validate(root)))
+
+    def test_long_reference_requires_contents_outside_fence(self) -> None:
+        root = self.make_repo()
+        usage = root / "skills" / "sample-skill" / "references" / "usage.md"
+        usage.write_text(
+            "# Usage\n"
+            + "detail\n" * 101
+            + "```text\n## Contents\n\n- item one\n```\n"
+        )
+        self.assertTrue(any("needs a ## Contents" in error for error in VALIDATOR.validate(root)))
+
+    def test_long_reference_requires_contents_tilde_fence(self) -> None:
+        root = self.make_repo()
+        usage = root / "skills" / "sample-skill" / "references" / "usage.md"
+        usage.write_text(
+            "# Usage\n"
+            + "detail\n" * 101
+            + "~~~text\n## Contents\n\n- item one\n~~~\n"
+        )
+        self.assertTrue(any("needs a ## Contents" in error for error in VALIDATOR.validate(root)))
+
+    def test_long_reference_contents_in_indented_code(self) -> None:
+        root = self.make_repo()
+        usage = root / "skills" / "sample-skill" / "references" / "usage.md"
+        usage.write_text(
+            "# Usage\n"
+            + "detail\n" * 101
+            + "    ## Contents\n\n- item one\n"
+        )
+        self.assertTrue(any("needs a ## Contents" in error for error in VALIDATOR.validate(root)))
 
     def test_block_scalar_description_is_valid(self) -> None:
         root = self.make_repo()

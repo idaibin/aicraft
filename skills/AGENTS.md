@@ -15,6 +15,8 @@ effective repository instructions.
   and `assets/`, but must not depend on repository-root maintenance files at runtime.
 - Keep provider-specific metadata in its provider surface. This catalog includes
   `agents/openai.yaml` for OpenAI without treating it as portable frontmatter.
+- Do not invent parallel per-provider files. Add another provider surface only when
+  that provider documents a real machine-readable contract that this catalog ships.
 - Do not put installation, update, changelog, or repository-maintenance guidance in
   published packages.
 - Preserve unrelated changes and keep Git mutation in `repo-delivery`.
@@ -26,6 +28,10 @@ When adding, renaming, or removing a package, update `README.md`, `INSTALL.md`, 
 `skills.sh.json` in the same change.
 
 ## Validation
+
+On a fresh maintainer checkout, install the pinned validation dependency with
+`python3 -m pip install --requirement requirements-dev.txt` from the repository root.
+GitHub Actions runs the full matrix below for pull requests and pushes to `main`.
 
 For a bounded prose correction in one package:
 

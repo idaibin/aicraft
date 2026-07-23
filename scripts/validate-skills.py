@@ -18,7 +18,11 @@ CATALOG_ROW_RE = re.compile(r"^\| `([a-z0-9-]+)` \|", re.MULTILINE)
 INSTALL_PATH_RE = re.compile(r"^- `skills/([a-z0-9-]+)`$", re.MULTILINE)
 ROUTE_RE = re.compile(r"\$([a-z][a-z0-9-]*)")
 EVAL_HEADINGS = ("## Trigger Eval", "## Non-Trigger Eval", "## Quality Eval")
+FENCE_RE = re.compile(r"^(?P<indent>[ ]{0,3})(?P<fence>`{3,}|~{3,})(?P<rest>.*)$")
+HEADING_RE = re.compile(r"^(?P<indent>[ ]{0,3})##\s+(?P<title>.*?)\s*$")
 FORBIDDEN_PACKAGE_FILES = {"README.md", "INSTALL.md", "INSTALLATION_GUIDE.md", "CHANGELOG.md"}
+PORTABLE_FIELDS = {"name", "description", "license", "compatibility", "metadata", "allowed-tools"}
+LONG_REFERENCE_LINES = 100
 
 
 def frontmatter(path: Path) -> tuple[dict[str, object], str]:
@@ -48,6 +52,85 @@ def openai_interface(path: Path) -> dict[str, str]:
         for field in ("display_name", "short_description", "default_prompt")
         if isinstance((value := interface.get(field)), str)
     }
+
+
+def section_has_content(text: str, heading: str) -> bool:
+    lines = text.splitlines()
+    in_code_fence = False
+    fence_char: str = ""
+    fence_len: int = 0
+    start = None
+    for i, line in enumerate(lines):
+        in_code_fence, fence_char, fence_len = _update_fence_state(
+            line, in_code_fence, fence_char, fence_len
+        )
+        if in_code_fence:
+            continue
+        if _heading_matches(line, heading):
+            start = i
+            break
+    if start is None:
+        return False
+
+    for line in lines[start + 1 :]:
+        in_code_fence, fence_char, fence_len = _update_fence_state(
+            line, in_code_fence, fence_char, fence_len
+        )
+        if in_code_fence:
+            continue
+        if _is_h2_heading(line):
+            return False
+        if line.strip():
+            return True
+    return False
+
+
+def has_exact_h2_heading(text: str, heading: str) -> bool:
+    in_code_fence = False
+    fence_char: str = ""
+    fence_len: int = 0
+    for line in text.splitlines():
+        in_code_fence, fence_char, fence_len = _update_fence_state(
+            line, in_code_fence, fence_char, fence_len
+        )
+        if in_code_fence:
+            continue
+        if _heading_matches(line, heading):
+            return True
+    return False
+
+
+def _is_h2_heading(line: str) -> bool:
+    return _heading_match(line) is not None
+
+
+def _heading_match(line: str) -> str | None:
+    match = HEADING_RE.match(line)
+    if match is None:
+        return None
+    return f"## {match.group('title').strip()}"
+
+
+def _heading_matches(line: str, heading: str) -> bool:
+    match = _heading_match(line)
+    return match is not None and match == heading
+
+
+def _update_fence_state(
+    line: str, in_code_fence: bool, fence_char: str, fence_len: int
+) -> tuple[bool, str, int]:
+    match = FENCE_RE.match(line)
+    if match is None:
+        return in_code_fence, fence_char, fence_len
+    marker = match.group("fence")
+    rest = match.group("rest").strip()
+    if not in_code_fence:
+        return True, marker[0], len(marker)
+    if marker[0] != fence_char or len(marker) < fence_len:
+        return in_code_fence, fence_char, fence_len
+    if rest == "":
+        return False, "", 0
+    return in_code_fence, fence_char, fence_len
 
 
 def local_link_errors(markdown: Path, package: Path) -> list[str]:
@@ -81,6 +164,9 @@ def package_errors(package: Path, all_names: set[str]) -> list[str]:
 
     name = metadata.get("name", "")
     description = metadata.get("description", "")
+    unknown_fields = set(metadata) - PORTABLE_FIELDS
+    if unknown_fields:
+        errors.append(f"{package.name}: unsupported frontmatter fields: {sorted(unknown_fields)}")
     if name != package.name:
         errors.append(f"{package.name}: frontmatter name must match directory")
     if not isinstance(name, str) or not NAME_RE.fullmatch(name) or len(name) > 64:
@@ -94,6 +180,25 @@ def package_errors(package: Path, all_names: set[str]) -> list[str]:
         errors.append(f"{package.name}: description must be plain text with 1-1024 characters")
     elif "Use when" not in description:
         errors.append(f"{package.name}: description must state when to use the Skill")
+    license_value = metadata.get("license")
+    if license_value is not None and (not isinstance(license_value, str) or not license_value.strip()):
+        errors.append(f"{package.name}: license must be a non-empty string when provided")
+    compatibility = metadata.get("compatibility")
+    if compatibility is not None and (
+        not isinstance(compatibility, str) or not compatibility.strip() or len(compatibility) > 500
+    ):
+        errors.append(f"{package.name}: compatibility must be a string with 1-500 characters")
+    portable_metadata = metadata.get("metadata")
+    if portable_metadata is not None and (
+        not isinstance(portable_metadata, dict)
+        or not all(isinstance(key, str) and isinstance(value, str) for key, value in portable_metadata.items())
+    ):
+        errors.append(f"{package.name}: metadata must map strings to strings")
+    allowed_tools = metadata.get("allowed-tools")
+    if allowed_tools is not None and (
+        not isinstance(allowed_tools, str) or not allowed_tools.strip()
+    ):
+        errors.append(f"{package.name}: allowed-tools must be a non-empty string when provided")
     if len(body.splitlines()) > 500:
         errors.append(f"{package.name}: SKILL.md body exceeds the recommended 500 lines")
 
@@ -115,6 +220,13 @@ def package_errors(package: Path, all_names: set[str]) -> list[str]:
             relative = reference.relative_to(package).as_posix()
             if relative not in linked:
                 errors.append(f"{package.name}: reference is not linked from SKILL.md: {relative}")
+            reference_text = reference.read_text(encoding="utf-8")
+            if len(reference_text.splitlines()) > LONG_REFERENCE_LINES and not has_exact_h2_heading(
+                reference_text, "## Contents"
+            ):
+                errors.append(
+                    f"{package.name}: long reference needs a ## Contents section: {relative}"
+                )
     else:
         errors.append(f"{package.name}: missing references directory")
 
@@ -124,8 +236,10 @@ def package_errors(package: Path, all_names: set[str]) -> list[str]:
     else:
         eval_text = eval_file.read_text(encoding="utf-8")
         for heading in EVAL_HEADINGS:
-            if heading not in eval_text:
+            if not has_exact_h2_heading(eval_text, heading):
                 errors.append(f"{package.name}: eval-cases.md missing {heading}")
+            elif not section_has_content(eval_text, heading):
+                errors.append(f"{package.name}: eval-cases.md has empty {heading}")
 
     openai_file = package / "agents" / "openai.yaml"
     if not openai_file.is_file():
@@ -139,6 +253,11 @@ def package_errors(package: Path, all_names: set[str]) -> list[str]:
         for field in ("display_name", "short_description", "default_prompt"):
             if not interface.get(field):
                 errors.append(f"{package.name}: openai.yaml missing interface.{field}")
+        short_description = interface.get("short_description", "")
+        if short_description and not 25 <= len(short_description) <= 64:
+            errors.append(
+                f"{package.name}: openai.yaml interface.short_description must be 25-64 characters"
+            )
         prompt = interface.get("default_prompt", "")
         if f"${package.name}" not in prompt:
             errors.append(f"{package.name}: default_prompt must route through ${package.name}")

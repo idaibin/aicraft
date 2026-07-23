@@ -126,6 +126,12 @@ Packages add `assets/` or `scripts/` only when the capability needs them. A
 published package may depend only on files inside its own directory and must not
 require another Skill or an absolute local path at runtime.
 
+`SKILL.md` is the portable Agent Skills contract. `agents/openai.yaml` is the only
+provider-specific per-Skill surface currently shipped; Anthropic consumes the portable
+package directly and does not require a parallel `agents/anthropic.yaml`. Additional
+provider adapters are added only for documented machine-readable contracts, not as
+copies of the Skill instructions.
+
 Repository-level `docs/`, `protocols/`, and `scripts/` are maintainer surfaces;
 published packages do not depend on them at runtime.
 

@@ -1,5 +1,7 @@
 .DS_Store
 archive.zip
+# Raw evaluation output is local-only. Publish a sanitized, basis-fixed summary
+# under docs/quality/ only when the evidence remains useful.
 eval-results/
 __pycache__/
 *.py[cod]
