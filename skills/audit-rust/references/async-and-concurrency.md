@@ -20,10 +20,14 @@ make APIs async until the I/O and caller model justify it.
 
 ## Tasks And Cancellation
 
-For every spawned task, answer:
+For every spawned task, establish a lifecycle and outcome policy proportional
+to its responsibility:
 
-- Who owns the join handle or tracker?
-- How are success, error, and panic observed?
+- Is it joined, supervised, intentionally detached, or owned by another runtime
+  boundary, and why is that policy safe?
+- When correctness, durable work, resources, shutdown, or caller-visible
+  outcomes depend on it, how are success, error, cancellation, and panic
+  observed?
 - How is cancellation requested, and where are cancellation points?
 - Does cancellation leave partial files, transactions, native handles, or
   progress state?
@@ -32,6 +36,23 @@ For every spawned task, answer:
 
 Dropping a future is not a complete cancellation design when external side
 effects or blocking work continue.
+
+- For `tokio::select!`, identify which branches are cancellation-safe and what
+  state is lost when another branch wins. Pin or retain in-progress work when
+  restarting it would duplicate side effects, lose messages, or violate
+  protocol state.
+- Require owned joining, cancellation, and result/panic observation when the
+  task affects correctness, durable work, resource lifetime, shutdown, or a
+  caller-visible outcome. Distinguish successful output, task-returned error,
+  cancellation, and panic.
+- Intentional detachment is acceptable when work is bounded and non-critical,
+  retains no uncontrolled resource, and failure is irrelevant or independently
+  observable. Dropping a `JoinHandle` is supported Tokio behavior, not proof by
+  itself that the task lifecycle is correct.
+- Prefer the repository's established task set, tracker, supervisor, or other
+  structured owner when those responsibilities require one. A specific
+  `JoinSet`, `TaskTracker`, or cancellation-token crate is a conditional
+  implementation choice, not a universal requirement.
 
 ## Channels, Locks, And State
 

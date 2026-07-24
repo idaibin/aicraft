@@ -32,6 +32,9 @@ Do not mix evidence between bases. Current-worktree content is contamination whe
    - **Standards:** repository guidance, architecture, correctness, security, performance, maintainability, and applicable domain conventions.
    - **Spec:** originating requirements, decisions, acceptance criteria, missing behavior, wrong behavior, and unrequested scope.
    If no trustworthy spec exists, mark Spec `Not verified`; do not infer one from the diff.
+   When maintainability, duplication, dead/unused code, abstraction, or coupling
+   materially applies, load the shared code-quality reference and apply its
+   fixed-basis attribution rules inside the Standards axis.
 7. Keep the two evidence passes independent. They may run in parallel only when delegation is available, both scopes are read-only and fixed, and the coordinator can verify and integrate their results.
 8. Select only applicable profiles. Delegate bounded frontend or Rust specialist work only when the user requests it or an independently necessary evidence result cannot be obtained efficiently by the coordinator. Retain integration, deduplication, severity, and final ownership for the review basis.
 9. Resolve documented path mismatches at the selected basis. If a path or parent is absent, ascend to the nearest existing ancestor and search only the relevant subtree; route repo-map edits to `repo-map`.
@@ -68,6 +71,9 @@ Do not mix evidence between bases. Current-worktree content is contamination whe
 - Do not recommend `git add .`, `git add -A`, directory-wide adds, or broad wildcards unless explicitly approved.
 - Do not claim whole-repository, PR, release, or package coverage from partial evidence.
 - Do not report findings without reachable evidence and concrete impact.
+- Do not turn unchanged repository debt, optional lint advice, code size, or a
+  language/framework signal into a finding against the selected basis. Prove
+  whether the basis introduces, expands, exposes, or directly depends on it.
 - Do not approve structural add/reuse/move/rename/delete work while manifests, exports, commands, tests, CI/deploy, docs, indexes, migrations, generated files, consumers, or stale references disagree.
 - Treat runtime, CI, deployment, external services, branch policy, and package completeness as `Not verified` unless directly evidenced.
 - Do not require OpenAPI for ordinary REST changes. When the protocol-contract
@@ -86,6 +92,9 @@ Lead with mode/profile, basis, scope, exclusions, and validation, then severity-
 - See [references/checklist.md](references/checklist.md) for immutable basis, severity, and release review.
 - See [references/protocol-contracts.md](references/protocol-contracts.md) only for an existing or explicitly requested OpenAPI/generated-client review gate.
 - See [references/standards-and-spec.md](references/standards-and-spec.md) for independent Standards and Spec review axes.
+- Read [references/code-quality.md](references/code-quality.md) when the basis
+  materially involves duplication, dead or unused code, abstractions, hidden
+  coupling, or maintainability.
 - See [references/codebase-design.md](references/codebase-design.md) only when the fixed change basis materially affects a public module/interface, seam, abstraction, locality, or testability.
 - See [references/worktree-examples.md](references/worktree-examples.md) for commit grouping examples.
 - See [references/eval-cases.md](references/eval-cases.md) for trigger, boundary, scenario, and quality evals.

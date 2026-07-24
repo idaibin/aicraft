@@ -89,6 +89,9 @@ When docs or commands reference a missing path:
 ## 5. Standards and Spec Axes
 
 - [ ] Build the Standards source set from effective repository guidance, architecture/contribution docs, selected domain conventions, and non-mutating tool evidence.
+- [ ] When code quality applies, load `code-quality.md`; distinguish a signal
+      from a finding and record basis attribution, concrete impact, owner, and
+      verification.
 - [ ] Locate the originating requirement, issue, PRD, decisions, and acceptance criteria without inferring intent from the diff.
 - [ ] Review Standards and Spec independently; use parallel read-only passes only when delegation is available and the fixed scopes are auditable.
 - [ ] Mark Spec `Not verified` when no trustworthy source exists.
@@ -106,6 +109,9 @@ For every proposed finding:
 - [ ] Provide bounded remediation direction.
 - [ ] Provide a verification command, test, runtime check, or artifact inspection.
 - [ ] Mark unavailable runtime, CI, deployment, data, or consumer evidence `Not verified`.
+- [ ] For duplication, dead/unused code, abstractions, pass-through layers, or
+      hidden coupling, satisfy the shared evidence gate and the selected
+      language/framework reachability rules.
 
 ## 7. Severity Calibration
 

@@ -1,5 +1,19 @@
 # Frontend Audit Checklist
 
+## Contents
+
+- [1. Grounding and Delegation](#1-grounding-and-delegation)
+- [2. Profile Selection](#2-profile-selection)
+- [3. Architecture/Reuse Profile](#3-architecturereuse-profile)
+- [4. State/Data/Contracts Profile](#4-statedatacontracts-profile)
+- [5. Component/Layout/Design-System Profile](#5-componentlayoutdesign-system-profile)
+- [6. Accessibility Profile](#6-accessibility-profile)
+- [7. Performance Profile](#7-performance-profile)
+- [8. Build/Tooling Profile](#8-buildtooling-profile)
+- [9. Desktop-Boundary Profile](#9-desktop-boundary-profile)
+- [10. Validation and Read-Only Boundary](#10-validation-and-read-only-boundary)
+- [11. Final Report](#11-final-report)
+
 ## 1. Grounding and Delegation
 
 - Read all applicable guidance and status.
@@ -22,6 +36,7 @@ Select at least one profile and mark every other profile `Out of scope`:
 - Component/Layout/Design System
 - Accessibility
 - Performance
+- Build/Tooling
 - Desktop Boundary
 
 Do not perform token checks, memoization advice, generic accessibility scanning, or Tauri review merely to make a focused audit look comprehensive.
@@ -72,7 +87,28 @@ Do not perform token checks, memoization advice, generic accessibility scanning,
 - For React, inspect render boundaries, context/store subscriptions, effects, and cache/request ownership.
 - Do not treat component/file size as performance evidence.
 
-## 8. Desktop-Boundary Profile
+## 8. Build/Tooling Profile
+
+- Identify actual package/runtime pins, scripts, framework, bundler version, and
+  direct versus framework-owned tooling.
+- Trace applicable entry/module graph, plugins, resolution, env/define, proxy,
+  base/assets, targets, output, sourcemaps, dev/prod/test, SSR/library, and
+  deployment contracts.
+- For Vite/Rolldown, report the installed contract. Do not infer a Vite 8
+  migration, standalone Rolldown dependency, or separate Rolldown config from
+  Vite's internal builder alone.
+- Treat client env prefixes as public bundle data; verify secret exposure,
+  string parsing, mode precedence, ignored local files, and mode versus
+  `NODE_ENV` for applicable build/deploy commands.
+- For lint migrations, compare effective/type-aware rules, plugins, ignores,
+  generated paths, severities, editor/CI adoption, and check versus fix
+  behavior before claiming parity.
+- Require a representative route/workload and before/after evidence for chunk,
+  bundle, build-time, startup, or runtime performance findings.
+- Mark unexercised preview, deployment, SSR, browser compatibility, and
+  production runtime `Not verified`.
+
+## 9. Desktop-Boundary Profile
 
 - Tauri pages use a typed frontend adapter or service.
 - Commands expose stable transport DTOs and errors and delegate business logic to Rust owners.
@@ -80,7 +116,7 @@ Do not perform token checks, memoization advice, generic accessibility scanning,
 - Menus, shortcuts, windows, and platform behavior use real-client evidence when claimed.
 - Frontend typing, command registration, and capability config do not substitute for native authorization or validation.
 
-## 9. Validation and Read-Only Boundary
+## 10. Validation and Read-Only Boundary
 
 - Run only repository-defined non-mutating format checks, lint, typecheck, focused tests, builds, and generated-route checks relevant to selected profiles.
 - Use `ops-browser` for browser/runtime evidence and `ops-client` for real desktop-window evidence.
@@ -90,7 +126,7 @@ Do not perform token checks, memoization advice, generic accessibility scanning,
 - Return specialist findings to the coordinating review owner.
 - `repo-delivery` alone performs authorized staging, commit, rebase/squash, push, or cleanup.
 
-## 10. Final Report
+## 11. Final Report
 
 - State product/framework profile.
 - State selected and excluded audit profiles.

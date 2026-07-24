@@ -2,7 +2,7 @@
 
 ## Summary
 
-Use `audit-frontend` as one read-only frontend audit entrypoint. Detect the actual framework and local API style, then select only the profiles required by the request. React, Vue, UI/`ui-spec`, accessibility, performance, and Tauri concerns are internal profiles rather than separate public skills because they share the same evidence basis, ownership model, mutation boundary, and final report contract.
+Use `audit-frontend` as one read-only frontend audit entrypoint. Detect the actual framework and local API style, then select only the profiles required by the request. React, Vue, UI/`ui-spec`, accessibility, performance, build/tooling, and Tauri concerns are internal profiles rather than separate public skills because they share the same evidence basis, ownership model, mutation boundary, and final report contract.
 
 ## Profiles
 
@@ -11,6 +11,9 @@ Use `audit-frontend` as one read-only frontend audit entrypoint. Detect the actu
 - **Component/Layout/Design System:** primitives, variants, tokens, DOM/CSS, density, responsive layout, spacing, scrolling, and duplicate systems.
 - **Accessibility:** semantics, keyboard, focus, accessible names, dialogs/popovers, forms, errors, and async status.
 - **Performance:** render/reactivity/data paths, fan-out, request duplication, bundle/runtime/IPC cost, long tasks, and measurement quality.
+- **Build/Tooling:** package/runtime pins, scripts, effective bundler, plugins,
+  resolution, environment, proxy/base, output, SSR/library, compatibility, and
+  deployment contracts.
 - **Desktop Boundary:** frontend adapters, Tauri/native commands, DTO/errors, progress, cancellation, menus, shortcuts, windows, and real-client evidence.
 
 Always state selected profiles and mark all other profiles `Out of scope`.
@@ -41,6 +44,7 @@ Select only styling profiles present in the audited boundary. A styling technolo
 - `Audit this Vue Options and Ant Design form without converting its API style or replacing its component system.`
 - `Review accessibility and performance for this React table using browser evidence where static inspection is insufficient.`
 - `Audit this Tauri frontend boundary for adapters, progress, cancellation, errors, menus, and shortcuts.`
+- `Audit whether this Vite app needs Rolldown configuration and verify its production-output contract.`
 - `Under repo-review, inspect only the changed frontend paths for selected state/data and layout profiles.`
 
 ## Non-Triggers
@@ -66,4 +70,4 @@ A new public skill is justified only when it has a distinct user intent, authori
 
 ## Expected Report
 
-Lead with product/framework profile, selected profiles, excluded profiles, coordinating owner when delegated, and severity-ranked findings. Then report inspected evidence, reuse candidates, ownership map, selected state/data/layout/accessibility/performance/desktop evidence, component/injection/router/lifetime contracts, structural/documentation lifecycle, validation, and residual `Not verified` risks.
+Lead with inspection snapshot, product/framework profile, selected profiles, excluded profiles, coordinating owner when delegated, and severity-ranked findings. Then report inspected evidence, reuse candidates, ownership map, selected state/data/layout/accessibility/performance/build/desktop evidence, component/injection/router/lifetime contracts, structural/documentation lifecycle, validation, and residual `Not verified` risks.

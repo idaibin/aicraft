@@ -12,10 +12,18 @@ Select the styling profile from manifests, configuration, imports, nearby compon
 ## Tailwind
 
 - Use Tailwind only where the same UI layer already uses utilities.
+- Detect the installed major and effective configuration before editing:
+  JavaScript/TypeScript configuration and content globs are common in v3,
+  while v4 may use CSS-first imports, `@theme`, and source directives. Do not
+  require one model in a repository using the other.
 - Reuse the configured spacing, sizing, color, radius, typography, shadow, breakpoint, and variant scales plus existing class-composition helpers.
 - Prefer scale utilities such as `h-12`, `gap-3`, or `px-4` for routine dimensions.
 - Do not scatter arbitrary pixel utilities such as `h-[22px]`, `w-[88px]`, or `mt-[7px]` for routine UI dimensions.
 - Put real product or layout constants in named classes, component variants, tokens, or CSS variables.
+- Keep utility names statically discoverable by the installed compiler unless
+  the repository owns an explicit source/safelist pattern. Do not build class
+  fragments dynamically when complete class alternatives or an established
+  variant helper can express the state.
 - Do not fight component-library tokens with utility overrides unless the feature already owns that integration pattern.
 
 ## CSS Modules
@@ -41,12 +49,17 @@ Select the styling profile from manifests, configuration, imports, nearby compon
 - Prefer existing wrappers, theme tokens, `ConfigProvider`, table/form/modal/drawer conventions, and locale setup.
 - Preserve validation, field names, pagination, row keys, loading states, and overlay lifecycle.
 - Avoid brittle overrides against generated class names when props, tokens, or owned wrappers exist.
+- Preserve `ConfigProvider`/`App` context for theme, locale, prefix, message,
+  notification, and modal behavior. Before using static feedback APIs, verify
+  the installed major and whether that call can consume the required context.
 - Do not replace Ant Design controls with custom or shadcn/ui controls unless requested.
 
 ## shadcn/ui
 
 - Reuse existing generated components and local composition/variant patterns before changing primitives.
-- Confirm Radix or Base UI, Tailwind, `cn`, component paths, and variant utilities before importing.
+- Confirm `components.json`, schema/style, Radix or Base UI choice, Tailwind
+  setup, aliases, `cn`, component paths, icon choice, and variant utilities
+  before importing or regenerating.
 - Do not rerun generators or alter shared primitives for one page unless that shared change is requested.
 - Do not introduce shadcn/ui into an Ant Design or non-shadcn feature without established precedent or explicit direction.
 

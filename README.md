@@ -64,14 +64,14 @@ See [INSTALL.md](INSTALL.md) for project/global scope, updates, and removal.
 | Skill | Use when |
 | --- | --- |
 | `ui-spec` | A selected visual source or accepted UI surface must become an implementation-ready layout, state, interaction, responsive/accessibility, component/token, and acceptance contract. |
-| `dev-frontend` | A requested frontend feature, component, page, or accepted UI specification must be implemented and validated. |
+| `dev-frontend` | A requested frontend feature, component, page, build/tooling migration, or accepted UI specification must be implemented and validated. |
 | `dev-rust` | A requested Rust feature, refactor, or port must be implemented with ownership and behavior evidence. |
 
 ### Audit and Operations
 
 | Skill | Use when |
 | --- | --- |
-| `audit-frontend` | A known frontend surface needs a bounded read-only architecture, accessibility, performance, state, or design audit. |
+| `audit-frontend` | A known frontend surface needs a bounded read-only architecture, build/tooling, accessibility, performance, state, or design audit. |
 | `audit-rust` | A Rust workspace or surface needs a bounded ownership, concurrency, SQLite, unsafe/FFI, performance, or memory audit. |
 | `ops-browser` | A browser page or bounded platform action must be operated or verified with capability, identity, authorization, and before/after evidence. |
 | `ops-client` | A Tauri, Electron, or native desktop client must be verified against its real process and window. |

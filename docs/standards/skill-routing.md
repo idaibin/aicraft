@@ -37,6 +37,25 @@ inside frontend Skills; Rust subsystem checks remain inside Rust Skills. A futur
 or Python Skill should appear only after repeated real implementation work shows that
 its workflow and domain knowledge justify an independently maintained package.
 
+## Shared Code Quality Model
+
+Cross-language quality principles live in one synchronized protocol rather than
+being redeclared by every Skill. Language/framework references refine
+reachability and semantics; owner Skills apply the stage meaning:
+
+| Owner | Quality question |
+| --- | --- |
+| `repo-review` | Did the fixed basis introduce, expand, expose, or directly depend on the issue? |
+| `audit-frontend` / `audit-rust` | What currently exists inside the declared profile and path scope? |
+| `dev-frontend` / `dev-rust` | How does the authorized change avoid the issue and remove only what it makes obsolete? |
+
+Duplication, dead/unused code, over-design, pass-through layers, and hidden
+coupling are findings only after reachability, concrete impact, precise owner,
+stage attribution, and falsifiable verification are established. React, Vue,
+Vite/Rolldown, Rust/Clippy, async, FFI, and similar details stay in their domain
+profiles. They do not create a new public Skill or an unconstrained whole-repo
+scan inside `repo-review`.
+
 ## Composition
 
 Start with the closest owner. Add a handoff only when the user's requested outcome

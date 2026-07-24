@@ -1,4 +1,4 @@
 interface:
   display_name: "Frontend Audit"
-  short_description: "Audit selected frontend framework and styling profiles"
-  default_prompt: "Use $audit-frontend to run a read-only, profile-selected frontend audit and return evidence-ranked findings without editing code."
+  short_description: "Audit frontend framework, build, and styling profiles"
+  default_prompt: "Use $audit-frontend to run a read-only, profile-selected frontend audit across applicable framework, build/tooling, styling, and quality risks and return evidence-ranked findings without editing code."

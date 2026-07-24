@@ -24,18 +24,25 @@ Do not rewrite a working local design merely to resemble an external project.
 
 ## Workflow
 
-1. Read repository guidance, run `git status --short`, and inspect only relevant manifests, entry points, modules, docs, tests, benches, migrations, CI, and runtime configuration. When delegated, record the exact Rust paths or diff and keep the caller as review coordinator.
+1. Read repository guidance, record the inspected revision plus relevant Worktree
+   state for reproducibility, run `git status --short`, and inspect only relevant
+   manifests, entry points, modules, docs, tests, benches, migrations, CI, and
+   runtime configuration. This inspection snapshot does not imply change
+   attribution. When delegated, record the exact Rust paths or diff and keep the
+   caller as review coordinator.
 2. Determine workspace/crate boundaries, library and binary entries, feature flags, MSRV, edition, runtime/thread model, error/tracing style, database linkage, migration strategy, quality commands, and unsafe/FFI/native dependencies that apply to the task.
 3. Select one or more audit profiles:
    - **Architecture/baseline:** crate/module/API ownership, dependencies, toolchain policy, structural lifecycle, docs, and legacy exceptions.
-   - **Ownership/errors:** resource lifetime, copying/retention, typed errors, panic/log/retry boundaries.
+   - **Ownership/errors:** resource lifetime, copying/retention, typed errors,
+     panic/log/retry boundaries, and applicable Axum HTTP or Tauri IPC
+     contracts.
    - **Concurrency/runtime:** Tokio/blocking work, tasks, channels, locks, backpressure, cancellation, panic propagation, and shutdown.
    - **Performance/memory:** representative workload, release baseline, CPU, allocation, RSS, I/O, binary/compile cost, caches, mmap, allocator/native/OS retention.
    - **SQLite:** runtime/linkage, connections, transactions, WAL, migrations, schema, indexes, plans, maintenance, backup, and recovery.
    - **Unsafe/FFI:** invariants, ABI/layout, pointer ownership, callbacks, threads, panic containment, alloc/free symmetry, and native cleanup.
 4. Classify applicable standards as portable governance, organization baseline, new-project template, repository contract, or documented legacy exception. Never turn a version snapshot or example tree into a universal rule.
 5. Consume current `repo-map` output or build a targeted inventory of analogous APIs, modules, database access, background tasks, tests, benchmarks, migrations, callers, and architecture docs.
-6. Map governing invariants, resource owners, shutdown/cancellation paths, error boundaries, workload, baseline, and validation gaps for the selected profiles only.
+6. Map governing invariants, resource owners, shutdown/cancellation paths, error boundaries, workload, baseline, and validation gaps for the selected profiles only. When duplication, dead/unused code, abstraction, coupling, or maintainability materially applies, load `references/code-quality.md` with audit semantics and Rust reachability rules.
 7. When an in-scope selected-profile change adds, reuses, moves, renames, or deletes a structural surface, audit every affected manifest, registration, export, feature, test, migration, generated file, deployment path, architecture document, and index; search for stale references.
 8. Validate hypotheses with non-mutating repository-defined commands and representative data. Do not substitute `cargo check` for release, benchmark, concurrency, migration, or runtime evidence.
 9. Stop when the selected profiles are supported by evidence. Mark unselected profiles out of scope rather than partially reviewing them.
@@ -55,9 +62,14 @@ Do not rewrite a working local design merely to resemble an external project.
 - Do not hard-code the latest stable Rust release or universal MSRV. Read the repository's pinned toolchain and support policy.
 - Do not impose one `apps/`, `crates/`, `domain/`, `application/`, `infrastructure/`, or frontend-mirrored directory tree. Split by stable responsibility or deployment boundary, not file count.
 - Do not label every `clone`, `Arc`, `Mutex`, `unwrap`, large file, or full table scan as a finding. Prove context, frequency, reachability, and impact.
+- Do not declare Rust code unused from reference search alone. Resolve public
+  API, features, targets, `cfg`, macros, derives, build scripts, examples,
+  benches, FFI exports, and downstream consumers; interpret Clippy groups in
+  repository context.
 - Load and apply only references for the selected architecture, ownership/error,
-  concurrency, performance/memory, SQLite, or unsafe/FFI profiles. Require the
-  profile's workload, runtime, invariant, or target evidence before conclusions.
+  concurrency, performance/memory, SQLite, unsafe/FFI, or conditional
+  code-quality profile. Require the profile's workload, runtime, invariant,
+  reachability, or target evidence before conclusions.
 - Apply stricter templates to new projects only when adopted. Migrate established projects incrementally at real change boundaries; never rename mechanically for visual consistency.
 - Do not edit, stage, commit, post review comments, or deliver code in audit mode. Route approved remediation to `dev-rust`. `repo-review` owns Worktree and immutable review coordination; `repo-delivery` alone owns Git mutation.
 - Do not claim profiles were reviewed when their workload, runtime, target, dataset, or tool support was unavailable. Mark the exact gap `Not verified`.
@@ -74,7 +86,7 @@ Do not rewrite a working local design merely to resemble an external project.
 
 ## Output Contract
 
-Start with selected profiles and severity-ranked findings. For each finding, report impact, exact location, evidence, remediation direction, and validation gap. Then summarize project class; coordinating owner when this is a scoped specialist subreview; guidance/manifests/code/migrations/docs/tests/commands inspected; existing candidates; ownership and invariants; selected profile evidence; structural lifecycle; workload and before/after data where applicable; explicitly excluded profiles; and `Not found` or `Not verified` gaps.
+Start with the inspection snapshot, selected profiles, and severity-ranked findings. For each finding, report impact, exact location, evidence, remediation direction, and validation gap. Then summarize project class; coordinating owner when this is a scoped specialist subreview; guidance/manifests/code/migrations/docs/tests/commands inspected; existing candidates; ownership and invariants; selected profile evidence; structural lifecycle; workload and before/after data where applicable; explicitly excluded profiles; and `Not found` or `Not verified` gaps.
 
 ## References
 
@@ -82,10 +94,16 @@ Load each linked reference independently when its named surface applies; groupin
 
 - Read [architecture-and-modules.md](references/architecture-and-modules.md) for structural boundaries and [project-baseline-and-lifecycle.md](references/project-baseline-and-lifecycle.md) for baseline classification, legacy policy, reuse, and lifecycle.
 - Read [ownership-and-resources.md](references/ownership-and-resources.md) for ownership, clone, `Arc`, buffers, and caches and [errors-and-api-design.md](references/errors-and-api-design.md) for invariants, panic, retry, logging, and boundary translation.
+- Read [web-and-desktop-boundaries.md](references/web-and-desktop-boundaries.md)
+  for Axum extractors/state/middleware/response testing and Tauri command,
+  capability, permission, CSP, path, and webview trust boundaries.
 - Read [async-and-concurrency.md](references/async-and-concurrency.md) for runtime, blocking work, tasks, channels, locks, timeouts, cancellation, shutdown, and Loom.
 - Read [performance.md](references/performance.md) for workloads, CPU, I/O, binary/compile cost, and measurement and [memory.md](references/memory.md) for allocation, retention, RSS, caches, mmap, and leak classification.
 - Read [sqlite.md](references/sqlite.md) for linkage, connections, transactions, WAL, migrations, schema, indexes, plans, maintenance, backup, and recovery.
 - Read [testing-and-quality.md](references/testing-and-quality.md) for Cargo, Clippy, Miri, coverage, benchmarks, and risk-based gates and [unsafe-and-security.md](references/unsafe-and-security.md) for unsafe, FFI, native-resource, dependency, and security checks.
+- Read [code-quality.md](references/code-quality.md) when duplication,
+  dead/unused code, abstraction quality, hidden coupling, or maintainability is
+  materially in scope.
 - Read [review-checklist.md](references/review-checklist.md) for profile-scoped gates and [anti-patterns.md](references/anti-patterns.md) for detectable failure patterns.
 - Read [reference-corpus.md](references/reference-corpus.md) for official source evidence, adopted rules, and rejected cargo-cult choices.
 - Read [usage.md](references/usage.md) and [eval-cases.md](references/eval-cases.md) for routing/reporting/evals; load [codebase-design.md](references/codebase-design.md) only for a selected public-module, seam, abstraction, locality, or testability audit.

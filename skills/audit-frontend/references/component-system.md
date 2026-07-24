@@ -54,7 +54,10 @@ Treat shadcn/ui as source-owned code with compositional conventions, not as an
 external black box:
 
 - inspect the installed local primitive before adding or regenerating it;
-- preserve the project's selected base, tokens, variant utility, and aliases;
+- inspect `components.json` and preserve the project's schema/style, selected
+  base, tokens, icon choice, variant utility, aliases, and registry ownership;
+- treat generator output as project-owned source: compare local edits and
+  consumers before updating rather than assuming regeneration is harmless;
 - keep compound component hierarchy valid;
 - use `asChild`/slot composition only when element semantics and refs remain
   correct;

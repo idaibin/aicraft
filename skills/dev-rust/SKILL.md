@@ -27,7 +27,7 @@ Implement Rust changes against the repository's real toolchain, project class, c
 7. Decide in order: directly reuse, extend an existing contract, adapt the nearest reference, or create new. Record why existing interfaces are insufficient before adding an endpoint, trait, type family, or module.
 8. Trace ownership, dependency direction, and the complete interface chain before adding or moving code. If Protocol automation applies, identify one code-first or contract-first authority; otherwise preserve the repository-native API authority without introducing OpenAPI.
 9. When behavior is stable and a durable public seam exists, confirm that seam, then work one external behavior at a time: run one red-capable check, make the minimum green change, and continue as a vertical tracer bullet. Load `references/behavior-first.md`; do not force it onto exploratory work, generated code, or behavior without an honest seam.
-10. Implement the smallest idiomatic change that follows local ownership, borrowing, module, error, async, persistence, FFI, configuration, logging, documentation, and test patterns.
+10. Implement the smallest idiomatic change that follows local ownership, borrowing, module, error, async, persistence, FFI, configuration, logging, documentation, and test patterns. When the task materially involves duplication, dead/unused code, abstraction, coupling, or maintainability, load `references/code-quality.md` with implementation semantics and remove only declarations made obsolete by the authorized change after resolving Rust reachability.
 11. Update manifests, module exports, tests, commands, docs, CI/deploy paths, migrations, generated files, and indexes when the structural or public boundary changes.
 12. Run focused checks after each slice, then the repository's baseline gates and every selected overlay. Use Miri, sanitizers, fuzzing, stress, or repeated-operation tools only when both supported by the target repository/environment and relevant to the changed invariant.
 
@@ -59,12 +59,17 @@ Implement Rust changes against the repository's real toolchain, project class, c
 - Preserve dependency direction. Entry modules stay thin; workflows belong in the established service/engine owner; deterministic domain logic avoids IO; persistence stays behind repository or storage boundaries when the project defines them.
 - Prefer typed errors and `Result` propagation. Do not add runtime `unwrap`, `expect`, `panic!`, silent error swallowing, or fallback behavior unless the contract explicitly requires it.
 - Load and apply only references for the selected protocol, concurrency, persistence,
-  unsafe/FFI, porting, target/platform, behavior-first, or codebase-design overlays.
-  Do not inherit heavy gates from an unselected overlay.
+  unsafe/FFI, porting, target/platform, behavior-first, conditional code-quality,
+  or codebase-design overlays. Do not inherit heavy gates from an unselected
+  overlay.
 - Treat new warnings in the touched surface as defects. Do not broaden scope to clean unrelated legacy warnings; report them separately. Prefer a local justified `#[expect(...)]` over weakening workspace lints.
 - Keep product-specific behavior in the product repository. Move code to a shared crate only after real reuse, stable API, named ownership, and consumer validation are established.
 - When adding, reusing, moving, renaming, or deleting a crate, module, feature, binary, migration, or shared surface, update every owning manifest, export, command, test, doc, CI/deploy path, generated output, and index in the same task.
 - Preserve unrelated local changes and generated files not owned by the task.
+- Do not add speculative traits, generic layers, managers, repositories, or
+  configuration switches for hypothetical consumers. Do not delete apparently
+  unused items until public API, features, targets, `cfg`, macros, derives,
+  build scripts, examples/benches, FFI exports, and downstream use are resolved.
 
 ## Validation Model
 
@@ -87,5 +92,8 @@ Report project class, Baseline evidence, selected risk overlays, toolchain and c
 - See [references/behavior-first.md](references/behavior-first.md) when a stable public seam supports vertical red-green slices.
 - See [references/codebase-design.md](references/codebase-design.md) only when the change materially affects a public module/interface, seam, cross-caller abstraction, or testability.
 - See [references/best-practices.md](references/best-practices.md) for idiomatic Rust API, ownership, error, test, docs, performance, dispatch, and concurrency rules.
+- See [references/code-quality.md](references/code-quality.md) when the requested
+  change materially involves duplication, dead/unused code, abstraction
+  quality, hidden coupling, or maintainability.
 - See [references/bun-production-patterns.md](references/bun-production-patterns.md) for source-backed migration, FFI, unsafe, resource-lifetime, lint, and validation patterns derived from Bun's production Rust rewrite.
 - See [references/eval-cases.md](references/eval-cases.md) for trigger and quality evals.

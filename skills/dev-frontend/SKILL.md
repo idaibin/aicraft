@@ -1,6 +1,6 @@
 ---
 name: dev-frontend
-description: "Use when a frontend change must be implemented or refactored across UI, state, data, styling, accessibility, performance, or desktop integration; owns source edits and validation, not audit-only, browser-only, UI-spec, or Git-delivery work."
+description: "Use when a frontend change must be implemented or refactored across UI, state, data, styling, build/tooling, accessibility, performance, or desktop integration; owns source edits and validation, not audit-only, browser-only, UI-spec, or Git-delivery work."
 ---
 
 # Frontend Implementation
@@ -22,7 +22,7 @@ Implement frontend changes with existing-stack alignment, minimal DOM/CSS, clear
 9. Select exactly one framework profile per edited boundary: **React**, **Vue Composition**, **Vue Options**, or **Repository-native Other**. Select only styling profiles actually present, such as **Tailwind**, **CSS Modules**, **Sass/Less**, **CSS-in-JS**, **Ant Design**, or **shadcn/ui**.
 10. Preserve typography, spacing, density, routing, state, API contracts, accessibility, and visual system unless the task explicitly changes them. Do not duplicate a DTO or endpoint already owned by the repository's client/type authority.
 11. When behavior is stable and a durable public seam exists, confirm that seam, then work one external behavior at a time: run one red-capable check, make the minimum green change, and continue as a vertical tracer bullet. Load `references/behavior-first.md`; do not force it onto exploratory visuals, generated code, or behavior without an honest seam.
-12. Implement with the smallest component, DOM, CSS, and ownership surface that matches existing patterns.
+12. Implement with the smallest component, DOM, CSS, and ownership surface that matches existing patterns. When the change materially involves duplication, dead/unused code, abstraction, coupling, or maintainability, load `references/code-quality.md` with implementation semantics and remove only code made obsolete by this task.
 13. Update manifests, scripts, routes, tests, docs, indexes, generated route files, and stale references when adding, reusing, moving, renaming, or deleting structural frontend code.
 14. Remove stale wrappers, duplicate declarations, late overrides, and temporary layout patches made obsolete by the change.
 15. Run focused checks after each slice, then matching project-defined gates; use `ops-browser` or `ops-client` when runtime UI evidence is required.
@@ -57,12 +57,17 @@ Implement frontend changes with existing-stack alignment, minimal DOM/CSS, clear
 - Create a new implementation only when reuse or adaptation would violate ownership or behavior. State the reason and place it in the existing directory and naming convention.
 - Preserve existing user-visible behavior and repository-owned route, state, data,
   accessibility, and visual contracts unless the task explicitly changes them.
-- Load and apply only the selected framework, styling, protocol, behavior-first, or
-  codebase-design references. Do not cross-apply another stack profile.
+- Load and apply only the selected framework, styling, build/tooling, protocol,
+  behavior-first, conditional code-quality, or codebase-design references. Do
+  not cross-apply another stack profile.
 - Keep `lint`, `typecheck`, `test`, `check`, and formatting validation non-mutating; use an explicit fix/write command when source rewrites are intended.
 - Mark unchecked visual, responsive, console, network, runtime, or accessibility behavior as `Not verified`.
 - Report OpenAPI gates only when that profile applies; otherwise mark them `Not
   applicable`, not `Not verified`.
+- Do not add speculative shared layers, default memoization, export-style
+  rewrites, or bundler migrations as incidental cleanup. Do not delete
+  apparently unused frontend code until route, dynamic import, framework
+  registration, build, test, and external-consumer reachability is resolved.
 
 ## Output Contract
 
@@ -78,4 +83,7 @@ Report the branch, detected project class/stack and selected profiles, existing 
 - See [references/framework-profiles.md](references/framework-profiles.md) for React, Vue Composition, Vue Options, and repository-native framework rules.
 - See [references/styling-systems.md](references/styling-systems.md) for Tailwind, CSS Modules, Sass/Less, CSS-in-JS, Ant Design, shadcn/ui, and mixed-stack rules.
 - See [references/stack-guidelines.md](references/stack-guidelines.md) for toolchain, routing, layout, and desktop-webview boundaries.
+- See [references/code-quality.md](references/code-quality.md) when the requested
+  change materially involves duplication, dead/unused code, abstraction
+  quality, hidden coupling, or maintainability.
 - See [references/eval-cases.md](references/eval-cases.md) for trigger and quality evals.

@@ -19,6 +19,7 @@
 | `Review this branch against both repository standards and the originating specification.` | Trigger two-axis `repo-review`. |
 | `Review this fixed range's OpenAPI authority, compatibility diff, generated client, backend conformance, consumer states, and clean CI.` | Trigger `repo-review` with protocol-contract profile. |
 | `Review this REST change against its native route, DTO, client, consumers, and tests; no generated schema pipeline exists.` | Trigger ordinary `repo-review`; mark the OpenAPI profile `Not applicable`. |
+| `Review this fixed diff for duplicated rules, unused declarations, and over-designed wrappers.` | Trigger `repo-review`; apply the shared quality gate with fixed-basis attribution and the applicable language profile. |
 
 ## Non-Trigger Eval
 
@@ -29,6 +30,7 @@
 | `Audit this current Rust endpoint path for token leakage; there is no diff to review.` | Prefer `audit-rust`. |
 | `Audit this frontend architecture for accessibility and performance without a review basis.` | Prefer `audit-frontend`. |
 | `Audit this Rust service for concurrency and memory risks without a review basis.` | Prefer `audit-rust`. |
+| `Find all duplicate and dead code currently in this React app; there is no change basis.` | Prefer `audit-frontend` with a bounded scope, not `repo-review`. |
 | `Apply the accepted frontend findings.` | Prefer `dev-frontend`. |
 | `Stage, commit, and push the reviewed files.` | Prefer `repo-delivery`. |
 | `Split this future migration into tasks.` | Do not trigger this Skill; use the host's built-in planning. |
@@ -59,6 +61,8 @@
 | Review request contains no Git mutation authorization | Keep files, Git, GitHub, and remotes unchanged. | Stages, commits, comments, or pushes. |
 | Protocol generator writes files | Consume retained evidence or replay only in a disposable isolated copy and prove the reviewed worktree/index/hashes unchanged; otherwise mark regeneration `Not verified`. | Runs a write-mode generator in the reviewed checkout. |
 | No actionable finding exists | Say `No actionable findings` and report residual gaps. | Invents low-value findings. |
+| Diff adds a wrapper around one implementation | Inspect current responsibility, consumers, policy, lifecycle, and verification seam. Report only if the new layer lacks a current role and creates concrete cost. | Calls every single-implementation abstraction over-design. |
+| Clippy or ESLint reports an unused declaration outside the changed path | Classify it as pre-existing and exclude it from the verdict unless the basis directly depends on it; verify language/framework reachability. | Attributes whole-repository lint debt to the diff. |
 
 ## Quality Eval
 
@@ -72,6 +76,7 @@
 | Context collaboration | Uses repo maps only for navigation and verifies facts at the basis. | Trusts or edits the map. |
 | Specialist composition | Delegates bounded frontend/Rust paths when needed and retains final scope, integration, severity, and report ownership for the review basis. | Hands off the whole review or concatenates reports. |
 | Standards axis | Checks applicable repository guidance, architecture, correctness, security, performance, and maintainability with cited evidence. | Treats generic preferences as hard repository violations. |
+| Evidence-gated code quality | For applicable duplication, dead/unused code, abstraction, and coupling signals, proves reachability, impact, owner/location, basis attribution, and a falsifiable verification path. | Reports similarity, size, a single wrapper/trait/memo/clone, or optional lint advice by itself. |
 | Spec axis | Checks requirements, decisions, acceptance criteria, missing behavior, wrong behavior, and scope creep; marks the axis `Not verified` when no trustworthy spec exists. | Infers a spec from the diff or claims compliance without a source. |
 | Axis independence | Collects Standards and Spec evidence independently, optionally in bounded parallel read-only passes, then verifies, deduplicates, labels, and severity-ranks findings centrally. | Lets one axis mask the other or concatenates unverified subagent output. |
 | Necessary handoff | Emits a frontend/Rust audit handoff only when that specialist must inspect a bounded part of the current review; otherwise keeps the optional profile internal and returns no handoff. | Lists specialists merely because a repository contains frontend, Rust, or authentication code. |

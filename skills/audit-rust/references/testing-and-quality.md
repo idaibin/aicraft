@@ -24,6 +24,14 @@ cargo test --workspace --doc
 cargo build --workspace --release
 ```
 
+Use compiler and Clippy output as typed evidence, not a universal design
+verdict. Distinguish correctness and suspicious lints from style, complexity,
+performance, pedantic, nursery, cargo, and restriction groups. Do not enable the
+entire restriction group; apply individual lints only with repository-owned
+rationale. Before accepting an unused/dead-code conclusion, resolve public API,
+features, targets, `cfg`, macros, derives, generated code, build scripts,
+examples/benches, FFI exports, and known downstream consumers.
+
 Additional project-supported gates may include, only for selected claims:
 
 ```bash

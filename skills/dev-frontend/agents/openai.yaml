@@ -1,4 +1,4 @@
 interface:
   display_name: "Frontend Implementation"
-  short_description: "Implement frontend and generated contract clients safely"
-  default_prompt: "Use $dev-frontend to make scoped frontend changes with reuse-first discovery, repository-native conventions, and generated OpenAPI client consumption when applicable."
+  short_description: "Implement frontend and build/tooling changes safely"
+  default_prompt: "Use $dev-frontend to make scoped frontend or build/tooling changes with reuse-first discovery, repository-native conventions, quality guardrails, and generated OpenAPI client consumption when applicable."

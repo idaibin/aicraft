@@ -9,6 +9,25 @@ Use these guidelines only after verifying the project actually uses the relevant
 - Do not replace reviewed version ranges with `latest`.
 - Prefer stable script names such as `dev`, `build`, `lint`, `typecheck`, `test`, and `check` when the repository standard defines them.
 - Keep validation scripts read-only. Use explicit `:fix`, format-write, or equivalent commands for rewrites.
+- Read the effective ESLint/Oxlint/Biome/TypeScript configuration, ignore
+  boundaries, generated-file ownership, and CI invocation before changing a
+  lint rule or declaring the scanned surface clean. Type-aware rules require
+  the repository's real project configuration and must not be inferred from a
+  syntax-only run.
+- Treat ESLint flat-config conversion, ESLint-to-Oxlint adoption, formatter
+  replacement, or lint-rule-family changes as explicit migrations. Keep the
+  old and new checks comparable until unsupported rules, plugins, ignores,
+  severity, editor, and CI behavior are accounted for; generated config is a
+  starting point, not proof of parity.
+- For Oxlint type-aware parity, verify pinned Oxlint and `oxlint-tsgolint`
+  versions, actual type-aware enablement, TypeScript/`tsconfig` compatibility,
+  supported rules, and representative diagnostics. Retain ESLint for gaps, and
+  do not replace a repository-owned `tsc` gate without a separate explicit
+  compatibility decision.
+- For `.eslintrc*` to flat config, compare the actual linted file set and
+  representative effective configs across ordinary files, nested globs,
+  dotfiles, `.eslintignore`/generated paths, overrides/processors, and affected
+  CLI flags before deleting the legacy configuration.
 
 ## Directory Classes
 
@@ -23,6 +42,43 @@ Use these guidelines only after verifying the project actually uses the relevant
 - Do not change alias, proxy, base path, env names, or build output paths for a component-level task.
 - Preserve route paths, params, loaders/actions, query handling, layouts, and navigation conventions.
 - Prefer existing scripts from `package.json`, docs, or repo guidance.
+- Detect the installed Vite/framework version and effective builder before
+  changing configuration. Vite 8 uses Rolldown and exposes
+  `build.rolldownOptions`; the deprecated `build.rollupOptions` alias is a
+  compatibility fact, not a reason to migrate an unaffected application.
+- In a normal Vite application, do not install standalone Rolldown or create a
+  separate `rolldown.config.*` merely because Vite uses it internally. Use the
+  repository's `vite.config.*` and only add configuration required by an
+  explicit behavior, compatibility, performance, or deployment need.
+- Treat `rolldown-vite` for older Vite projects, Vite-major upgrades, and
+  Rollup-to-Rolldown option/plugin changes as explicit migrations. Read the
+  applicable migration guide, preserve plugin and output semantics, and prove
+  dev, production build, preview/deployment, SSR, library, and sourcemap
+  behavior that the project actually uses.
+- Do not cargo-cult chunk splitting, minifier, dependency optimization, or
+  plugin settings. Establish a route/workload/bundle baseline and verify the
+  resulting output before keeping performance-oriented configuration.
+- Treat every client-exposed env prefix, including Vite's default `VITE_`, as
+  public bundle data. Never place secrets there. Preserve mode precedence,
+  explicit parsing of string values, and the repository's distinction between
+  Vite mode and `NODE_ENV`; validate every changed mode used by build or deploy.
+
+## React Correctness And Performance
+
+- Keep components and hooks pure during render: do not mutate props, state, Hook
+  arguments/return values, or non-local values while rendering. Side effects
+  that synchronize external systems belong in event handlers or Effects and
+  must follow dependency, ownership, cleanup, and cancellation contracts.
+  Follow the Rules of Hooks and the repository's official
+  `eslint-plugin-react-hooks` configuration.
+- Use effects to synchronize with external systems, with complete dependencies
+  and cleanup. Keep event-specific logic in events rather than effects.
+- Treat `memo`, `useMemo`, `useCallback`, lazy loading, virtualization, and
+  store/context splitting as measured optimizations. Verify the actual render,
+  calculation, route, request, or bundle path; do not apply them by default.
+- Component co-location, file count, export style, and prop-passing depth follow
+  repository ownership and change reasons. Extract only a stable responsibility
+  or demonstrated coordinated-change seam.
 
 ## Layout Selection
 

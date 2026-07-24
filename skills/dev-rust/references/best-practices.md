@@ -9,7 +9,9 @@ define a stricter or intentionally different contract.
 - [Option, Result, And Errors](#option-result-and-errors)
 - [Control Flow And Allocation](#control-flow-and-allocation)
 - [Traits, Dispatch, And State](#traits-dispatch-and-state)
+- [Code Quality And Abstraction](#code-quality-and-abstraction)
 - [Concurrency And Unsafe](#concurrency-and-unsafe)
+- [Axum And Tauri Boundaries](#axum-and-tauri-boundaries)
 - [FFI And Native Resources](#ffi-and-native-resources)
 - [Ports And Large Rewrites](#ports-and-large-rewrites)
 - [Tests, Documentation, And Lints](#tests-documentation-and-lints)
@@ -60,6 +62,26 @@ define a stricter or intentionally different contract.
 - Do not introduce a trait for a single implementation unless it defines a real
   boundary, test seam, or extension contract already required by the design.
 
+## Code Quality And Abstraction
+
+- Prefer one owner for a business rule, schema, configuration fact, error
+  mapping, or state transition. Similar syntax is acceptable when sharing would
+  couple independent change reasons; duplicate authorities are not.
+- Account for public API, features, targets, `cfg`, macros, derives, generated
+  code, build scripts, examples/benches, FFI exports, and downstream crates
+  before removing apparently unused code.
+- A trait, newtype, adapter, or module earns its cost when it enforces an
+  invariant, stabilizes a public/third-party/platform boundary, owns lifecycle
+  or policy, or creates a necessary test or observability seam. One current
+  implementation does not disprove that role.
+- Reject pass-through service/manager/repository layers only when they add no
+  validation, transformation, policy, error mapping, lifecycle, transaction,
+  caching, instrumentation, compatibility, or stable boundary and create a
+  demonstrated change/debug cost.
+- Treat `clone`, `Arc`, `Mutex`, generics, dynamic dispatch, and lint suggestions
+  as investigation signals. Decide from ownership, size/frequency, contention,
+  async boundaries, public compatibility, and representative measurement.
+
 ## Concurrency And Unsafe
 
 - Match pointer and synchronization types to the ownership model: `Rc` for
@@ -70,6 +92,37 @@ define a stricter or intentionally different contract.
 - Avoid global mutable state and unbounded tasks, channels, queues, or retries.
 - Use `unsafe` only when no safe design satisfies the requirement. Keep the
   block minimal and document invariants with `# Safety` or `// SAFETY:`.
+- For `tokio::select!`, preserve state across cancellation when a losing branch
+  is not safe to restart. Give spawned work an explicit lifecycle/outcome
+  policy. Join, cancel, and observe output/error/panic when correctness, durable
+  work, resources, shutdown, or caller-visible outcomes depend on it.
+  Intentional detachment is acceptable only for bounded non-critical work that
+  retains no uncontrolled resources and whose failure is irrelevant or
+  independently observable; do not add a task-set or token mechanically.
+
+## Axum And Tauri Boundaries
+
+- In Axum, keep request extraction/validation and response translation at the
+  transport edge, preserve the repository's typed `State`/`FromRef` model, and
+  keep domain workflows independent of handler signatures. Respect the
+  one-body-consumer extractor boundary and map rejections/errors deliberately.
+- Compose Tower middleware in the smallest router scope that owns the policy.
+  Do not add permissive CORS, a universal timeout, or generic tracing/body-limit
+  layers without a workload and trust-boundary requirement. Test the router as
+  a service when the repository exposes that seam.
+- In Tauri, keep commands thin and validate frontend-controlled inputs in Rust.
+  Use capabilities and permissions for core/plugin invocation authorization.
+  Custom commands registered through `invoke_handler` are application-wide by
+  default; use `tauri_build::AppManifest::commands` and the generated
+  `allow-<command>`/`deny-<command>` permissions before relying on capability
+  assignments for per-window/webview command ACL. Enforce configured scopes in
+  the command or plugin implementation, and enforce user/domain authorization
+  at its Rust owner when business identity or policy applies. Update
+  registration, `build.rs`, generated permissions, typed caller/DTO/error
+  contracts, capability/permission/scope, CSP, tests, and real-client
+  validation when affected. Never duplicate platform ACL mechanically in every
+  command or authorize arbitrary paths, URLs, shell/process operations, or
+  remote content merely because the frontend can type the call.
 
 ## FFI And Native Resources
 

@@ -4,11 +4,20 @@ Select exactly one framework profile per audited boundary from manifests, file e
 
 ## React
 
+- Verify render purity, immutable props/state, Rules of Hooks, and the
+  repository's official React lint configuration before applying stylistic
+  preferences.
 - Trace component, hook, context/store, route/data, error-boundary, suspense/loading, and subscription ownership.
 - Verify effect dependencies and cleanup against the actual lifecycle; distinguish event logic from synchronization effects.
 - Check context/store subscription scope and render boundaries before recommending memoization or store splitting.
 - Preserve React Router, Next.js, or TanStack Router paths, params, search, loaders/actions, layouts, cache, and navigation contracts.
 - Require render, calculation, bundle, or request evidence before recommending memoization, virtualization, or cache changes.
+- Before declaring code unused, trace JSX use, exports, lazy/dynamic imports,
+  file-system routes, framework registration, server/client boundaries, tests,
+  stories, and CSS/module references.
+- Do not require one component per file, named exports, shallow prop-drilling
+  limits, or default `memo`/`useMemo`; those are repository or evidence-based
+  decisions, not React correctness rules.
 
 ## Vue Composition
 

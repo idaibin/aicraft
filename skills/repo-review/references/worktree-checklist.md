@@ -60,7 +60,12 @@ This checklist is read-only. Do not edit, create, delete, rename, or format work
   - data transformation, normalization, default values, and compatibility layers
   - runtime payload or response evidence; write `Not verified` when runtime evidence was not checked
 - Verify tests or validation commands were updated when behavior changed.
-- Check type, lint, build, formatter, unused import, unused definition, and broken reference risk.
+- Check type, lint, build, formatter, unused import, unused definition, and broken reference risk. Treat tool output as evidence, then account for public exports, conditional builds, dynamic registration, generation, and external consumers before declaring code dead.
+- When relevant, check whether the change creates competing authorities,
+  speculative or responsibility-free layers, or a hidden producer/consumer
+  contract. Require concrete coordinated-change or reachable failure evidence;
+  similarity, file size, wrapper count, and optional lint advice alone are not
+  findings.
 - Check for missing config, workflow, or path updates.
 - Check for files that should not be committed.
 - Record what was verified and what is still `Not verified`.

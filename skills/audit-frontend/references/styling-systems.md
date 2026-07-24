@@ -11,8 +11,14 @@ Select only the styling profiles present in the audited boundary. A project may 
 
 ## Tailwind
 
+- Detect the installed major and effective source of truth. Audit v3-style
+  config/content globs differently from v4 CSS-first `@theme` and source
+  directives; a missing `tailwind.config.*` is not automatically a defect.
 - Verify utilities use the configured scale, tokens, breakpoints, variants, and class-composition helpers.
 - Look for repeated arbitrary values, conflicting responsive utilities, duplicated parent/child spacing, class-order conflicts, and utilities fighting component-library tokens.
+- Check that state-dependent utilities remain discoverable by the installed
+  compiler or an explicit repository-owned source/safelist contract; dynamic
+  string fragments can silently omit production CSS.
 - Distinguish justified product geometry from routine dimensions that should use the project scale.
 - Do not recommend Tailwind adoption, config expansion, or a global utility convention when the target layer owns another system.
 
@@ -37,11 +43,15 @@ Select only the styling profiles present in the audited boundary. A project may 
 ## Ant Design
 
 - Verify wrappers, theme tokens, `ConfigProvider`, forms, tables, overlays, locale, and generated-class override boundaries.
+- Check installed-major behavior for static `message`, `notification`, and
+  modal APIs when theme, locale, prefix, or other provider context matters.
 - Look for brittle selector overrides, duplicated validation/state behavior, and controls replaced by parallel primitives.
 
 ## shadcn/ui
 
-- Verify local generated source, Radix or Base UI composition, Tailwind integration, `cn`, variants, and compound accessibility contracts.
+- Verify `components.json`, local generated source, schema/style and aliases,
+  Radix or Base UI composition, Tailwind integration, `cn`, variants, and
+  compound accessibility contracts.
 - Look for copied primitives, generator drift, local edits without consumer checks, and feature-specific behavior pushed into business-neutral primitives.
 
 ## Mixed Stacks

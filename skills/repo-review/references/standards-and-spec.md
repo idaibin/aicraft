@@ -6,6 +6,13 @@ Build the standard set from effective repository/host guidance, contribution and
 
 For each finding, cite the governing source when one exists. Treat general smells as judgment signals, not hard violations; repository rules and demonstrated local conventions win.
 
+When code quality materially applies, load `code-quality.md`. Attribute each
+issue to the fixed review basis: newly introduced, expanded, exposed,
+pre-existing-but-blocking, or merely pre-existing. Only the first four can
+affect the review verdict, and a blocking pre-existing issue must be directly
+required by the changed path. Language/framework profiles refine reachability;
+they do not replace the shared finding gate.
+
 ## Spec Axis
 
 Locate the originating requirement in this order when available:

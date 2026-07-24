@@ -1,6 +1,6 @@
 ---
 name: audit-frontend
-description: "Use when a known frontend surface needs a scoped, read-only audit of selected architecture, reuse, data/UI contract, accessibility, performance, or desktop-boundary profiles; use repo-review when a Worktree or immutable change basis needs coordination."
+description: "Use when a known frontend surface needs a scoped, read-only audit of selected architecture, reuse, data/UI contract, build/tooling, accessibility, performance, or desktop-boundary profiles; use repo-review when a Worktree or immutable change basis needs coordination."
 ---
 
 # Frontend Audit
@@ -24,7 +24,11 @@ Never rewrite a working local structure merely to match this skill or an externa
 
 ## Workflow
 
-1. Read repository guidance, run `git status --short`, and identify the target app, project class, framework, package manager, scripts, documented architecture, and coordinating review owner when delegated.
+1. Read repository guidance, record the inspected revision plus relevant Worktree
+   state for reproducibility, run `git status --short`, and identify the target
+   app, project class, framework, package manager, scripts, documented
+   architecture, and coordinating review owner when delegated. This inspection
+   snapshot does not turn the audit into change attribution.
 2. Consume current `repo-map` output or perform a targeted inventory of route/page entry, owning feature, analogous screens, UI primitives, layout/tokens, data/cache, forms/schema, state/store, tests, docs, and desktop adapter. When a `ui-spec` package is in scope, verify its selected source and accepted revision and use it as the declared UI contract, not as runtime proof.
 3. Classify the product surface as Web, high-density Console, or Tauri Desktop. Select exactly one framework profile per audited boundary: **React**, **Vue Composition**, **Vue Options**, or **Repository-native Other**. Select only styling profiles present in scope: **Tailwind**, **CSS Modules**, **Sass/Less**, **CSS-in-JS**, **Ant Design**, **shadcn/ui**, or a documented local system.
 4. Select one or more audit profiles; explicitly mark the rest `Out of scope`:
@@ -33,10 +37,13 @@ Never rewrite a working local structure merely to match this skill or an externa
    - **Component/layout/design system:** primitives, variants, tokens, density, DOM/CSS, spacing/scroll ownership, responsive behavior, and duplicated systems.
    - **Accessibility:** semantics, keyboard, focus, labels, dialogs/popovers, errors, status communication, and async feedback.
    - **Performance:** render/reactivity/data paths, request duplication, fan-out, bundle/runtime/IPC cost, long tasks, and measurement quality.
+   - **Build/tooling:** package/runtime pins, scripts, Vite/Rolldown, Webpack,
+     Rspack, Next/Turbopack, plugins, resolution, environment, proxy, base,
+     output, SSR/library, and deployment contracts.
    - **Desktop boundary:** frontend adapter, Tauri/native commands, DTO/errors, progress, cancellation, window/menu/shortcut behavior, and real-client evidence.
 5. Map each selected responsibility to its page, feature, primitive, hook/composable, service, store, schema, local type, or desktop adapter owner.
 6. Compare the target with direct reuse candidates, the nearest analogous feature, documented contracts, and the existing component/layout system.
-7. Trace only selected profiles without changing the repository. Do not perform shallow checks for excluded profiles merely to imply coverage.
+7. Trace only selected profiles without changing the repository. Do not perform shallow checks for excluded profiles merely to imply coverage. When code-quality concerns materially apply, load the shared code-quality reference with audit semantics and the selected framework/build reachability rules.
 8. Audit applicable loading, empty, error, partial, retry, optimistic, stale, cancellation, keyboard, focus, and long-task behavior within the selected profiles.
 9. Use non-mutating repository checks and request browser or real-client evidence only when a selected claim cannot be proven statically.
 10. Report severity-ranked findings with exact location, framework-specific evidence, impact, remediation direction, validation gap, selected profiles, and excluded profiles.
@@ -53,11 +60,15 @@ Never rewrite a working local structure merely to match this skill or an externa
 - Select profiles before applying detailed checklists. Do not imply architecture, state, layout, accessibility, performance, and desktop were all reviewed when only some were evidenced.
 - Do not recommend a shared component, hook, composable, store, service, schema, or layout system before searching existing implementations and recording why reuse or adaptation is insufficient.
 - Load and apply only the selected framework, styling, architecture, state/data,
-  accessibility/performance, or desktop reference. Do not cross-apply an unselected
-  profile or imply its coverage.
+  build/tooling, accessibility/performance, desktop, or conditional
+  code-quality reference. Do not cross-apply an unselected profile or imply its
+  coverage.
 - Require reachable source evidence for ownership and reuse, and direct runtime or
   measurement evidence when the selected claim cannot be established statically.
 - Do not refactor unrelated legacy code. File length alone never justifies splitting.
+- Do not call code dead from text-search absence alone or prescribe one
+  component per file, named exports, memoization, or a bundler migration as a
+  universal React rule.
 - Do not edit, stage, commit, post review comments, or deliver code in audit mode. `repo-review` owns Worktree and immutable review coordination; `repo-delivery` alone owns Git mutation. Route accepted remediation to `dev-frontend`.
 
 ## Do Not Use For
@@ -73,7 +84,7 @@ Never rewrite a working local structure merely to match this skill or an externa
 
 ## Output Contract
 
-Start with selected product, framework, styling, and audit profiles; explicitly excluded audit profiles; coordinating owner when delegated; and severity-ranked findings. For each finding, report impact, exact location, profile-specific evidence, recommended remediation owner/direction, and validation gap. Then summarize inspected rules/files, existing candidates, ownership map, selected state/data/layout/accessibility/performance/desktop evidence, component/injection/router/lifetime contracts, structural/documentation drift, commands/runtime evidence, and all `Not found` or `Not verified` residual risks.
+Start with the inspection snapshot, selected product, framework, styling, and audit profiles; explicitly excluded audit profiles; coordinating owner when delegated; and severity-ranked findings. For each finding, report impact, exact location, profile-specific evidence, recommended remediation owner/direction, and validation gap. Then summarize inspected rules/files, existing candidates, ownership map, selected state/data/layout/accessibility/performance/build/desktop evidence, component/injection/router/lifetime contracts, structural/documentation drift, commands/runtime evidence, and all `Not found` or `Not verified` residual risks.
 
 ## References
 
@@ -85,6 +96,12 @@ Start with selected product, framework, styling, and audit profiles; explicitly 
 - Read [styling-systems.md](references/styling-systems.md) for Tailwind, CSS Modules, Sass/Less, CSS-in-JS, Ant Design, shadcn/ui, and mixed-stack audit rules.
 - Read [desktop-tauri.md](references/desktop-tauri.md) for frontend adapters, commands, Rust boundaries, windows, shortcuts, progress, and cancellation.
 - Read [accessibility-and-performance.md](references/accessibility-and-performance.md) for keyboard/focus checks and evidence-based performance review.
+- Read [build-tooling.md](references/build-tooling.md) when package scripts,
+  bundler configuration, Vite/Rolldown, framework build behavior, or deployment
+  output is selected.
+- Read [code-quality.md](references/code-quality.md) when duplication,
+  dead/unused code, abstraction quality, hidden coupling, or maintainability is
+  materially in scope.
 - Read [review-checklist.md](references/review-checklist.md) for the profile-driven audit sequence.
 - Read [anti-patterns.md](references/anti-patterns.md) for detectable failure patterns and corrective decisions.
 - Read [reference-corpus.md](references/reference-corpus.md) for official source evidence, adopted rules, and rejected cargo-cult choices.

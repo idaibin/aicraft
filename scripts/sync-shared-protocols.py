@@ -24,6 +24,13 @@ PROTOCOLS = {
         Path("skills/audit-rust/references/codebase-design.md"),
         Path("skills/repo-review/references/codebase-design.md"),
     ),
+    Path("protocols/code-quality-v1.md"): (
+        Path("skills/dev-frontend/references/code-quality.md"),
+        Path("skills/dev-rust/references/code-quality.md"),
+        Path("skills/audit-frontend/references/code-quality.md"),
+        Path("skills/audit-rust/references/code-quality.md"),
+        Path("skills/repo-review/references/code-quality.md"),
+    ),
 }
 
 

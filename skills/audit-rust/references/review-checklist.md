@@ -56,13 +56,27 @@ the profile selected and mark the exact claim `Not verified`.
 - [ ] Classify relevant user, business, dependency, corruption, retryable, and
       invariant errors; trace conversion, logging, retry, and user mapping.
 - [ ] Keep expected failures recoverable and sensitive data out of logs.
+- [ ] For selected Axum boundaries, verify extractor/body ordering, state,
+      rejection/response mapping, middleware order/scope, auth/CORS/body limits,
+      and router-service tests.
+- [ ] For selected Tauri boundaries, verify Rust-side input/path/resource
+      validation, command registration, typed errors, and whether a custom
+      command remains app-wide by default or has `AppManifest::commands`
+      generated allow/deny permissions assigned through capabilities; then
+      verify scope enforcement, domain authorization when applicable, CSP,
+      caller contract, and real-client gaps.
 
 ## 4. Concurrency/Runtime Profile
 
 - [ ] Prove async is needed and locate relevant blocking file, CPU, SQLite, and
       native work.
-- [ ] Record task owner, join/panic path, cancellation points, shutdown wait,
-      and cleanup for each in-scope background task.
+- [ ] Record each in-scope task as joined, supervised, intentionally detached,
+      or runtime-owned. Require join/result/panic observation, cancellation,
+      shutdown wait, and cleanup only when correctness, durable work, resource
+      lifetime, shutdown, or caller-visible outcomes depend on it; verify the
+      bounded/resource/observability rationale for intentional detachment.
+- [ ] For `select!` or task sets, verify losing-branch cancellation safety and
+      observe task output, returned error, cancellation, and panic distinctly.
 - [ ] Record channel capacity/backpressure, concurrency limit, timeout scope,
       retry amplification, lock scope/order, and `.await` interaction.
 - [ ] Identify deterministic lifecycle tests and a focused Loom or stress model
