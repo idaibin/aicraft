@@ -1,7 +1,7 @@
 ---
 name: ui-spec
-description: "Use when a selected visual source or accepted UI surface must become an implementation-ready specification covering layout, states, interaction, responsive/accessibility behavior, component/token mappings, shared visual contracts, and acceptance; do not use for visual exploration, image generation, or frontend source edits."
-compatibility: "Python 3.10+; PyYAML 6.0.2; jsonschema 4.25.1 with Draft 2020-12 support."
+description: "Use when a selected visual source or accepted UI surface must become an implementation-ready Feature Spec or a Google DESIGN.md shared visual contract covering layout, states, interaction, responsive/accessibility behavior, components, tokens, and acceptance; do not use for visual exploration, image generation, or frontend source edits."
+compatibility: "Node.js + npm, with `@google/design.md@0.3.0` for DESIGN.md lint/diff/export."
 ---
 
 # UI Specification
@@ -13,36 +13,24 @@ Turn a selected visual source and verified product facts into an implementation-
 ## Workflow
 
 1. Read effective repository guidance and run `git status --short` before planning an authorized artifact write.
-2. Fix the selected visual source: a user-selected Product Design result, supplied screenshot/mockup/frame, accepted current surface, or accepted shared design-system revision. Record its identity, revision, approval, rights, `use`, and `ignore` boundaries. If no visual source has been selected and the user wants exploration, redesign, images, or a prototype, stop and route that work to the host's Product Design capability when available.
-3. Fix the target surfaces, flows, and business domains, then count each independent
-   implementation slice. For one page or flow, keep one Feature Spec. For multiple
-   independent domains that share visual rules, create one short shared UI index and
-   one independently loadable contract per confirmed domain; load
-   [references/multi-surface.md](references/multi-surface.md). Route unresolved
-   behavior, permissions, failure semantics, or product acceptance to `product-spec`.
-4. Select one profile:
-   - **Feature Spec (default):** specify one selected page or flow without changing shared semantics.
-   - **Design System Spec (conditional):** specify an accepted revision only when shared tokens, component semantics, variants, state vocabulary, or product-wide visual rules must change.
-5. Inspect only the selected visual source, live routes/components/tokens, DTO-shaped facts, accepted product artifacts, and scoped references needed for the profile. Treat pending, rejected, or stale artifacts as leads only; revalidate live owners and do not promote them implicitly.
-6. Challenge only residual UI-contract ambiguity after product facts and the visual
-   source are fixed. Resolve source and repository facts first; ask one material UI
-   question at a time with a recommendation, trade-off, and affected slice, then stop
-   when that slice's contract gates pass. Route product decisions back to
-   `product-spec` and unselected visual direction to Product Design.
-7. Translate the selected direction into explicit hierarchy, regions, layout ownership, density, semantic colors, typography roles, spacing and geometry, material, assets, copy, component/token mappings, required states and transitions, feedback ownership, responsive rules, focus, reduced motion, overflow, and acceptance checks. Mark every value as verified, extracted, proposed, or `Not verified`; an image does not prove exact tokens, behavior, accessibility, or runtime state.
-8. Reuse current owners before declaring `adapt` or `new`. Keep Feature Spec changes local unless shared meaning actually changes; preserve one accepted shared-system owner and rollback path.
-9. Apply deterministic truth, rights, required-state, mapping, responsive, accessibility, overflow, approval, and implementation-budget gates. Human rejection cannot be averaged away.
-10. Produce the smallest specification artifacts that remove implementation ambiguity.
-    Generate a structured change/evaluation manifest when an accepted Design System
-    Spec revision changes. Create the durable
-    `docs/ui/design-system/manifest.yaml` automation contract only when a verified
-    repository consumer requires it. Ordinary Feature Specs that reuse current
-    themes/components remain prose contracts.
-11. For a durable design-system automation manifest, bind the human-readable design
-    authority and declared machine assets by path and SHA-256, declare the real
-    automation consumer, and fail validation on any mismatch. The manifest registers
-    bindings only; it never introduces an independent design decision.
-12. Validate authored artifacts with applicable local checks, then hand source work to `dev-frontend` and runtime evidence to `ops-browser` or `ops-client` without claiming implementation or runtime verification.
+2. Fix the selected visual source: a user-selected Product Design result, supplied screenshot/mockup/frame, accepted current surface, or accepted shared visual baseline. Record identity, revision, approval, rights status, `use`, and `ignore` boundaries.
+3. Require the repository-root `DESIGN.md` as the single source of truth for shared visual semantics. If it does not exist, copy [assets/DESIGN.md](assets/DESIGN.md) as the structural starter, replace every placeholder from verified sources, omit unverified token groups, obtain named human approval, and validate it before authoring Feature Specs or shared-system changes.
+4. Define implementation slices: one Feature Spec per confirmed page/flow/domain; for multiple independent domains, create one shared index plus one independently loadable contract per slice and load [references/multi-surface.md](references/multi-surface.md).
+5. Select one profile:
+   - **Feature Spec (default):** reuse current shared systems unless shared semantics truly change.
+   - **Design System Spec (conditional):** only when shared tokens, reusable component meaning/variants, state vocabulary, or cross-surface visual rules must change.
+6. In Design System Spec, make the repository-root `DESIGN.md` the only durable shared output.
+   - `DESIGN.md` is the only accepted shared product visual output.
+   - Feature Spec never copies token values or component semantics from shared systems into its own artifacts.
+7. Translate the selected source into concrete layout, state, interaction, and accessibility specifications for each slice. Mark each decision `verified`, `extracted`, `proposed`, or `Not verified`. Do not infer exact values from pixels.
+8. For every slice and multi-slice task, add one `Ready for dev-frontend <slice>` verdict or one blocker verdict; mark partial multi-surface tasks clearly.
+9. Before finalizing:
+   - run official lint with `npx -p @google/design.md@0.3.0 designmd lint --format json DESIGN.md`;
+   - treat duplicate H2 headings as hard blockers for repository contracts: do not accept any output if the contract contains duplicate H2 (even if `@google/design.md@0.3.0` only emits warnings and exits `0`);
+   - for a Design System Spec update only, compare with the previous accepted source using `npx -p @google/design.md@0.3.0 designmd diff <before-DESIGN.md> DESIGN.md --format json`; record diff as `Not applicable` for a Feature Spec that leaves DESIGN.md unchanged or for the first accepted creation, with no fabricated baseline;
+   - only export machine assets when explicitly required, and always as explicit derived outputs (`--format ...`) after acceptance of the updated `DESIGN.md`.
+10. Do not claim lint, diff, or export success without evidence output. If required tooling or network is blocked, report those checks `Not verified` and mark the affected slice `Blocked`.
+11. Hand the spec and checks to `dev-frontend`; do not claim runtime implementation or runtime behavior evidence in this Skill.
 
 ## Profiles
 
@@ -69,11 +57,10 @@ Turn a selected visual source and verified product facts into an implementation-
 - Do not treat pixels as proof of exact tokens, component ownership, behavior, accessibility, or implementation feasibility.
 - Do not activate Design System Spec merely because a feature reuses existing tokens or components.
 - Do not create a parallel component library or token system when the project already has an owner.
-- Do not promote a present manifest when approval is absent, pending, rejected, or stale.
-- Treat the accepted `DESIGN.md` or repository-native equivalent as the human-readable
-  semantic authority. Treat `design-system/manifest.yaml` only as its machine-readable
-  automation contract; reject stale authority hashes, stale binding hashes, undeclared
-  consumers, independent decision fields, or a conflict policy other than failure.
+- Do not author or rely on another structured UI package as shared visual authority.
+- Treat the repository-root `DESIGN.md` as the single human-readable visual-semantic authority.
+- Require named human approval before treating a newly created or changed `DESIGN.md` as accepted.
+- Treat duplicate H2 headings as hard blockers in Design System Spec contracts, regardless of CLI warning wording or exit code.
 - Require applicable loading, empty, error, populated, permission, focus, responsive, overflow, localization, and reduced-motion rules; justify exclusions.
 - Do not merge independent business domains into one omnibus contract. Author only
   confirmed slice contracts, keep unconfirmed slices visible in the shared index,
@@ -85,13 +72,18 @@ Turn a selected visual source and verified product facts into an implementation-
 ## Output Contract
 
 Report the selected profile, source identity and approval, evidence basis, target
-surfaces and slice boundaries, shared index and slice artifacts, verified/extracted/
-proposed decisions, layout and state contract, component/token mappings, responsive/
-accessibility rules, assets and copy, shared-system changes or `None`, structured
-artifact reason or `Skipped`, evaluation gates, one `Ready for dev-frontend <slice>`
-or blocker verdict per slice, overall `Complete` or `Partial`, handoff, validation,
-and every `Not found` or `Not verified` gap. Never present a source image or
-specification as implemented or runtime-verified UI.
+surfaces and slice boundaries, verified/extracted/proposed decisions, layout and
+state contract, component/token mappings, responsive/accessibility rules, assets and
+copy, shared-system changes or `None`, evaluation gates, one `Ready for dev-frontend
+<slice>` or blocker verdict per slice, overall `Complete` or `Partial`, and every
+`Not found` or `Not verified` gap. Include at least:
+
+- root `DESIGN.md` revision
+- lint command and result
+- diff command and regression verdict, or `Not applicable` when a Feature Spec leaves `DESIGN.md` unchanged or the authority is created for the first time
+- per-slice spec IDs and readiness
+
+Never present a source image or specification as implemented or runtime-verified UI.
 
 ## References
 
@@ -100,6 +92,6 @@ specification as implemented or runtime-verified UI.
 - See [references/visual-source.md](references/visual-source.md) when qualifying and translating the selected visual source.
 - See [references/multi-surface.md](references/multi-surface.md) when a request covers more than one page, flow, or business domain.
 - See [references/documentation-boundaries.md](references/documentation-boundaries.md) for durable UI locations, PRD links, and consumer reads.
-- See [references/artifact-contract.md](references/artifact-contract.md) only for a shared Design System Spec package or accepted revision.
+- See [references/design-md-contract.md](references/design-md-contract.md) for the official DESIGN.md format, validation gates, and derived exports.
 - See [references/evaluation-rubric.md](references/evaluation-rubric.md) for blockers and scoring.
 - See [references/eval-cases.md](references/eval-cases.md) for trigger and quality evals.

@@ -60,7 +60,7 @@ Use these cases when changing `dev-frontend` triggers, stack guidance, layout-ow
 | `Verify this page in the browser and check console/network.` | Should prefer `ops-browser`. | Runtime browser evidence. |
 | `Capture the real Electron app window with platform-specific window evidence.` | Should prefer `ops-client`. | Desktop-client evidence. |
 | `These frontend changes are reviewed; stage, commit, and push them.` | Should prefer `repo-delivery`. | Authorized Git mutation after review. |
-| `Translate this selected visual source into the UI specification, component/token mapping, state contract, and rubric, but do not edit product source.` | Should prefer `ui-spec`. | UI specification ownership. |
+| `Translate this selected visual source into a docs/ui/<slice-id>/spec.md page/flow contract against the root DESIGN.md, but do not edit product source.` | Should prefer `ui-spec`. | UI specification ownership. |
 | `Define the product behavior, permission rules, user-visible states, and acceptance before anyone edits source.` | Should prefer `product-spec`. | Product decisions are unresolved. |
 
 ## Independent Review Outlet Eval

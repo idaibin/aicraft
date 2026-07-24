@@ -63,7 +63,7 @@ See [INSTALL.md](INSTALL.md) for project/global scope, updates, and removal.
 
 | Skill | Use when |
 | --- | --- |
-| `ui-spec` | A selected visual source or accepted UI surface must become an implementation-ready layout, state, interaction, responsive/accessibility, component/token, and acceptance contract. |
+| `ui-spec` | A selected visual source or accepted UI surface must become an implementation-ready contract; use the Google DESIGN.md format at the repository root as the sole shared visual authority and write Feature Specs to `docs/ui/<slice-id>/spec.md`. |
 | `dev-frontend` | A requested frontend feature, component, page, build/tooling migration, or accepted UI specification must be implemented and validated. |
 | `dev-rust` | A requested Rust feature, refactor, or port must be implemented with ownership and behavior evidence. |
 
@@ -95,7 +95,7 @@ complex change      -> host planning and repository instructions
 known failure       -> evidence-driven diagnosis under effective instructions
 source work         -> dev-frontend / dev-rust
 visual exploration  -> Codex Product Design -> selected visual source
-UI specification    -> ui-spec (Feature Spec; Design System Spec when shared) -> dev-frontend
+UI specification    -> ui-spec (repo-root DESIGN.md + per-slice Feature Spec) -> dev-frontend
 review              -> repo-review (including security risks on the selected basis)
 delivery            -> repo-delivery
 ```

@@ -61,4 +61,5 @@ echo "validation python: $resolved_python"
 "${python_runner[@]}" scripts/sync-shared-protocols.py --check
 "${python_runner[@]}" scripts/validate-skills.py
 "${python_runner[@]}" -m unittest discover -s scripts -p 'test_*.py'
+bash scripts/test_design_md_contract.sh
 git diff --check

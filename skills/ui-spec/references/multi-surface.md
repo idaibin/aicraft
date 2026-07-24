@@ -1,73 +1,65 @@
 # Multi-Surface UI Contracts
 
-Load this reference only when a request covers more than one page, flow, or business
-domain.
+Use this reference only when one task covers multiple pages, flows, or business domains.
 
 ## Scope Gate
 
-Inventory the requested surfaces before authoring:
+- A **surface** is a separate reachable page, modal, panel, or embedded UI region.
+- A **flow** is one connected user job whose states and acceptance can be evaluated together.
+- A **domain** owns distinct behavior, data, permissions, failure semantics, or acceptance.
 
-- A **surface** is a separately reachable page, modal, panel, or embedded UI region.
-- A **flow** is a connected user job whose states and acceptance can be evaluated
-  together even when it crosses several surfaces.
-- A **business domain** owns distinct behavior, data, actions, failure semantics, or
-  acceptance and can be implemented without loading unrelated domain detail.
+Several requested pages stay in one slice only when they share the same flow, state model,
+implementer, and acceptance. Home, tasks, contacts, and profile are independent domains by
+default unless facts prove they are one domain.
 
-Several pages remain one UI slice only when they implement one connected job and share
-the same product decisions, state model, implementation owner, and acceptance boundary.
-Home, tasks, contacts, and profile are separate domains by default even when one shell
-or theme contains them.
-
-## Artifact Shape
+## Shared Index Scope
 
 | Scope | Required artifact |
 | --- | --- |
-| One page or connected flow | One Feature Spec file |
-| Multiple surfaces in one domain | One domain contract when its states and acceptance remain cohesive |
-| Multiple independent domains sharing visual rules | One short shared UI index plus one independently loadable contract per confirmed domain |
-| Shared token or component semantics change | Design System Spec plus its required structured change/evaluation manifest; add the durable automation manifest only for a verified consumer |
+| One page/flow | One Feature Spec contract |
+| Multiple connected surfaces in one domain | One domain-level Feature Spec contract |
+| Multiple independent domains with shared visual rules | One short shared index + one independently loadable Feature Spec per domain |
+| Shared token/component semantic change across slices | Design System Spec update to repository-root `DESIGN.md` |
 
-The shared UI index contains only source identity, shared visual facts, domain/surface
-inventory, contract links, per-slice status, shared exclusions, and shared dependencies.
-Do not repeat each slice's layout, states, interaction, or acceptance in the index.
+The shared index contains only source identity, the root `DESIGN.md` link and accepted
+revision, inventory, per-slice links, per-slice status, exclusions, and dependencies.
+Do not copy shared visual rules into the index.
 
-Each domain contract must independently contain:
+Each slice contract must include:
 
-1. selected visual-source mapping and `use`/`ignore` boundaries;
-2. layout, regions, components, and token mappings;
-3. applicable states, transitions, actions, and feedback ownership;
-4. responsive, overflow, localization, keyboard/focus, reduced-motion, semantic, and
-   accessibility rules;
-5. executable acceptance criteria and unresolved blockers.
+1. selected source identity and boundaries (`use`/`ignore`)
+2. hierarchy, regions, and responsive behavior
+3. states, transitions, feedback ownership, overflow, and loading/error/empty/success paths
+4. keyboard/focus, reduced-motion, localization, and accessibility rules
+5. component mapping and acceptance checks with per-slice blockers
 
-## Readiness And Partial Results
+## Consumer Read Order
 
-Evaluate every requested slice independently. Emit `Ready for dev-frontend <slice>`
-only when that slice's contract passes all applicable gates. One open slice must not
-block unrelated ready slices.
+Read only this order when implementing one slice:
 
-Author contracts only for slices with selected visual sources and confirmed product
-facts. List unconfirmed slices and their blockers in the index without inventing their
-contracts. Mark the overall result `Partial` when any requested slice lacks a complete
-contract, required states/interactions, responsive/accessibility rules, acceptance, or
-its own readiness verdict. Use `Complete` only when every requested slice passes.
+1. root `DESIGN.md`
+2. shared UI index (for multi-slice tasks only)
+3. target slice contract
 
-## Consumer Read Contract
+Do not require sibling slice contracts for implementation.
 
-To implement one slice, a consumer reads only:
+## Readiness and Partial Results
 
-1. the shared UI index;
-2. the target slice contract;
-3. any explicitly linked accepted Design System Spec facts.
+Evaluate every requested slice independently.
 
-No slice may depend on the consumer loading every sibling contract. Put a fact in the
-shared index only when two or more slices genuinely consume it.
+- Emit `Ready for dev-frontend <slice>` only when that slice passes all gates.
+- Unconfirmed slices remain listed in the shared index with blockers.
+- One incomplete slice does not block unrelated ready slices.
+- Mark overall result `Partial` when any requested slice is unready or missing required gates.
+- Mark overall result `Complete` only when all requested slices are ready.
 
-## Structured Artifact Gate
+## Design System Change Gate for Multi-Slice
 
-Do not generate JSON, a package manifest, or other structured artifacts merely because
-a task has many pages or reuses an existing theme. Generate a structured
-change/evaluation manifest when the task creates or changes an accepted Design System
-Spec revision. Generate the durable automation manifest only when repository automation
-explicitly consumes it. Record the shared-system delta and, when applicable, the real
-automation consumer; otherwise report `Structured artifacts: Skipped`.
+When a request requires shared token/component change:
+
+- Update repository-root `DESIGN.md` content.
+- Before handoff, run official lint and diff gates on `DESIGN.md`:
+  - `npx -p @google/design.md@0.3.0 designmd lint --format json DESIGN.md`
+  - `npx -p @google/design.md@0.3.0 designmd diff <before-DESIGN.md> DESIGN.md --format json`
+
+No additional machine artifact is required for this gate.

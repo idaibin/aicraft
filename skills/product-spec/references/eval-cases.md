@@ -18,7 +18,7 @@
 | `Implement the approved React form and tests now.` | Prefer `dev-frontend`. |
 | `Implement the approved Rust change and tests now.` | Prefer `dev-rust`. |
 | `Resolve conflicting shared business language and rules across three product areas, including lifecycle or context depth only where material.` | Prefer `domain-modeling`. |
-| `Create the selected-source UI contract, shared tokens, component semantics, variants, and evaluation rules.` | Prefer `ui-spec`. |
+| `Create a selected-source Feature Spec at docs/ui/<slice-id>/spec.md that references the root DESIGN.md.` | Prefer `ui-spec`. |
 | `Map existing components, owners, exports, consumers, and reuse boundaries.` | Prefer `repo-map`. |
 | `Map the current implementation interface, owner, callers, and consumers.` | Prefer `repo-map`; repository topology is outside `product-spec`. |
 | `Review this feature branch against the approved spec.` | Prefer `repo-review`. |
@@ -55,7 +55,7 @@
 | Missing decision affects only an internal naming choice | Mark Assumption or Deferred and declare Ready for the slice. | Blocks implementation ceremony without behavioral impact. |
 | Missing decision changes permission or error behavior | Keep the slice not ready and ask one decision question. | Lets implementation invent the behavior. |
 | Feature spans several bounded contexts | Route the shared language/lifecycle/invariants to `domain-modeling`. | Builds a complete domain model inside the spec. |
-| Feature changes shared component semantics/tokens | Route the shared contract to `ui-spec`; keep product behavior in the product spec. | Duplicates a design system. |
+| Feature changes shared component semantics/tokens | Route the root `DESIGN.md` update to `ui-spec`; keep product behavior in the product spec and add a Feature Spec only for affected implementation details. | Duplicates a design system. |
 | Request asks for current implementation-interface facts | Route that mapping separately to `repo-map`; keep the product spec behavioral. | Adds technical interface definitions to the product spec. |
 
 ## Quality Eval

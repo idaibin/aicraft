@@ -29,7 +29,7 @@ Never rewrite a working local structure merely to match this skill or an externa
    app, project class, framework, package manager, scripts, documented
    architecture, and coordinating review owner when delegated. This inspection
    snapshot does not turn the audit into change attribution.
-2. Consume current `repo-map` output or perform a targeted inventory of route/page entry, owning feature, analogous screens, UI primitives, layout/tokens, data/cache, forms/schema, state/store, tests, docs, and desktop adapter. When a `ui-spec` package is in scope, verify its selected source and accepted revision and use it as the declared UI contract, not as runtime proof.
+2. Consume current `repo-map` output or perform a targeted inventory of route/page entry, owning feature, analogous screens, UI primitives, layout/tokens, data/cache, forms/schema, state/store, tests, docs, and desktop adapter. When UI contracts are in scope, read the repository-root `DESIGN.md` as shared visual authority and the relevant `docs/ui/<slice-id>/spec.md` before source checks; never infer another contract authority from generated metadata.
 3. Classify the product surface as Web, high-density Console, or Tauri Desktop. Select exactly one framework profile per audited boundary: **React**, **Vue Composition**, **Vue Options**, or **Repository-native Other**. Select only styling profiles present in scope: **Tailwind**, **CSS Modules**, **Sass/Less**, **CSS-in-JS**, **Ant Design**, **shadcn/ui**, or a documented local system.
 4. Select one or more audit profiles; explicitly mark the rest `Out of scope`:
    - **Architecture/reuse:** routes, features, shared layers, dependency direction, reuse, abstractions, structural lifecycle, and docs.
@@ -75,7 +75,7 @@ Never rewrite a working local structure merely to match this skill or an externa
 
 - Repository orientation, commands, reuse inventory, or docs/code alignment without an audit request; use `repo-map`.
 - Frontend implementation, modification, or refactoring; use `dev-frontend`.
-- Creating selected-source UI specifications, project profiles, reference registries, tokens, mappings, or task contracts; use `ui-spec`.
+- Creating a repository-root `DESIGN.md` or selected-source Feature Specs; use `ui-spec`.
 - Root-cause diagnosis of a concrete failure; use the host's built-in diagnosis under effective instructions.
 - Owning Worktree readiness or immutable repository/range/PR/release coordination; use `repo-review`, which may delegate a bounded frontend surface here.
 - Actual staging, commit, rebase/squash, push, or delivery; use `repo-delivery`.
@@ -84,7 +84,7 @@ Never rewrite a working local structure merely to match this skill or an externa
 
 ## Output Contract
 
-Start with the inspection snapshot, selected product, framework, styling, and audit profiles; explicitly excluded audit profiles; coordinating owner when delegated; and severity-ranked findings. For each finding, report impact, exact location, profile-specific evidence, recommended remediation owner/direction, and validation gap. Then summarize inspected rules/files, existing candidates, ownership map, selected state/data/layout/accessibility/performance/build/desktop evidence, component/injection/router/lifetime contracts, structural/documentation drift, commands/runtime evidence, and all `Not found` or `Not verified` residual risks.
+Start with the inspection snapshot, selected product, framework, styling, and audit profiles; explicitly excluded audit profiles; coordinating owner when delegated; and severity-ranked findings. For each finding, report impact, exact location, profile-specific evidence, recommended remediation owner/direction, and validation gap. Then summarize inspected rules/files, existing candidates, ownership map, selected state/data/layout/accessibility/performance/build/desktop evidence, component/injection/router/lifetime contracts, Google `DESIGN.md` token/prose consistency, official lint evidence, implementation drift from source, commands/runtime evidence, and all `Not found` or `Not verified` residual risks.
 
 ## References
 

@@ -13,7 +13,7 @@ Implement frontend changes with existing-stack alignment, minimal DOM/CSS, clear
 
 1. Read effective repository guidance first, including `AGENTS.md`, `CLAUDE.md`, and host-provided instructions when present.
 2. Identify the frontend project class, app boundary, package manager, runtime pin, script contract, directory/naming standard, and documented exceptions.
-3. Identify the target page, route, screen, component, framework, UI type, visual source, and required states before editing. When an accepted `ui-spec` package exists, verify its revisions and consume its selected-source identity, fact boundary, tokens, component map, state contract, and acceptance checks.
+3. Identify the target page, route, screen, component, framework, UI type, visual source, and required states before editing. Read the repository-root `DESIGN.md` first, then the target `docs/ui/<slice-id>/spec.md` when present; consume their selected-source, product-fact, shared visual, and acceptance boundaries without creating another visual authority.
 4. Read the approved requirement/specification when one exists. Confirm acceptance criteria, non-goals, affected contracts/files, and validation seams; for complex work without a usable specification, use the host's built-in planning and effective repository instructions before editing.
 5. Consume a current `repo-map` inventory or perform a targeted search for existing routes, UI, state, services, tests, and analogous implementations. For API callers, follow the repository's existing client/type authority. Load the protocol-contract profile only when an OpenAPI/generated-client chain already exists or the task explicitly introduces one.
 6. Decide in order: directly reuse, adapt the nearest reference, or create new. Record why existing candidates are insufficient before adding a file or abstraction.
@@ -71,7 +71,7 @@ Implement frontend changes with existing-stack alignment, minimal DOM/CSS, clear
 
 ## Output Contract
 
-Report the branch, detected project class/stack and selected profiles, existing implementations checked, reuse or new-surface decision, changed files and ownership/contracts, validation and failures, runtime evidence or `Not verified` gaps, and intentionally excluded changes. Add detailed layout, state, protocol, desktop, or lifecycle evidence only when that profile materially affected the task. If the user explicitly requests independent external review/research, hand one fixed basis/question to `ask-chatgpt`; never send implicitly.
+Report the branch, detected project class/stack and selected profiles, existing implementations checked, reuse or new-surface decision, changed files and ownership/contracts, validation status, and intentionally excluded changes. Mark lint/runtime behavior as `Not verified` unless executed in scope; add detailed layout, state, protocol, desktop, or lifecycle evidence only when that profile materially affected the task. If the user explicitly requests independent external review/research, hand one fixed basis/question to `ask-chatgpt`; never send implicitly.
 
 ## References
 

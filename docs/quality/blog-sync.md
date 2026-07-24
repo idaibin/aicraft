@@ -22,10 +22,12 @@ in the bilingual catalog and catalog-evolution articles:
 ## Verified AICraft facts to synchronize
 
 - The catalog has 14 public packages after the current source validation.
-- `ui-spec` translates a selected visual source into a Feature Spec for one page or
-  flow by default; shared tokens, component semantics, variants, or shared visual
-  rules activate the conditional Design System Spec profile. Visual exploration,
-  image generation, critique, and prototypes belong to Codex Product Design.
+- `ui-spec` requires Google DESIGN.md at the repository root as the sole shared
+  visual authority. It translates a selected visual source into a Feature Spec for
+  one page or flow by default; shared tokens, component semantics, variants, or
+  shared visual rules update root `DESIGN.md` through the conditional Design System
+  Spec profile. Visual exploration, image generation, critique, and prototypes
+  belong to Codex Product Design.
 - `domain-modeling` defaults to shared business terms, ambiguity, rules, and
   boundary scenarios. Lifecycle and bounded-context work are conditional; API,
   database, frontend, and backend structure remain outside its ownership.

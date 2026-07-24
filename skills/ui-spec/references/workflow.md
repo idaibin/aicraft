@@ -42,7 +42,7 @@ Choose **Feature Spec** unless at least one answer is yes:
 - Must several surfaces adopt a changed shared rule?
 - Is an accepted shared-system owner being created, extracted, maintained, or evaluated?
 
-If not, reference existing owners and keep the specification local. If yes, load the Design System Spec artifact contract and change only the shared closure. Artifact presence does not prove acceptance: pending, rejected, or stale manifests locate candidates only; verify live owners before reuse and require approval before promotion.
+If not, reference existing owners and keep the specification local. If yes, open and update the repo root `DESIGN.md` directly and change only the shared closure. Artifact presence does not prove acceptance: pending, rejected, or stale candidates are not proof; verify live owners before reuse and require approval before promotion.
 
 ## Specification Pass
 
@@ -61,15 +61,22 @@ Do not infer exact CSS values or behavior from pixels alone. Trace exact values 
 
 | Profile | Primary artifact | Optional dependencies |
 | --- | --- | --- |
-| Feature Spec, one slice | one page/flow implementation specification | source annotations, component/token mapping, state matrix, acceptance checklist |
+| Feature Spec, one slice | `docs/ui/<slice-id>/spec.md` | source annotations, component/token mapping, state matrix, acceptance checklist |
 | Feature Spec, multiple domains | one short shared UI index plus one independently loadable contract per confirmed domain | only shared facts and per-slice links/status in the index |
-| Design System Spec | changed accepted shared contract | affected tokens/components, references, structured change/evaluation manifest, rollback |
+| Design System Spec | repo root `DESIGN.md` (the only shared visual artifact) | feature-spec references and relevant owner approvals |
 
 For multiple surfaces, apply [the multi-surface scope gate](multi-surface.md). Produce
-only what removes a real implementation ambiguity. An accepted Design System Spec
-revision requires a structured change/evaluation manifest. The durable
-`docs/ui/design-system/manifest.yaml` is a separate automation contract and exists
-only when a verified repository consumer consumes it.
+only what removes a real implementation ambiguity. The shared System update should be
+single-sourced in root `DESIGN.md`; do not create or maintain a separate Design System
+manifest in this path.
+
+## Lint And Diff Gates
+
+The official lint and diff gates require external tool access and network authorization.
+Run lint for every root `DESIGN.md`. Run diff against the previous accepted file for an
+update; record diff as `Not applicable` for the first accepted creation instead of
+inventing a baseline. If a required tool cannot run, mark the gate `Not verified` and
+keep the readiness result `Not Ready`.
 
 ## Evaluation And Handoff
 

@@ -106,6 +106,6 @@ metadata and must list the same package set as the root catalog.
 Use the command matrix in [`../../skills/AGENTS.md`](../../skills/AGENTS.md). The
 validator checks portable metadata, OpenAI metadata, package-local links, progressive
 disclosure, representative eval sections, distribution hygiene, and catalog parity.
-Focused regression tests protect those checks, and GitHub Actions runs the full matrix
-for pull requests and pushes to `main`. The validator does not claim that a model will
+Focused regression tests are run by local `bash scripts/check-skills.sh`.
+The validator does not claim that a model will
 behave identically on every host or task.

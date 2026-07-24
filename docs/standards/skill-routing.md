@@ -11,7 +11,7 @@ and output.
 | `repo-map` | repository boundaries, commands, reuse, and durable maps | named map artifact only |
 | `domain-modeling` | shared business terms, rules, and ambiguity | named fact source only |
 | `product-spec` | feature behavior, scope, states, and acceptance | named product artifact only |
-| `ui-spec` | implementation-ready UI specification from a selected visual source or accepted surface | specification artifacts only |
+| `ui-spec` | implementation-ready UI specification from a selected visual source, with Google DESIGN.md at the repository root as the sole shared visual authority and per-slice Feature Specs | specification artifacts only |
 | `repo-review` | current Worktree/index or fixed revision review | read-only |
 | `dev-frontend` | requested frontend implementation | source files |
 | `dev-rust` | requested Rust implementation | source files |

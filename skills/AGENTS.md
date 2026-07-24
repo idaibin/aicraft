@@ -32,8 +32,7 @@ When adding, renaming, or removing a package, update `README.md`, `INSTALL.md`, 
 Use `bash scripts/check-skills.sh` as the single local validation entry point. On
 macOS it resolves and verifies Homebrew Python, refuses `/usr/bin/python3`, and uses
 `uv` with the pinned `requirements-dev.txt` when available. Other platforms use their
-configured `PYTHON_BIN` or `python3`. GitHub Actions keeps its existing equivalent
-validation steps.
+configured `PYTHON_BIN` or `python3`.
 
 For a bounded prose correction in one package:
 
